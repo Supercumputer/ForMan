@@ -1,6 +1,2 @@
-import adminRoutes from "./adminRouter";
-import clientRoutes from "./clientRouter";
-
-const arrRoutes = [...adminRoutes, ...clientRoutes];
-
-export default arrRoutes;
+export {default as clientRouter} from "./clientRouter";
+export {default as adminRouter} from "./adminRouter";

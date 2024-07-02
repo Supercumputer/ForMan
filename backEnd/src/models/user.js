@@ -1,22 +1,31 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const mongooseDelete = require("mongoose-delete");
 
-const User = new Schema(
+const user = new Schema(
   {
-    userName: { type: String, default: "" },
-    fullName: { type: String, required: true },
+    userName: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
     avatar: { type: String, default: "" },
-    birthday: { type: Date, default: null },
-    address: { type: Array, required: [] },
+    birthDay: { type: Date, default: null },
+    address: { type: Array, default: [] },
+    phone: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: Schema.Types.ObjectId, ref: "GroupRole" },
-    sex: { type: String, default: "" },
-    status: { type: String, default: "ACTIVE" },
+    sex: { type: String, enum: ["Male", "Female", "Other"] },
+    status: {
+      type: String,
+      enum: ["InActive", "Active", "Banned"],
+      default: "InActive",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("User", User);
+user.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
+
+module.exports = mongoose.model("User", user);

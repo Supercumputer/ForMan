@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const role = new Schema(
   {
-    name: { type: String, required: true, unique: true, unique: true },
-    url: { type: String, required: true, unique: true },
+    route: { type: String, required: true, unique: true },
+    description: { type: String, required: true, unique: true, unique: true },
   },
   {
     timestamps: true,

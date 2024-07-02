@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const groupRole = new Schema(
   {
-    nameRole: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true },
     permissions: [{ type: Schema.Types.ObjectId, ref: "Role" }],
   },
   {

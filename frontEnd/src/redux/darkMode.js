@@ -3,12 +3,12 @@ import { createSlice } from '@reduxjs/toolkit';
 export const darkMode = createSlice({
     name: 'product',
     initialState: {
-        dark: false
+        dark: 'dark'
     },
 
     reducers: {
         lightDark: (state, action) => {
-            state.searchValue = !state.dark
+            state.dark = action.payload
         }
         
     },

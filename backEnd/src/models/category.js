@@ -5,7 +5,12 @@ const category = new Schema(
   {
     categoryName: { type: String, required: true },
     description: { type: String, default: "" },
-    images: { type: String, default: '' },
+    image: { type: String, default: "" },
+    status: {
+      type: String,
+      enum: ["Hidden", "Presently"],
+      default: "Presently",
+    },
   },
   {
     timestamps: true,
