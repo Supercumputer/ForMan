@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { HiHome } from "react-icons/hi";
 import {
@@ -30,6 +30,7 @@ import Swal from "sweetalert2";
 const schema = z.object({
   categoryName: z.string().min(1, { message: "Tên danh mục không hợp lệ." }),
   description: z.string().min(1, { message: "Mô tả không hợp lệ." }),
+  parentId: z.string().optional(),
   status: z.enum(["Hidden", "Presently"], {
     message: "Trạn thái không hợp lệ.",
   }),
@@ -86,7 +87,11 @@ function ListCategory() {
         setId(id);
         setOpenModal(true);
         setPreview(res.category.image);
-        reset(res.category);
+        const formatData = {
+          ...res.category,
+          parentId: res.category.parentId || "",
+        };
+        reset(formatData);
       }
     } catch (error) {
       toast.error(error);
@@ -135,7 +140,7 @@ function ListCategory() {
       console.log(error);
     }
   };
-  
+
   const handleCheckbox = (id) => {
     setDataCheck((prev) => {
       if (prev.includes(id)) {
@@ -193,6 +198,15 @@ function ListCategory() {
       }
     });
   };
+
+  const filterCategory = useCallback(
+    (id) => {
+      return categories.filter(
+        (item) => item.parentId?._id !== id && item._id !== id
+      );
+    },
+    [id]
+  );
 
   useEffect(() => {
     callApiGetAllCategory();
@@ -270,10 +284,10 @@ function ListCategory() {
                 {t("fields.description")}
               </Table.HeadCell>
               <Table.HeadCell className="text-nowrap">
-                {t("fields.createdAt")}
+                Parent Category
               </Table.HeadCell>
               <Table.HeadCell className="text-nowrap">
-                {t("fields.updatedAt")}
+                {t("fields.createdAt")}
               </Table.HeadCell>
               <Table.HeadCell className="text-nowrap">
                 {t("fields.status")}
@@ -304,8 +318,10 @@ function ListCategory() {
                       />
                     </Table.Cell>
                     <Table.Cell>{item.description}</Table.Cell>
+                    <Table.Cell>
+                      {item.parentId?.categoryName ?? "Null"}
+                    </Table.Cell>
                     <Table.Cell>{item.createdAt}</Table.Cell>
-                    <Table.Cell>{item.updatedAt}</Table.Cell>
                     <Table.Cell>
                       <span
                         className={`${
@@ -365,7 +381,27 @@ function ListCategory() {
               register={register("categoryName")}
               errors={errors.categoryName?.message}
             />
-
+            <div class="">
+              <label
+                for="countries"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Danh mục cha
+              </label>
+              <select
+                id="countries"
+                {...register("parentId")}
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value={""}>Chon danh mục cha</option>
+                {filterCategory(id).map((item) => (
+                  <option value={item._id}>{item.categoryName}</option>
+                ))}
+              </select>
+              {errors?.parentId?.message && (
+                <p className="text-red-500">{errors?.parentId?.message}</p>
+              )}
+            </div>
             <div>
               <label
                 htmlFor=""

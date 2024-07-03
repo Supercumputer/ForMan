@@ -1,1 +1,2 @@
-export {default as Slide} from "./Slide";
+export {default as SlideBanner} from "./SlideBanner";
+export {default as SlideProduct} from "./SlideProduct";

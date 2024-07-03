@@ -194,9 +194,7 @@ function ListRating() {
         <Modal.Header>Reply Rating</Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            {/* <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-              {item && item.content}
-            </p> */}
+            
             <figure className="max-w-screen-md">
               <div className="mb-4 flex items-center">
                 <Rating size="md">
@@ -207,9 +205,7 @@ function ListRating() {
               </div>
               <Blockquote>
                 <p className="text-xl font-semibold text-gray-800 dark:text-white">
-                  "Flowbite is just awesome. It contains tons of predesigned
-                  components and pages starting from login screen to complex
-                  dashboard. Perfect choice for your next SaaS application."
+                  "{item?.content}"
                 </p>
               </Blockquote>
               <figcaption className="mt-6 flex items-center space-x-3">

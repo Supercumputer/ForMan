@@ -10,5 +10,6 @@ router.post("/create", uploadCloud.single("image"), categoryController.createCat
 router.put("/:id/update", uploadCloud.single("image"), categoryController.updateCategory);
 router.delete("/:id/delete", categoryController.deleteCategory);
 router.post("/deletes", categoryController.deleteCategorys);
+router.get("/cate", categoryController.cate);
 
 module.exports = router

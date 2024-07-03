@@ -2,7 +2,7 @@ const Categories = require("../models/category");
 
 const getAllCategory = async (req, res) => {
   try {
-    const categories = await Categories.find({});
+    const categories = await Categories.find({}).populate("parentId");
 
     res.status(200).json({ status: true, categories });
   } catch (error) {
@@ -44,6 +44,8 @@ const createCategory = async (req, res) => {
         .json({ status: false, message: "Please fill in all fields" });
     }
 
+    let parentId = req.body.parentId || null;
+
     const existingCategory = await Categories.findOne({ categoryName });
 
     if (existingCategory) {
@@ -52,7 +54,7 @@ const createCategory = async (req, res) => {
         .json({ status: false, message: "Category already exists" });
     }
 
-    const category = new Categories({ ...req.body, image });
+    const category = new Categories({ ...req.body, parentId, image });
 
     await category.save();
 
@@ -83,7 +85,7 @@ const updateCategory = async (req, res) => {
 
     const checkCategoryName = await Categories.findOne({ categoryName });
 
-    if (checkCategoryName) {
+    if (checkCategoryName && checkCategoryName._id.toString() !== id) {
       return res
         .status(400)
         .json({ status: false, message: "Category already exists" });
@@ -97,11 +99,17 @@ const updateCategory = async (req, res) => {
         .json({ status: false, message: "Category not found" });
     }
 
+    let parentId = req.body.parentId || null;
+
     const updatedCategory = await Categories.updateOne(
       {
         _id: id,
       },
-      { ...req.body, image: req.file?.path || existingCategory.image },
+      {
+        ...req.body,
+        parentId,
+        image: req.file?.path || existingCategory.image,
+      },
       { new: true }
     );
 
@@ -170,6 +178,21 @@ const deleteCategorys = async (req, res) => {
   }
 };
 
+const cate = async (req, res) => {
+  try {
+    const cateNull = await Categories.find({ parentId: null });
+    
+    cateNull.forEach((item) => {
+      
+       const ca = Categories.find({parentId: item._id})
+    })
+
+    console.log(cateNull);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllCategory,
   getCategory,
@@ -177,4 +200,5 @@ module.exports = {
   updateCategory,
   deleteCategory,
   deleteCategorys,
+  cate,
 };

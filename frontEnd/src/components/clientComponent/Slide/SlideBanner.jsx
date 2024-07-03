@@ -7,7 +7,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
-function Slide({ data = [] }) {
+function SlideBanner({ data = [] }) {
   return (
     <div>
       <Swiper
@@ -34,4 +34,4 @@ function Slide({ data = [] }) {
   );
 }
 
-export default Slide;
+export default SlideBanner;

@@ -158,9 +158,7 @@ function Footer() {
           </h1>
           <div className="w-full h-full">
             <iframe
-              src={
-                "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10043.525975809182!2d105.72816313082332!3d21.049036178595735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31345459c08fbfb9%3A0x47fb207d9906f9f9!2zMzUgUC5UdSBIb8OgbmcsIFR1IEhvw6BuZywgVOG7qyBMacOqbSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e1!3m2!1svi!2s!4v1719843678020!5m2!1svi!2s"
-              }
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d10043.525975809182!2d105.72816313082332!3d21.049036178595735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31345459c08fbfb9%3A0x47fb207d9906f9f9!2zMzUgUC5UdSBIb8OgbmcsIFR1IEhvw6BuZywgVOG7qyBMacOqbSwgSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e1!3m2!1svi!2s!4v1719843678020!5m2!1svi!2s"
               width="100%"
               height="100%"
               style={{ border: 0 }}

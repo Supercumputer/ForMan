@@ -84,7 +84,9 @@ export const apiDeleteCategory = (id) => {
 export const apiDeleteCategorys = (data) => {
   return instance.post(`/api/category/deletes`, data);
 };
-
+export const apicate = () => {
+  return instance.get(`/api/category/cate`);
+};
 //========================== Brand api==================================
 export const apiGetAllBrand = () => {
   return instance.get(`/api/brand/getall`);
