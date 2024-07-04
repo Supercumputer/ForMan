@@ -9,7 +9,7 @@ function Header() {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
 
   return (
-    <header className="font-roboto sticky top-0 z-50">
+    <header className="font-roboto sticky top-0 z-40">
       <div className="md:flex justify-between bg-[#292929] text-[#fff] text-sm py-2 lg:px-[8%] px-2 hidden">
         <div className="flex items-center gap-2">
           <i class="fa-solid fa-phone"></i>
