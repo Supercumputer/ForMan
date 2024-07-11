@@ -31,7 +31,7 @@ function SlideBrand() {
           },
         }}
         // modules={[Pagination]}
-        className="mySwiper"
+        className=""
       >
         <SwiperSlide>
           <Img

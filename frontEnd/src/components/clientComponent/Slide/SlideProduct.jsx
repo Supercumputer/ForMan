@@ -1,15 +1,13 @@
 
-import React, { useRef, useState } from 'react';
-// Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/pagination";
 
 // import required modules
 // import { Pagination } from 'swiper/modules';
-import Product from '../Product';
+import ProItem from "../ProItem";
 function SlideProduct() {
   return (
     <div>
@@ -36,17 +34,33 @@ function SlideProduct() {
         // modules={[Pagination]}
         className="initial mySwiper z-10"
       >
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
-        <SwiperSlide><Product /></SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
+        <SwiperSlide>
+          <ProItem />
+        </SwiperSlide>
       </Swiper>
     </div>
-  )
+  );
 }
 
-export default SlideProduct
+export default SlideProduct;

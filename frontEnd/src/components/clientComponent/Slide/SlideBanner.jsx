@@ -22,7 +22,7 @@ function SlideBanner({ data = [] }) {
         }}
         navigation={true}
         modules={[Autoplay, Pagination, Navigation]}
-        className="mySwiper"
+        className=""
       >
         {data.map((slide, index) => (
           <SwiperSlide key={index}>

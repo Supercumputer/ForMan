@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+var slug = require("mongoose-slug-generator");
 const mongooseDelete = require("mongoose-delete");
 
 const product = new Schema(
   {
     code: { type: String, required: true, unique: true },
     name: { type: String, required: true },
+    slug: { type: String, slug: "name", unique: true },
     description: { type: String, default: "" },
     category: { type: Schema.Types.ObjectId, ref: "Category" },
     brand: { type: Schema.Types.ObjectId, ref: "Brand" },
@@ -15,6 +17,8 @@ const product = new Schema(
     timestamps: true,
   }
 );
+
+mongoose.plugin(slug);
 product.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 module.exports = mongoose.model("Product", product);
@@ -50,4 +54,3 @@ module.exports = mongoose.model("Product", product);
 // product.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 // module.exports = mongoose.model("Product", product);
-

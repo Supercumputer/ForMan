@@ -178,16 +178,37 @@ const deleteCategorys = async (req, res) => {
   }
 };
 
-const cate = async (req, res) => {
+const getCategorys = async (req, res) => {
   try {
-    const cateNull = await Categories.find({ parentId: null });
-    
-    cateNull.forEach((item) => {
-      
-       const ca = Categories.find({parentId: item._id})
-    })
+    // Tìm tất cả các danh mục và populate trường parentId
+    const categories = await Categories.find().exec();
 
-    console.log(cateNull);
+    // Tạo một đối tượng để dễ dàng truy cập các danh mục con
+    const categoryMap = {};
+
+    categories.forEach((category) => {
+      categoryMap[category._id] = category.toObject(); // Chuyển đổi sang đối tượng thuần
+      categoryMap[category._id].children = []; // Khởi tạo mảng danh mục con
+    });
+
+    // Xây dựng cấu trúc cây
+    const tree = [];
+
+    categories.forEach((category) => {
+      if (category.parentId) {
+        // Nếu có parentId, thêm vào danh mục con của parentId nếu tồn tại
+        if (categoryMap[category.parentId._id]) {
+          categoryMap[category.parentId._id].children.push(
+            categoryMap[category._id]
+          );
+        }
+      } else {
+        // Nếu không có parentId, thêm vào danh sách root
+        tree.push(categoryMap[category._id]);
+      }
+    });
+
+    return res.status(200).json({ status: true, categories: tree });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -200,5 +221,5 @@ module.exports = {
   updateCategory,
   deleteCategory,
   deleteCategorys,
-  cate,
+  getCategorys,
 };

@@ -72,7 +72,14 @@ const pathAdmin = {
 const CLIENT = "/";
 
 const pathClient = {
-  client: CLIENT
+  client: CLIENT,
+  product: `/collections`,
+  // productDetail: `/slugCate/:slugPro`,
+  productDetail: `/detail`,
+  checkout: `/checkout`,
+  account: `/account`,
+  search: `/search`,
+
 }
 
 export { pathAdmin, pathClient };

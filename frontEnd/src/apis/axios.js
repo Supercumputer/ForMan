@@ -66,6 +66,9 @@ export const apiUpdateUser = (data, id) => {
 export const apiGetAllCategory = () => {
   return instance.get(`/api/category/getall`);
 };
+export const apiGetCategorys = () => {
+  return instance.get(`/api/category/categories`);
+};
 export const apiCreateCategory = (data) => {
   return instance.post("/api/category/create", data);
 };
@@ -84,9 +87,7 @@ export const apiDeleteCategory = (id) => {
 export const apiDeleteCategorys = (data) => {
   return instance.post(`/api/category/deletes`, data);
 };
-export const apicate = () => {
-  return instance.get(`/api/category/cate`);
-};
+
 //========================== Brand api==================================
 export const apiGetAllBrand = () => {
   return instance.get(`/api/brand/getall`);
@@ -133,6 +134,9 @@ export const apiSoftDeleteProducts = (data) => {
 //========================== Variant api ================================
 export const apiGetAllVariantById = (id) => {
   return instance.get(`/api/variant/${id}/getall`);
+};
+export const apiGetAllProductVariant = (query) => {
+  return instance.get(`/api/variant/getAllProductVariant${query}`);
 };
 export const apiCreateVariant = (data, id) => {
   return instance.post(`/api/variant/${id}/createvariant`, data);

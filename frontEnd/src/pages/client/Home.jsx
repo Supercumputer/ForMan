@@ -1,25 +1,19 @@
-import React, { useEffect } from "react";
 import {
   SlideBanner,
   SlideBrand,
   SlideProduct,
 } from "../../components/clientComponent/Slide";
-import { apicate } from "../../apis/axios";
-import { Product, SectionHeader } from "../../components/clientComponent";
+
+import { ProItem, SectionHeader } from "../../components/clientComponent";
 import { Img } from "../../components/common";
 import { Link } from "react-router-dom";
 
 const slides = [
   "https://4menshop.com/images/thumbs/slides/slide-2-trang-chu-slide-2.png?t=1716575843",
-  "https://4menshop.com/images/thumbs/slides/banner-top-trang-chu-2-slide-20.jpg?t=1716573264",
+  "https://theme.hstatic.net/200000690725/1001078549/14/slide_4_img.jpg?v=422",
   "https://theme.hstatic.net/200000690725/1001078549/14/slide_1_img.jpg?v=418",
 ];
 function Home() {
-  useEffect(() => {
-    (async () => {
-      await apicate();
-    })();
-  }, []);
   return (
     <>
       <div className="">
@@ -29,25 +23,25 @@ function Home() {
           <SlideProduct />
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
           </div>
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
+            <ProItem />
           </div>
           <SectionHeader title={"THƯƠNG HIỆU ĐỒNG HÀNH"} />
           <SlideBrand />

@@ -7,6 +7,7 @@ const ProductModal = ({ handlerClose }) => {
         onClick={handlerClose}
         className="fixed left-0 right-0 z-10 bottom-0 top-0 bg-gray-500 bg-opacity-75 transition-opacity block"
       ></div>
+
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="flex min-h-full items-stretch justify-center text-center md:items-center md:px-2 lg:px-4">
           <div className="flex w-full transform text-left text-base transition md:my-8 md:max-w-2xl md:px-4 lg:max-w-4xl">

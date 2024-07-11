@@ -23,6 +23,7 @@ router.post("/softdeletes", variantController.softDeleteVariants);
 
 router.get("/:id/getratings", variantController.getRatings);
 router.put("/:id/updateReply", variantController.updatereply);
+router.get("/getAllProductVariant", variantController.getAllProductVariant);
 
 
 module.exports = router;
