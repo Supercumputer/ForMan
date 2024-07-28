@@ -1,5 +1,5 @@
 import DefaultLayout from "../layouts/layoutAdmin/DefaultLayout";
-import { Dasboard, Login, Messenger } from "../pages/admin";
+import { Dasboard, Messenger } from "../pages/admin";
 import { CreateCategory, ListCategory } from "../pages/admin/category";
 import {
   ListAccount,
@@ -7,6 +7,7 @@ import {
   EditAccount,
   DetailAccount,
   InforAccount,
+  Profile,
 } from "../pages/admin/account";
 import { pathAdmin } from "../utils/path";
 import { DetailComment, ListComment } from "../pages/admin/comment";
@@ -26,11 +27,7 @@ import { CreateBrand, ListBrand } from "../pages/admin/brand";
 import { ListDiscount } from "../pages/admin/discount";
 
 const adminRouter = [
-  // {
-  //   //router dashboard
-  //   path: pathAdmin.login,
-  //   component: Login,
-  // },
+
   {
     //router dashboard
     path: pathAdmin.dashboard,
@@ -79,7 +76,6 @@ const adminRouter = [
     component: ListAccount,
     layout: DefaultLayout,
   },
-
   {
     //router user edit
     path: pathAdmin.usersEdit,
@@ -102,6 +98,12 @@ const adminRouter = [
     //router user edit
     path: pathAdmin.usersDetail,
     component: DetailAccount,
+    layout: DefaultLayout,
+  },
+  {
+    //router user edit
+    path: pathAdmin.profile,
+    component: Profile,
     layout: DefaultLayout,
   },
   {

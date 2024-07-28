@@ -1,29 +1,26 @@
 const express = require("express");
 const router = express.Router();
-var passport = require("passport");
+const passport = require("passport");
 
 const authController = require("../controllers/authController");
 
-router.post("/register", authController.Register);
+router.post("/register", authController.register);
 
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    session: false,
-  }),
-  authController.Login
+router.post("/login", passport.authenticate("local"), authController.login);
+
+router.get(
+  "/google",
+  passport.authenticate("google")
 );
 
 router.get(
-  "/logout",
-  passport.authenticate("jwt", { session: false }),
-  authController.Logout
+  "/google/callback",
+  passport.authenticate("google"),
+  authController.googleLogin
 );
 
-router.get(
-  "/checklogin",
-  passport.authenticate("jwt", { session: false }),
-  authController.CheckLogin
-);
+router.get("/logout", authController.logout);
+
+router.get("/account", authController.getAccount);
 
 module.exports = router;

@@ -16,8 +16,13 @@ router.put(
   uploadCloud.array("images", 10),
   productController.updateProduct
 );
+
 router.delete("/:id/softdelete", productController.softDeleteProduct);
 router.post("/softdeletes", productController.softDeleteProducts);
 router.get("/count", productController.countProduct);
+router.get(
+  "/getProductBySlug/:slug/detail",
+  productController.getProductBySlug
+);
 
 module.exports = router;

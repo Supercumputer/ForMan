@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { HiHome } from "react-icons/hi";
 import {
@@ -26,13 +26,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Swal from "sweetalert2";
+import { formatDate } from "../../../utils/helper";
 
 const schema = z.object({
   categoryName: z.string().min(1, { message: "Tên danh mục không hợp lệ." }),
   description: z.string().min(1, { message: "Mô tả không hợp lệ." }),
   parentId: z.string().optional(),
   status: z.enum(["Hidden", "Presently"], {
-    message: "Trạn thái không hợp lệ.",
+    message: "Trạng thái không hợp lệ.",
   }),
   image: z.custom((value) => {
     if (value instanceof FileList) {
@@ -321,7 +322,7 @@ function ListCategory() {
                     <Table.Cell>
                       {item.parentId?.categoryName ?? "Null"}
                     </Table.Cell>
-                    <Table.Cell>{item.createdAt}</Table.Cell>
+                    <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
                     <Table.Cell>
                       <span
                         className={`${

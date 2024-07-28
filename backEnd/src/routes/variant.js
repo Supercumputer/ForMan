@@ -22,8 +22,11 @@ router.delete("/:id/softdeletevariant", variantController.deleteVariant);
 router.post("/softdeletes", variantController.softDeleteVariants);
 
 router.get("/:id/getratings", variantController.getRatings);
+router.get("/:id/getratingbystar", variantController.getRatingByStar);
+router.get("/:id/getaveragerating", variantController.getAverageRating);
 router.put("/:id/updateReply", variantController.updatereply);
 router.get("/getAllProductVariant", variantController.getAllProductVariant);
+router.put("/updatequantity", variantController.updateQuantityAfterOrder);
 
 
 module.exports = router;

@@ -101,7 +101,7 @@ const updateCategory = async (req, res) => {
 
     let parentId = req.body.parentId || null;
 
-    const updatedCategory = await Categories.updateOne(
+    const updatedCategory = await Categories.findByIdAndUpdate(
       {
         _id: id,
       },
@@ -181,7 +181,7 @@ const deleteCategorys = async (req, res) => {
 const getCategorys = async (req, res) => {
   try {
     // Tìm tất cả các danh mục và populate trường parentId
-    const categories = await Categories.find().exec();
+    const categories = await Categories.find({ status: "Presently" }).exec();
 
     // Tạo một đối tượng để dễ dàng truy cập các danh mục con
     const categoryMap = {};

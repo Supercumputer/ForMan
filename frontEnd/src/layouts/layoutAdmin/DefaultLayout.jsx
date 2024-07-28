@@ -217,7 +217,7 @@ function DefaultLayout({ children }) {
                 <div className="box" tabIndex="-1" {...attrs}>
                   <div className="w-44 bg-[#fff] dark:bg-slate-800 rounded-md border border-[#ccc] overflow-hidden">
                     <Link
-                      to={`${pathAdmin.managers}/detail/1`}
+                      to={`${pathAdmin.profile}`}
                       className="flex gap-3 items-center hover:bg-[#F8FAFC] dark:hover:bg-[#2A303D] p-3"
                     >
                       <i className="fa-solid fa-address-card"></i>

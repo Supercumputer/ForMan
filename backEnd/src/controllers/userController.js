@@ -1,6 +1,6 @@
 const Users = require("../models/user");
 const GroupRoles = require("../models/groupRole");
-const { hashPassword } = require("../services/authService");
+const { hashPassword, comparePassword } = require("../services/authService");
 const user = require("../models/user");
 
 const paginate = async (req, res) => {
@@ -66,7 +66,7 @@ const findById = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ user });
+    res.status(200).json({ status: true, user });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -186,7 +186,7 @@ const update = async (req, res) => {
     if (!user) {
       return res.status(404).json({ status: false, message: "User not found" });
     }
-
+    
     const password = req.body.password
       ? hashPassword(req.body.password)
       : user.password;
@@ -225,6 +225,52 @@ const countUser = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const {email, password, newPassword } = req.body;
+    const id = req.params.id
+
+    if (!email || !password || !newPassword) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Please fill in all fields" });
+    }
+
+    const user = await Users.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, message: "User not found" });
+    }
+   
+    if(user._id != id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Tài khoản không khớp với tài khoản đang đăng nhập." });
+    }
+
+    const checkPass = comparePassword(password, user.password);
+
+    if (!checkPass) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Password không đúng" });
+    }
+
+    const hashPass = hashPassword(newPassword);
+
+    user.password = hashPass;
+
+    await user.save();
+
+    return res.status(200).json({ status: true, message: "Đổi mật khẩu thành công." });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   paginate,
   findById,
@@ -233,4 +279,5 @@ module.exports = {
   softDeleteUsers,
   update,
   countUser,
+  resetPassword
 };

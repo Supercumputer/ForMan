@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  Dropdown,
   Pagination,
   Table,
   Breadcrumb,
@@ -13,8 +12,7 @@ import {
   Avatar,
 } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
-import { Link, useParams } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
+import { useParams } from "react-router-dom";
 import { ButtonPro, Img } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import { start } from "../../../utils/helper";
@@ -49,7 +47,7 @@ function ListRating() {
 
   useEffect(() => {
     apiGetRating();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
   const handlerSubmit = async (id) => {
     try {
@@ -131,43 +129,45 @@ function ListRating() {
               <Table.HeadCell className="text-nowrap">Actions</Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {data?.comments?.length > 0 ? data?.comments?.map((item, index) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell>{index + 1}</Table.Cell>
-                  <Table.Cell>
-                    <div className="flex items-center text-gray-900 whitespace-nowrap dark:text-white">
-                      <Img
-                        className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
-                        src={item.user_id.avatar}
-                        alt="Jese image"
-                      />
-                      <div className="ps-3">
-                        <div className="text-base font-semibold">{`${item.user_id.lastName} ${item.user_id.firstName}`}</div>
-                        <div className="font-normal text-gray-500">
-                          {item.user_id.email}
+              {data?.comments?.length > 0 ? (
+                data?.comments?.map((item, index) => (
+                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                    <Table.Cell>{index + 1}</Table.Cell>
+                    <Table.Cell>
+                      <div className="flex items-center text-gray-900 whitespace-nowrap dark:text-white">
+                        <Img
+                          className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
+                          src={item.user_id.avatar}
+                          alt="Jese image"
+                        />
+                        <div className="ps-3">
+                          <div className="text-base font-semibold">{`${item.user_id.lastName} ${item.user_id.firstName}`}</div>
+                          <div className="font-normal text-gray-500">
+                            {item.user_id.email}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>{item.content}</Table.Cell>
-                  <Table.Cell>
-                    <div className="flex gap-1">{start(item.rating)}</div>
-                  </Table.Cell>
+                    </Table.Cell>
+                    <Table.Cell>{item.content}</Table.Cell>
+                    <Table.Cell>
+                      <div className="flex gap-1 text-yellow-500">{start(item.rating)}</div>
+                    </Table.Cell>
 
-                  <Table.Cell>
-                    <div className="flex gap-1">{item.createdAt}</div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex gap-2">
-                      <ButtonPro
-                        onClick={() => handlerModelShow(item._id)}
-                        name={<i class="fa-solid fa-reply"></i>}
-                        className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
-                      />
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              )): (
+                    <Table.Cell>
+                      <div className="flex gap-1">{item.createdAt}</div>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className="flex gap-2">
+                        <ButtonPro
+                          onClick={() => handlerModelShow(item._id)}
+                          name={<i class="fa-solid fa-reply"></i>}
+                          className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
+                        />
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                ))
+              ) : (
                 <Table.Row>
                   <Table.Cell
                     className="bg-white dark:border-gray-700 dark:bg-gray-800 text-center"
@@ -194,7 +194,6 @@ function ListRating() {
         <Modal.Header>Reply Rating</Modal.Header>
         <Modal.Body>
           <div className="space-y-6">
-            
             <figure className="max-w-screen-md">
               <div className="mb-4 flex items-center">
                 <Rating size="md">

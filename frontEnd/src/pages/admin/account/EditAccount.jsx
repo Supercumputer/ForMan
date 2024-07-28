@@ -25,7 +25,6 @@ const schema = z.object({
   status: z.enum(["InActive", "Active", "Banned"], {
     message: "Status không hợp lệ.",
   }),
-  address: z.string().min(1, { message: "Address không hợp lệ." }),
   sex: z.enum(["Male", "Female", "Other"], { message: "Sex không hợp lệ." }),
   role: z
     .string()
@@ -91,7 +90,7 @@ function EditAccount() {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-
+   
     file.preview = URL.createObjectURL(file);
 
     setAvatarPreview(file);
@@ -265,15 +264,6 @@ function EditAccount() {
               src={avatarPreview?.preview || avatar}
               className="w-28 h-28 mt-3 rounded-sm object-cover"
               alt=""
-            />
-          </div>
-
-          <div className="mb-6">
-            <InputField
-              filed="Addresss"
-              placeholder="1234 Main St"
-              register={register("address")}
-              errors={errors?.address?.message}
             />
           </div>
 

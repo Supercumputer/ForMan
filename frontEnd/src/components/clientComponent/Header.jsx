@@ -1,13 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Img } from "../common";
 import { Drawer, Sidebar, Spinner } from "flowbite-react";
 import { useState } from "react";
-import { pathClient } from "../../utils/path";
-import { apiGetAllProductVariant, apiGetCategorys } from "../../apis/axios";
+import {
+  apiGetAllProductVariant,
+  apiGetCartByUserId,
+  apiGetCategorys,
+  apiMergeCart,
+} from "../../apis/axios";
 import useDebounce from "../../hooks/useDebounce";
 import NestedList from "./NestedList";
 import { calculateSalePrice, formatNumber } from "../../utils/helper";
+import { useDispatch, useSelector } from "react-redux";
+import { setCarts, setIsLoadCart } from "../../redux/cart";
+import { noCart } from "../../assets/images";
+import Swal from "sweetalert2";
+import CartItem from "./CartItem";
+import BtnCheckout from "./BtnCheckout";
+import { pathClient } from "../../utils/path";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +32,12 @@ function Header() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  const { carts, isLoadCart } = useSelector((state) => state.cart);
+  const { account, isAuthenticated } = useSelector((state) => state.auth);
+
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
@@ -33,15 +50,37 @@ function Header() {
     })();
   }, []);
 
+  useEffect(() => {
+    const callApiGetCartByUserId = async () => {
+      const res = await apiGetCartByUserId(account.id);
+
+      if (res && res.status) {
+        dispatch(setCarts(res.carts));
+      }
+    };
+
+    if (account && Object.keys(account)?.length > 0) {
+      callApiGetCartByUserId();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, isLoadCart]);
+
   const handleSearchClick = () => {
     navigate(`/search?keyword=${debouncedSearch}`);
-    setSearch("")
-    setIsOpen(false)
+    setSearch("");
+    setIsOpen(false);
+  };
+
+  const handleSearchItemClick = () => {
+    setSearch("");
+    setIsOpen(false);
   };
 
   const callApiSearchProduct = async (key) => {
     try {
       setLoading(true);
+
       const res = await apiGetAllProductVariant(`?search=${key}&limit=5`);
 
       if (res && res.status) {
@@ -67,7 +106,10 @@ function Header() {
   const renderSubCategories = (subCategories) => {
     return subCategories.map((subCategory) => (
       <li key={subCategory._id} className="flow-root">
-        <Link to="#" className="-m-2 block p-2 text-gray-500">
+        <Link
+          to={`/collections/${subCategory.slug}`}
+          className="-m-2 block p-2 text-gray-500"
+        >
           {subCategory.categoryName}
         </Link>
         {subCategory.children && subCategory.children.length > 0 && (
@@ -76,6 +118,85 @@ function Header() {
       </li>
     ));
   };
+
+  const callApiMergeCart = async (data) => {
+    try {
+      const res = await apiMergeCart(data);
+
+      if (res && res.status) {
+        dispatch(setIsLoadCart());
+        Swal.fire({
+          title: "Congratulations!",
+          text: "Đồng bộ giỏ hàng thành công.",
+          icon: "success",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      isAuthenticated &&
+      Object.keys(account).length > 0 &&
+      JSON.parse(sessionStorage.getItem("carts")?.length > 0)
+    ) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "Bạn có muốn đồng bộ giỏ hàng không",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Merge it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          callApiMergeCart({
+            user_id: account.id,
+            data: JSON.parse(sessionStorage.getItem("carts")),
+          });
+        }
+        sessionStorage.removeItem("carts");
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  const total = useMemo(() => {
+    return carts.reduce((acc, item) => {
+      return (
+        acc +
+        (calculateSalePrice(item.variant_id.price, item.variant_id.sale) ||
+          item.variant_id.price) *
+        item.quantity
+      );
+    }, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, carts]);
+
+  // const callApiCheckInventory = async (data) => {
+  //     try {
+  //         const res = await apiCheckInventory(data);
+
+  //         if (res && res.status && res.check) {
+  //             navigate("/checkouts/stock_problems");
+  //             sessionStorage.setItem("carts", JSON.stringify(res.result));
+  //             dispatch(setCarts(res.result));
+  //         } else {
+  //             navigate("/checkouts");
+  //         }
+  //     } catch (error) {
+  //         console.log(error);
+  //     }
+  // };
+  // const handlerCheckInventory = (carts) => {
+  //     if (isAuthenticated && Object.keys(account).length > 0) {
+  //         navigate("/checkouts");
+  //     } else {
+  //         callApiCheckInventory(carts);
+  //     }
+  // };
 
   return (
     <header className="font-roboto sticky top-0 z-30">
@@ -101,30 +222,38 @@ function Header() {
           </Link>
           <Link
             rel="stylesheet"
-            className="border-r px-3 hover:text-red-500 transition-all"
-            href=""
+            className="border-r flex items-center gap-1 px-3 hover:text-red-500 transition-all"
+            to={pathClient.orderLookUp}
           >
-            Giới thiệu
+            <i class="fa-brands fa-searchengin"></i>
+            <span>Tra cứu đơn hàng</span>
           </Link>
         </div>
       </div>
+
       <div className="flex justify-between items-center lg:px-[8%] p-2 bg-[#fff] shadow">
-        <Img
-          src={"https://4menshop.com/logo.png?v=1"}
-          alt={""}
-          className="lg:h-16 h-10"
-        />
+        <Link to={"/"}>
+          <Img
+            src={"https://4menshop.com/logo.png?v=1"}
+            alt={""}
+            className="lg:h-16 h-10"
+          />
+        </Link>
+
         <nav className="md:block hidden">
           <ul className="flex space-x-4 items-center">
             <li>
-              <Link to={"/"} className="hover:text-red-500">
+              <Link
+                to={"/collections/hang-moi-ve"}
+                className="hover:text-red-500"
+              >
                 HÀNG MỚI VỀ
               </Link>
             </li>
             {categories.map((category) => (
               <li className="group initial">
                 <Link
-                  to={`${pathClient.product}`}
+                  to={`/collections/${category.slug}`}
                   className="hover:text-red-500 before:block before:absolute before:w-full before:top-5 relative before:hover:h-10 uppercase"
                 >
                   {category.categoryName}
@@ -132,6 +261,7 @@ function Header() {
                     <i class="fa-solid fa-angle-down"></i>
                   )}
                 </Link>
+
                 {category.children && category.children.length > 0 && (
                   <div class="invisible group-hover:visible absolute z-10 left-0 lg:top-28 top-[90px] right-0 border-gray-200 shadow-sm bg-gray-50 md:bg-white border-y dark:bg-gray-800 dark:border-gray-600 transition-all transform translate-y-10 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 duration-300">
                     <div className="flex flex-row-reverse justify-between lg:px-[8%] px-2 lg:py-10 py-5">
@@ -156,6 +286,7 @@ function Header() {
                       {category.children.map((subCategory) => (
                         <div>
                           <Link
+                            to={`/collections/${subCategory.slug}`}
                             id="women-clothing-heading-mobile"
                             class="font-medium text-gray-900"
                           >
@@ -173,12 +304,16 @@ function Header() {
             ))}
 
             <li>
-              <Link to={""} className="hover:text-red-500">
+              <Link
+                to={"/collections/oulet-sale"}
+                className="hover:text-red-500"
+              >
                 OUTLET SALE
               </Link>
             </li>
           </ul>
         </nav>
+
         <div className="flex space-x-2 items-center">
           <div
             className="w-8 h-8 border rounded flex"
@@ -186,15 +321,22 @@ function Header() {
           >
             <i class="fa-solid fa-magnifying-glass m-auto"></i>
           </div>
-          <div className="w-8 h-8 border rounded flex">
+          <Link to={"/account"} className="w-8 h-8 border rounded flex">
             <i class="fa-solid fa-user m-auto"></i>
-          </div>
+          </Link>
+
           <div
-            className="w-8 h-8 border rounded flex"
+            className="w-8 h-8 border rounded flex relative"
             onClick={() => setIsOpenCart(true)}
           >
             <i class="fa-solid fa-cart-shopping m-auto"></i>
+            {carts?.length > 0 && (
+              <div class="absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-4 -end-4 ">
+                {carts.length}
+              </div>
+            )}
           </div>
+
           <div
             className="w-8 h-8 border rounded flex md:hidden"
             onClick={() => setIsOpenMenu(true)}
@@ -215,11 +357,13 @@ function Header() {
           </div>
 
           <div className="flex justify-between md:px-3 gap-3">
-            <Img
-              src={"https://4menshop.com/logo.png?v=1"}
-              alt={""}
-              className="md:block hidden h-[62px]"
-            />
+            <Link to={"/"}>
+              <Img
+                src={"https://4menshop.com/logo.png?v=1"}
+                alt={""}
+                className="md:block hidden h-[62px]"
+              />
+            </Link>
             <div className="w-full md:max-w-[600px] ">
               <div className="border rounded flex items-center overflow-hidden h-[40px] my-3">
                 <input
@@ -229,12 +373,12 @@ function Header() {
                   placeholder="Nhập nội dung tìm kiếm tại đây ..."
                   className="border-none flex-1 focus:outline-none focus:ring-0 pr-0"
                 />
-                <div
+                <button
                   onClick={handleSearchClick}
                   className="h-[40px] w-[40px] flex"
                 >
                   <i class="fa-solid fa-magnifying-glass m-auto"></i>
-                </div>
+                </button>
               </div>
 
               {loading ? (
@@ -250,33 +394,32 @@ function Header() {
                     {result.map((item) => (
                       <li>
                         <Link
-                          href="#"
+                          onClick={handleSearchItemClick}
+                          to={`/products/${item.product_id.slug}`}
                           class="items-center flex justify-between border-b border-[#dfe0e1] py-2 "
                         >
                           <div class="font-roboto text-[#333333] flex flex-col gap-1">
                             <h1 class="text-sm font-semibold">
-                              {item.product.name}
+                              {item.product_id.name}
                             </h1>
                             <div className="flex items-center gap-3">
                               <span class="text-red-500 font-medium text-[12px]">
                                 {formatNumber(
-                                  calculateSalePrice(
-                                    item.variant.price,
-                                    item.variant.sale
-                                  ) ?? item.variant.price
+                                  calculateSalePrice(item.price, item.sale) ??
+                                  item.price
                                 )}
                                 ₫
                               </span>
                               <s class="inline-flex items-center text-xs font-normal text-[#c4c4c4]">
-                                {item.variant.sale > 0 &&
-                                  `${formatNumber(item.variant.price)} ₫`}
+                                {item.sale > 0 &&
+                                  `${formatNumber(item.price)} ₫`}
                               </s>
                             </div>
                           </div>
 
                           <Img
                             class="w-12 h-12 object-cover"
-                            src={item.variant.images[0]}
+                            src={item.images[0]}
                             alt="Jese Leos image"
                           />
                         </Link>
@@ -321,28 +464,28 @@ function Header() {
             className="[&>div]:bg-transparent [&>div]:p-0 w-full"
           >
             <div className="flex h-full flex-col justify-between py-2 gap-2 font-roboto text-[#333333] font-semibold text-sm">
-              <Link>Hàng Mới Về</Link>
+              <Link to={"/collections/hang-moi-ve"}>Hàng Mới Về</Link>
               <NestedList data={categories} />
-              <Link to={""} className="my-3">
+              <Link to={"/collections/outlet-sale"} className="my-3">
                 Outlet Sale
               </Link>
 
               <Sidebar.Items className="border-t pt-3">
                 <Sidebar.ItemGroup>
                   <Sidebar.Item
-                    href="/outlet-sale"
+                    to="/outlet-sale"
                     icon={() => <i className="fa-solid fa-tags"></i>}
                   >
                     Cách chọn Size
                   </Sidebar.Item>
                   <Sidebar.Item
-                    href="/outlet-sale"
+                    to="/outlet-sale"
                     icon={() => <i className="fa-solid fa-tags"></i>}
                   >
                     Chính sách khách vip
                   </Sidebar.Item>
                   <Sidebar.Item
-                    href="/outlet-sale"
+                    to="/outlet-sale"
                     icon={() => <i className="fa-solid fa-tags"></i>}
                   >
                     Giới thiệu
@@ -385,244 +528,41 @@ function Header() {
                 </div>
 
                 <div class="flex-1 overflow-y-auto px-4 sm:px-6 custom-scroll">
-                  <ul class="divide-y divide-gray-200">
-                    <li class="flex pb-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg"
-                          alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
-                          class="h-full w-full object-cover object-center"
+                  <ul class="">
+                    {carts.length > 0 ? (
+                      carts?.map((item) => (
+                        <CartItem item={item} isBtnQuantity={true} sizeBtnQuantity="sm" />
+                      ))
+                    ) : (
+                      <div className="flex justify-center flex-col items-center">
+                        <Img
+                          src={noCart}
+                          className="w-56 m-auto transform -translate-y-1/2 mt-[50%]"
                         />
+                        <h1 className="text-xl">Chưa có sản phẩm trong giỏ hàng...</h1>
+
                       </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">
-                                Throwback Hip Bag fdgd fdgdf dfg dg d
-                              </a>
-                            </h3>
-                            <p class="ml-4">$90.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Salmon</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="flex py-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                          alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                          class="h-full w-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">Medium Stuff Satchel</a>
-                            </h3>
-                            <p class="ml-4">$32.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Blue</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="flex py-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                          alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                          class="h-full w-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">Medium Stuff Satchel</a>
-                            </h3>
-                            <p class="ml-4">$32.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Blue</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="flex py-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                          alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                          class="h-full w-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">Medium Stuff Satchel</a>
-                            </h3>
-                            <p class="ml-4">$32.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Blue</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="flex py-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                          alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                          class="h-full w-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">Medium Stuff Satchel</a>
-                            </h3>
-                            <p class="ml-4">$32.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Blue</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-
-                    <li class="flex py-6">
-                      <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img
-                          src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                          alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                          class="h-full w-full object-cover object-center"
-                        />
-                      </div>
-
-                      <div class="ml-4 flex flex-1 flex-col">
-                        <div>
-                          <div class="flex justify-between text-base font-medium text-gray-900">
-                            <h3>
-                              <a href="#">Medium Stuff Satchel</a>
-                            </h3>
-                            <p class="ml-4">$32.00</p>
-                          </div>
-                          <p class="mt-1 text-sm text-gray-500">Blue</p>
-                        </div>
-                        <div class="flex flex-1 items-end justify-between text-sm">
-                          <p class="text-gray-500">Qty 1</p>
-
-                          <div class="flex">
-                            <button
-                              type="button"
-                              class="font-medium text-indigo-600 hover:text-indigo-500"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
+                    )}
                   </ul>
                 </div>
-
-                <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
-                  <div class="flex justify-between text-base font-medium text-gray-900">
-                    <p>Subtotal</p>
-                    <p>$262.00</p>
-                  </div>
-                  <p class="mt-0.5 text-sm text-gray-500">
-                    Shipping and taxes calculated at checkout.
-                  </p>
-                  <div class="mt-6">
-                    <Link
-                      href="#"
-                      class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                    >
-                      Checkout
-                    </Link>
-                  </div>
-                  <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
-                    <p>
-                      or
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Continue Shopping
-                        <span aria-hidden="true"> &rarr;</span>
-                      </button>
+                {
+                  carts.length > 0 &&
+                  <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
+                    <div class="flex justify-between text-base font-medium text-gray-900">
+                      <p>Subtotal</p>
+                      <p>{formatNumber(total)}đ</p>
+                    </div>
+                    <p class="mt-0.5 text-sm text-gray-500">
+                      Shipping and taxes calculated at checkout.
                     </p>
+                    <div class="mt-6">
+                      <BtnCheckout setCloseModel={() => setIsOpenCart(false)} />
+                    </div>
+                    <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
+                      <Link to="/carts" onClick={() => setIsOpenCart(false)}>Xem giỏ hàng</Link>
+                    </div>
                   </div>
-                </div>
+                }
               </div>
             </div>
           </div>
@@ -630,272 +570,7 @@ function Header() {
         <div class="w-full"></div>
       </Drawer>
 
-      {/* <Drawer
-        open={isOpenCart}
-        onClose={() => setIsOpenCart(false)}
-        position="right"
-        style={{
-          width: "max-content",
-          padding: "0",
-        }}
-      >
-        <div class="flex h-full flex-col bg-white ">
-          <div class="flex items-start justify-between p-6">
-            <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">
-              Shopping cart
-            </h2>
-            <div class="ml-3 flex h-7 items-center">
-              <button
-                type="button"
-                class="text-gray-400 hover:text-gray-500"
-                onClick={() => setIsOpenCart(false)}
-              >
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-          </div>
 
-          <div class="flex-1 overflow-y-auto px-4 sm:px-6 custom-scroll">
-            <ul class="divide-y divide-gray-200">
-              <li class="flex pb-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg"
-                    alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#" className="text-wrap">
-                          Throwback Hip Bag dfgsgd fdgdfg dfgdfg{" "}
-                        </a>
-                      </h3>
-                      <p class="ml-4">$90.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Salmon</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="flex py-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                    alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#">Medium Stuff Satchel</a>
-                      </h3>
-                      <p class="ml-4">$32.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="flex py-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                    alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#">Medium Stuff Satchel</a>
-                      </h3>
-                      <p class="ml-4">$32.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="flex py-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                    alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#">Medium Stuff Satchel</a>
-                      </h3>
-                      <p class="ml-4">$32.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="flex py-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                    alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#">Medium Stuff Satchel</a>
-                      </h3>
-                      <p class="ml-4">$32.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-
-              <li class="flex py-6">
-                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                    alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                    class="h-full w-full object-cover object-center"
-                  />
-                </div>
-
-                <div class="ml-4 flex flex-1 flex-col">
-                  <div>
-                    <div class="flex justify-between text-base font-medium text-gray-900">
-                      <h3>
-                        <a href="#">Medium Stuff Satchel</a>
-                      </h3>
-                      <p class="ml-4">$32.00</p>
-                    </div>
-                    <p class="mt-1 text-sm text-gray-500">Blue</p>
-                  </div>
-                  <div class="flex flex-1 items-end justify-between text-sm">
-                    <p class="text-gray-500">Qty 1</p>
-
-                    <div class="flex">
-                      <button
-                        type="button"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
-            <div class="flex justify-between text-base font-medium text-gray-900">
-              <p>Subtotal</p>
-              <p>$262.00</p>
-            </div>
-            <p class="mt-0.5 text-sm text-gray-500">
-              Shipping and taxes calculated at checkout.
-            </p>
-            <div class="mt-6">
-              <Link
-                href="#"
-                class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-              >
-                Checkout
-              </Link>
-            </div>
-            <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
-              <p>
-                or
-                <button
-                  type="button"
-                  class="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Continue Shopping
-                  <span aria-hidden="true"> &rarr;</span>
-                </button>
-              </p>
-            </div>
-          </div>
-        </div>
-      </Drawer> */}
     </header>
   );
 }

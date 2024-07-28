@@ -15,11 +15,12 @@ import { ButtonPro, Img } from "../../../components/common";
 import { pathAdmin } from "../../../utils/path";
 import {
   apiSoftDeleteProduct,
-  apiGetAllProduct,
   apiSoftDeleteProducts,
+  apiGetAllProductVariant,
 } from "../../../apis/axios";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { formatDate } from "../../../utils/helper";
 
 const ListProduct = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +54,7 @@ const ListProduct = () => {
   const handleCheckAll = () => {
     setCheckAll(!checkAll);
     if (!checkAll) {
-      setDataCheck(data.map((item) => item._id));
+      setDataCheck(data.map((item) => item.product_id._id));
     } else {
       setDataCheck([]);
     }
@@ -61,11 +62,12 @@ const ListProduct = () => {
 
   const callApiGetAllProduct = async (currentPage, limit, keyword) => {
     try {
-      const res = await apiGetAllProduct(currentPage, limit, keyword);
+      const res = await apiGetAllProductVariant(
+        `?search=${keyword}&limit=${limit}&page=${currentPage}&sort=latest`);
       
       if (res && res.status) {
-        setTotalPages(res.totalPage);
-        setData(res.products);
+        setTotalPages(res.totalPages);
+        setData(res.listProducts);
       }
     } catch (err) {
       console.log(err);
@@ -78,7 +80,7 @@ const ListProduct = () => {
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
-        callApiGetAllProduct();
+        callApiGetAllProduct(currentPage, limit, keyword);
       } else {
         toast.error(res?.message);
       }
@@ -108,7 +110,7 @@ const ListProduct = () => {
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
-            callApiGetAllProduct();
+            callApiGetAllProduct(currentPage, limit, keyword);
           } else {
             toast.error(res?.message);
           }
@@ -209,46 +211,46 @@ const ListProduct = () => {
               </Table.HeadCell>
             </Table.Head>
             <Table.Body className="divide-y">
-              {data.map((item) => (
+              {data?.map((item) => (
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
-                      checked={dataCheck.includes(item?._id)}
-                      onChange={() => handleCheckbox(item?._id)}
+                      checked={dataCheck.includes(item?.product_id._id)}
+                      onChange={() => handleCheckbox(item?.product_id._id)}
                     />
                   </Table.Cell>
-                  <Table.Cell>{item.code}</Table.Cell>
-                  <Table.Cell>{item.name}</Table.Cell>
+                  <Table.Cell>{item.product_id.code}</Table.Cell>
+                  <Table.Cell>{item.product_id.name}</Table.Cell>
                   <Table.Cell>
                     <div className="w-20 h-20">
                       <Img
-                        src={item.image}
+                        src={item?.images[0]}
                         className="object-cover w-full h-full rounded-md"
                       />
                     </div>
                   </Table.Cell>
-                  <Table.Cell>{item?.category?.categoryName ?? "Chưa xác định"}</Table.Cell>
-                  <Table.Cell>{item?.brand?.brandName ?? "Chưa xác định"}</Table.Cell>
-                  <Table.Cell>{item.views}</Table.Cell>
-                  <Table.Cell>{item.createdAt}</Table.Cell>
+                  <Table.Cell>{item?.product_id.category.map(item => item.categoryName).join(", ") ?? "Chưa xác định"}</Table.Cell>
+                  <Table.Cell>{item?.product_id.brand.brandName ?? "Chưa xác định"}</Table.Cell>
+                  <Table.Cell>{item.product_id.views}</Table.Cell>
+                  <Table.Cell>{formatDate(item.product_id.createdAt)}</Table.Cell>
                   <Table.Cell>
                     <div className="flex gap-2">
                       <ButtonPro
                         type="button"
-                        dataId={item?._id}
+                        dataId={item.product_id._id}
                         actionDelete={handlerDelete}
                         name={<i className="fa-solid fa-trash"></i>}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                       />
 
                       <ButtonPro
-                        to={`${pathAdmin.products}/${item._id}/edit`}
+                        to={`${pathAdmin.products}/${item.product_id._id}/edit`}
                         name={<i className="fa-solid fa-pen-to-square"></i>}
                         className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                       />
 
                       <ButtonPro
-                        to={`${pathAdmin.products}/${item._id}/variants`}
+                        to={`${pathAdmin.products}/${item.product_id._id}/variants`}
                         name={<i className="fa-solid fa-eye"></i>}
                         className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                       />

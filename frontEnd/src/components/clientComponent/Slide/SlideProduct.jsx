@@ -1,4 +1,3 @@
-
 import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
@@ -8,7 +7,7 @@ import "swiper/css/pagination";
 // import required modules
 // import { Pagination } from 'swiper/modules';
 import ProItem from "../ProItem";
-function SlideProduct() {
+function SlideProduct({ data }) {
   return (
     <div>
       <Swiper
@@ -34,30 +33,11 @@ function SlideProduct() {
         // modules={[Pagination]}
         className="initial mySwiper z-10"
       >
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
-        <SwiperSlide>
-          <ProItem />
-        </SwiperSlide>
+        {data.map((item) => (
+          <SwiperSlide>
+            <ProItem item={item}/>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

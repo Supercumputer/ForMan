@@ -9,6 +9,8 @@ import {
   apiCreateProduct,
   apiGetAllBrand,
   apiGetAllCategory,
+  apiGetAllColor,
+  apiGetAllSize,
 } from "../../../apis/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +19,6 @@ import { pathAdmin } from "../../../utils/path";
 const schema = z.object({
   code: z.string().min(1, { message: "Mã không hợp lệ." }), // Code là một chuỗi không rỗng
   name: z.string().min(1, { message: "Tên không hợp lệ." }), // Name là một chuỗi không rỗng
-  category: z.string().min(1, { message: "Danh mục không hợp lệ." }), // Category là một chuỗi không rỗng
   brand: z.string().min(1, { message: "Thương hiệu không hợp lệ." }), // Brand là một chuỗi không rỗng
   color: z.string().min(1, { message: "Màu không hợp lệ." }), // Color là một chuỗi không rỗng
   price: z.preprocess((val) => {
@@ -52,6 +53,9 @@ function CreateProduct() {
   const [brands, setBrands] = useState([]);
   const [content, setContent] = useState("");
   const [categories, setCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState("");
+  const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handlerPreview = (e) => {
@@ -78,14 +82,31 @@ function CreateProduct() {
     setFiles((prevFiles) => [...prevFiles, ...filesWithPreview]);
   };
 
+  const handlerCheckBox = (id) => {
+    setCategoryId((prev) => {
+      let check = prev.includes(id);
+
+      if (check) {
+        return prev.filter((item) => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
   useEffect(() => {
     (async () => {
-      await Promise.all([apiGetAllBrand(), apiGetAllCategory()]).then(
-        ([brands, categorys]) => {
-          setBrands(brands.brands);
-          setCategories(categorys.categories);
-        }
-      );
+      await Promise.all([
+        apiGetAllBrand(),
+        apiGetAllCategory(),
+        apiGetAllColor(),
+        apiGetAllSize(),
+      ]).then(([brands, categorys, colors, sizes]) => {
+        setBrands(brands.brands);
+        setCategories(categorys.categories);
+        setColors(colors);
+        setSizes(sizes);
+      });
     })();
   }, []);
 
@@ -98,6 +119,7 @@ function CreateProduct() {
   const handlerSubmit = async (data) => {
     try {
       setIsLoading(true);
+      data.category = categoryId;
 
       const formData = new FormData();
 
@@ -151,9 +173,53 @@ function CreateProduct() {
             register={register("name")}
             errors={errors?.name?.message}
           />
+
           <div className="flex gap-4">
             <div className="flex-1">
               <label
+                htmlFor=""
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Color
+              </label>
+              <select
+                {...register("color")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="">-- Color --</option>
+                {colors.map((color) => (
+                  <option value={color._id}>{color.colorName}</option>
+                ))}
+              </select>
+              {errors.color && (
+                <p className="text-red-500">{errors.color.message}</p>
+              )}
+            </div>
+            <div className="flex-1">
+              <label
+                htmlFor=""
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Size
+              </label>
+              <select
+                {...register("size")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="">-- Size --</option>
+                {sizes.map((size) => (
+                  <option value={size._id}>{size.sizeName}</option>
+                ))}
+              </select>
+              {errors.size && (
+                <p className="text-red-500">{errors.size.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex gap-4">
+            <div className="flex-1">
+              {/* <label
                 htmlFor=""
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
@@ -170,7 +236,14 @@ function CreateProduct() {
               </select>
               {errors.category && (
                 <p className="text-red-500">{errors.category.message}</p>
-              )}
+              )} */}
+
+              <InputField
+                filed="Quantity"
+                placeholder="Nhập vào số lượng sản phẩm"
+                register={register("quantity")}
+                errors={errors?.quantity?.message}
+              />
             </div>
 
             <div className="flex-1">
@@ -195,35 +268,41 @@ function CreateProduct() {
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <InputField
-              filed="Color"
-              placeholder="Nhập vào màu sản phẩm"
-              register={register("color")}
-              errors={errors?.color?.message}
-            />
-            <InputField
-              filed="Size"
-              placeholder="Nhập vào kích thước sản phẩm"
-              register={register("size")}
-              errors={errors?.size?.message}
-            />
-          </div>
+          <InputField
+            filed="Price"
+            placeholder="Nhập vào giá sản phẩm"
+            register={register("price")}
+            errors={errors?.price?.message}
+          />
 
-          <div className="flex gap-4">
-            <InputField
-              filed="Quantity"
-              placeholder="Nhập vào số lượng sản phẩm"
-              register={register("quantity")}
-              errors={errors?.quantity?.message}
-            />
-
-            <InputField
-              filed="Price"
-              placeholder="Nhập vào giá sản phẩm"
-              register={register("price")}
-              errors={errors?.price?.message}
-            />
+          <div className="">
+            <label
+              htmlFor=""
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Category
+            </label>
+            <ul class="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
+              {categories.map((category) => (
+                <li class="w-full">
+                  <div class="flex items-center ps-3">
+                    <input
+                      id={category._id}
+                      onClick={() => handlerCheckBox(category._id)}
+                      type="checkbox"
+                      checked={categoryId.includes(category._id)}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                    />
+                    <label
+                      for={category._id}
+                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      {category.categoryName}
+                    </label>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div>

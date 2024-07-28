@@ -14,11 +14,9 @@ import {
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 
-
 const schema = z.object({
   code: z.string().min(1, { message: "Mã không hợp lệ." }), // Code là một chuỗi không rỗng
   name: z.string().min(1, { message: "Tên không hợp lệ." }), // Name là một chuỗi không rỗng
-  category: z.string().min(1, { message: "Danh mục không hợp lệ." }), // Category là một chuỗi không rỗng
   brand: z.string().min(1, { message: "Thương hiệu không hợp lệ." }), // Brand là một chuỗi không rỗng
 });
 
@@ -37,6 +35,8 @@ function EditProduct() {
   const [content, setContent] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [categoryId, setCategoryId] = useState("");
+
   const { id } = useParams();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ function EditProduct() {
       ]).then(([brands, categorys, product]) => {
         setBrands(brands.brands);
         setCategories(categorys.categories);
-
+        setCategoryId(product.product.category);
         setContent(product.product.description);
         reset(product.product);
       });
@@ -56,10 +56,23 @@ function EditProduct() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  const handlerCheckBox = (id) => {
+    setCategoryId((prev) => {
+      let check = prev.includes(id);
+
+      if (check) {
+        return prev.filter((item) => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
   const handlerSubmit = async (data) => {
     try {
+      data.category = categoryId;
       setIsLoading(true);
-      
+
       const formData = new FormData();
 
       for (const key in data) {
@@ -67,7 +80,7 @@ function EditProduct() {
       }
 
       formData.append("description", content);
-      
+
       const res = await apiUpdateProduct(formData, id);
 
       if (res && res.status) {
@@ -105,48 +118,57 @@ function EditProduct() {
             register={register("name")}
             errors={errors?.name?.message}
           />
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label
-                htmlFor=""
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Category
-              </label>
-              <select
-                {...register("category")}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="">-- Category --</option>
-                {categories.map((category) => (
-                  <option value={category._id}>{category.categoryName}</option>
-                ))}
-              </select>
-              {errors.category && (
-                <p className="text-red-500">{errors.category.message}</p>
-              )}
-            </div>
 
-            <div className="flex-1">
-              <label
-                htmlFor=""
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Brand
-              </label>
-              <select
-                {...register("brand")}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="">-- Brand --</option>
-                {brands.map((brand) => (
-                  <option value={brand._id}>{brand.brandName}</option>
-                ))}
-              </select>
-              {errors.brand && (
-                <p className="text-red-500">{errors.brand.message}</p>
-              )}
-            </div>
+          <div className="">
+            <label
+              htmlFor=""
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Brand
+            </label>
+            <select
+              {...register("brand")}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            >
+              <option value="">-- Brand --</option>
+              {brands.map((brand) => (
+                <option value={brand._id}>{brand.brandName}</option>
+              ))}
+            </select>
+            {errors.brand && (
+              <p className="text-red-500">{errors.brand.message}</p>
+            )}
+          </div>
+
+          <div className="">
+            <label
+              htmlFor=""
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Category
+            </label>
+
+            <ul class="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
+              {categories.map((category) => (
+                <li class="w-full">
+                  <div class="flex items-center ps-3">
+                    <input
+                      id={category._id}
+                      onClick={() => handlerCheckBox(category._id)}
+                      type="checkbox"
+                      checked={categoryId.includes(category._id)}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                    />
+                    <label
+                      for={category._id}
+                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >
+                      {category.categoryName}
+                    </label>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div>

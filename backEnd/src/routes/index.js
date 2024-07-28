@@ -8,6 +8,11 @@ const product = require("./product");
 const variant = require("./variant");
 const comment = require("./comment");
 const discount = require("./discount");
+const size = require("./size");
+const color = require("./color");
+const order = require("./order");
+const cart = require("./cart");
+const address = require("./address");
 
 const router = (app) => {
   app.use("/api/auth", auth);
@@ -20,7 +25,11 @@ const router = (app) => {
   app.use("/api/variant", variant);
   app.use("/api/comment", comment);
   app.use("/api/discount", discount);
-  app.use('/api/order', require('./order'));
-
+  app.use("/api/order", order);
+  app.use("/api/size", size);
+  app.use("/api/color", color);
+  app.use("/api/color", color);
+  app.use("/api/cart", cart);
+  app.use("/api/address", address);
 };
 module.exports = router;

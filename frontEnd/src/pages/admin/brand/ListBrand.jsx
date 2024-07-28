@@ -8,8 +8,6 @@ import {
   Button,
   Dropdown,
   Breadcrumb,
-  Pagination,
-  Select,
   Modal,
   Label,
   Textarea,
@@ -36,7 +34,7 @@ const schema = z.object({
   website: z.string().min(1, { message: "Website không hợp lệ." }),
   contactEmail: z.string().min(1, { message: "Email không hợp lệ." }),
   status: z.enum(["Hidden", "Presently"], {
-    message: "Trạn thái không hợp lệ.",
+    message: "Trạng thái không hợp lệ.",
   }),
   logo: z.custom((value) => {
     if (value instanceof FileList) {
@@ -419,6 +417,7 @@ function ListBrand() {
                 <p className="text-red-500">{errors?.description?.message}</p>
               )}
             </div>
+
             <div>
               <label
                 htmlFor=""

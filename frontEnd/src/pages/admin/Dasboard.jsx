@@ -10,12 +10,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Checkbox, Table, Button } from "flowbite-react";
-import { Doughnut, Bar } from "react-chartjs-2";
-import { ButtonPro } from "../../components/common";
+import { Table} from "flowbite-react";
+import { Bar } from "react-chartjs-2";
 import { useTranslation } from "react-i18next";
-import { qkvn } from "../../assets/images";
-import { pathAdmin } from "../../utils/path";
 import { apiCountProduct, apiCountUser, apiGetAllUser } from "../../apis/axios";
 import { toast } from "react-toastify";
 

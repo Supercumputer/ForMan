@@ -7,44 +7,58 @@ import {
 import { ProItem, SectionHeader } from "../../components/clientComponent";
 import { Img } from "../../components/common";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { apiGetAllBrand, apiGetAllProductVariant } from "../../apis/axios";
 
 const slides = [
   "https://4menshop.com/images/thumbs/slides/slide-2-trang-chu-slide-2.png?t=1716575843",
   "https://theme.hstatic.net/200000690725/1001078549/14/slide_4_img.jpg?v=422",
   "https://theme.hstatic.net/200000690725/1001078549/14/slide_1_img.jpg?v=418",
 ];
+
 function Home() {
+  const [productNews, setProductNews] = useState([]);
+  const [brands, setBrands] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      await Promise.all([
+        apiGetAllProductVariant("?limit=8&category=hang-moi-ve"),
+        apiGetAllBrand(),
+      ])
+        .then(([listProNew, listBrand]) => {
+          setProductNews(listProNew.listProducts);
+          setBrands(listBrand.brands);
+        })
+        .catch()
+        .finally();
+    })();
+  }, []);
+ 
   return (
     <>
       <div className="">
         <SlideBanner data={slides} />
+
         <div className="lg:px-[8%] px-2">
           <SectionHeader title={"THỜI TRANG HOT NHẤT"} />
-          <SlideProduct />
+          <SlideProduct data={productNews} />
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
+            {productNews.map((item) => (
+              <ProItem item={item} />
+            ))}
           </div>
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
-            <ProItem />
+            {productNews.map((item) => (
+              <ProItem item={item} />
+            ))}
           </div>
           <SectionHeader title={"THƯƠNG HIỆU ĐỒNG HÀNH"} />
-          <SlideBrand />
+
+          <SlideBrand data={brands} />
+
           <SectionHeader title={"TIN TỨC"} />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link href="#" class="flex flex-col border-gray-200 rounded-lg">

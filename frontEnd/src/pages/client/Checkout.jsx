@@ -1,150 +1,94 @@
-import React from "react";
-import { InputField } from "../../components/common";
-import { Button, Label, Textarea } from "flowbite-react";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { CheckoutForm, CheckoutInfo } from "../../components/clientComponent";
+import { useNavigate } from "react-router-dom";
+import { apiCreateOrder, apiCreatePaymentUrlVnpay } from "../../apis/axios";
+import { toast } from "react-toastify";
+
+
+const schema = z.object({
+    name: z.string().min(1, { message: "Full name không được để trống." }),
+    email: z.string().email({ message: "Email không hợp lệ." }),
+    phone: z.string().min(1, { message: "Số điẹn thoại không hợp lệ." }),
+    address: z.string().min(1, { message: "Address không hợp lệ." }),
+    note: z.string().optional(),
+    discount: z.string().optional(),
+    delivery: z.string().optional(),
+    total_payment: z.string().optional(),
+});
 
 function Checkout() {
-  return (
-    <div className="flex lg:px-[8%] px-2 my-10 gap-10 font-roboto">
-      <div className="flex-1">
-        <h1 className="font-semibold text-xl border-b pb-3 mb-3">
-          Thông tin nhận hàng
-        </h1>
-        <form action="" method="post" className="flex flex-col gap-2">
-          <div className="grid grid-cols-2 gap-5 mb-4">
-            <InputField filed={"Họ"} placeholder="Họ" />
-            <InputField filed={"Tên"} placeholder="Tên" />
-            <InputField filed={"Email"} placeholder="Email" />
-            <InputField filed={"Số điện thoại"} placeholder="Số điện thoại" />
-          </div>
-          <InputField filed={"Địa chỉ"} placeholder="Địa chỉ" />
-          <div className="w-full mt-4">
-            <div className="mb-2 block">
-              <Label htmlFor="comment" value="Ghi chú" />
-            </div>
-            <Textarea
-              id="comment"
-              placeholder="Ghi chú"
-              required
-              rows={4}
-            />
-          </div>
-        </form>
-      </div>
-      <div className="flex-1">
-        <ul class="divide-gray-200 border-b mb-5">
-          <li class="flex">
-            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-              <img
-                src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-01.jpg"
-                alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
-                class="h-full w-full object-cover object-center"
-              />
-            </div>
 
-            <div class="ml-4 flex flex-1 flex-col">
-              <div>
-                <div class="flex justify-between text-base font-medium text-gray-900">
-                  <h3>
-                    <a href="#">Throwback Hip Bag fdgd fdgdf dfg dg d</a>
-                  </h3>
-                  <p class="ml-4">$90.00</p>
-                </div>
-                <p class="mt-1 text-sm text-gray-500">Salmon</p>
-              </div>
-              <div class="flex flex-1 items-end justify-between text-sm">
-                <p class="text-gray-500">Qty 1</p>
+    const { carts } = useSelector((state) => state.cart);
+    const navigate = useNavigate();
 
-                <div class="flex">
-                  <button
-                    type="button"
-                    class="font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
+    useEffect(() => {
+        if (carts.length <= 0) navigate("/carts");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [carts]);
 
-          <li class="flex py-6">
-            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-              <img
-                src="https://tailwindui.com/img/ecommerce-images/shopping-cart-page-04-product-02.jpg"
-                alt="Front of satchel with blue canvas body, black straps and handle, drawstring top, and front zipper pouch."
-                class="h-full w-full object-cover object-center"
-              />
-            </div>
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(schema),
+    });
 
-            <div class="ml-4 flex flex-1 flex-col">
-              <div>
-                <div class="flex justify-between text-base font-medium text-gray-900">
-                  <h3>
-                    <a href="#">Medium Stuff Satchel</a>
-                  </h3>
-                  <p class="ml-4">$32.00</p>
-                </div>
-                <p class="mt-1 text-sm text-gray-500">Blue</p>
-              </div>
-              <div class="flex flex-1 items-end justify-between text-sm">
-                <p class="text-gray-500">Qty 1</p>
+    const { account } = useSelector((state) => state.auth);
 
-                <div class="flex">
-                  <button
-                    type="button"
-                    class="font-medium text-indigo-600 hover:text-indigo-500"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
+    const onSubmit = async (data) => {
+        try {
+            const newData = { carts, user_id: account?.id, ...data };
 
-        <div className="flex items-center gap-3 pb-5 border-b mb-5">
-          <input
-            type="text"
-            id="last_name"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-            placeholder="Voucher code"
-          />
+            const res = await apiCreateOrder(newData);
 
-          <Button
-            size="sm"
-            isProcessing={false}
-            gradientDuoTone="purpleToBlue"
-            className="text-nowrap"
-          >
-            Áp dụng
-          </Button>
-        </div>
+            if (res && res.status) {
+                switch (data.delivery) {
+                    case "COD":
+                        navigate(`/thanks?orderId=${res.data._id}&paymentStatus=00&type=COD`);
+                        break;
 
-        <div className="flex flex-col gap-3 pb-5 border-b mb-5">
-          <div className="flex justify-between">
-            <span className="font-bold">Tạm tính: </span>
-            <span className="text-red-500 font-bold">$160.00</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-bold">Phi ship: </span>
-            <span className="text-red-500 font-bold">$10.00</span>
-          </div>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-bold text-xl">Tổng thanh toán: </span>
-          <span className="text-2xl text-red-500 font-bold">$170.00</span>
-        </div>
+                    case "VNPAY":
+                        const resVnpay = await apiCreatePaymentUrlVnpay({ ...data, order_id: res.data._id });
 
-        <Button
-          size="lg"
-          isProcessing={false}
-          gradientDuoTone="purpleToBlue"
-          className="w-full mt-5 text-nowrap"
+                        const paymentUrl = resVnpay.paymentUrl;
+
+                        if (paymentUrl) {
+                            window.location.href = paymentUrl;
+                        }
+
+                        break;
+                    case "MOMO":
+                        
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }else{
+                toast.error(res.message);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    return (
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col lg:flex-row lg:px-[8%] px-2 lg:my-10 my-5 gap-10 font-roboto"
         >
-          Thanh toán
-        </Button>
-      </div>
-    </div>
-  );
+            <CheckoutForm register={register} account={account} errors={errors} reset={reset} />
+            <CheckoutInfo register={register} reset={reset} />
+        </form>
+    );
 }
 
 export default Checkout;

@@ -1,5 +1,6 @@
+const discount = require("../models/discount");
 const Discounts = require("../models/discount");
-
+const { updateDiscounts, checkDiscountValidity } = require("../services/discountService");
 const create = async (req, res) => {
   try {
     const { code, description, percentage, validFrom, validTo, quantity } =
@@ -42,9 +43,11 @@ const create = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const getAll = async (req, res) => {
   try {
+
+    await updateDiscounts()
+
     const { page = 1, limit = 10, keyword = "" } = req.query;
 
     const pageNumber = parseInt(page);
@@ -67,7 +70,6 @@ const getAll = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 const deleteDiscount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -93,7 +95,6 @@ const deleteDiscount = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const getDiscount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -117,7 +118,26 @@ const getDiscount = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const updateDiscountByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
 
+    const { user_id } = req.body;
+
+    const discount = await Discounts.findOne({ code: code.toUpperCase() });
+
+    discount.usedBy.filter((id) => id !== user_id);
+
+    discount.quantity += 1;
+
+    await discount.save();
+
+    return res.status(200).json({ status: true, message: "Discount updated successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 const updateDiscount = async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,7 +169,6 @@ const updateDiscount = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const deleteDiscounts = async (req, res) => {
   try {
     const ids = req.body;
@@ -175,6 +194,24 @@ const deleteDiscounts = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const getDiscountByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    await updateDiscounts()
+
+    const check = await checkDiscountValidity(code, req?.user?._id);
+
+    if (!check.status) {
+      return res.status(400).json({ status: false, message: check.message });
+    }
+
+    return res.status(200).json({ status: true, discount: check.discount });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   create,
@@ -183,4 +220,6 @@ module.exports = {
   getDiscount,
   updateDiscount,
   deleteDiscounts,
+  getDiscountByCode,
+  updateDiscountByCode
 };

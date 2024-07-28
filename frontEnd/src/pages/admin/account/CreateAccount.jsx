@@ -18,7 +18,6 @@ const schema = z
     phone: z.string().regex(/^0[0-9]{9}$/, {
       message: "Phone không hợp lệ.",
     }),
-    address: z.string().min(1, { message: "Address không hợp lệ." }),
     sex: z.enum(["Male", "Female", "Other"], { message: "Sex không hợp lệ." }),
     role: z
       .string()
@@ -56,7 +55,6 @@ function CreateAccount() {
   useEffect(() => {
     (async () => {
       const res = await apiGetAllGroupRole("admin");
-
       if (res) {
         setGroupRole(res.groupRoles);
       }
@@ -204,15 +202,6 @@ function CreateAccount() {
               filed="Avatar"
               register={register("avatar")}
               errors={errors?.avatar?.message}
-            />
-          </div>
-
-          <div className="mb-6">
-            <InputField
-              filed="Addresss"
-              placeholder="1234 Main St"
-              register={register("address")}
-              errors={errors?.address?.message}
             />
           </div>
 

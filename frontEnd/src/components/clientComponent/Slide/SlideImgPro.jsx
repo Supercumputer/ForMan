@@ -11,7 +11,10 @@ import "swiper/css/thumbs";
 // import required modules
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 
-const SlideImgPro = () => {
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
+
+const SlideImgPro = ({ data = [] }) => {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   return (
@@ -23,80 +26,15 @@ const SlideImgPro = () => {
         }}
         spaceBetween={10}
         navigation={true}
-        thumbs={thumbsSwiper ? { swiper: thumbsSwiper } : undefined}
+        thumbs={{ swiper: thumbsSwiper }}
         modules={[FreeMode, Navigation, Thumbs]}
         className="h-[80%]"
       >
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-1.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            className="h-full w-full object-cover"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-3.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-5.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-6.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-7.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-8.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-9.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://swiperjs.com/demos/images/nature-10.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
+        {data.map((item) => (
+          <SwiperSlide key={item}>
+            <img src={item} alt="" className="h-full w-full object-contain" />
+          </SwiperSlide>
+        ))}
       </Swiper>
 
       <Swiper
@@ -108,76 +46,13 @@ const SlideImgPro = () => {
         modules={[FreeMode, Navigation, Thumbs]}
         className="h-[20%]"
       >
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-1.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-2.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-3.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-5.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-6.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-7.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-8.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-9.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
-        <SwiperSlide style={{ width: "25%", paddingTop: "10px" }}>
-          <img
-            src="https://swiperjs.com/demos/images/nature-10.jpg"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        </SwiperSlide>
+        {data.map((item) => (
+          <SwiperSlide key={item} style={{ width: "25%", paddingTop: "10px" }}>
+            <Zoom>
+              <img src={item} alt="" className="h-full w-full object-cover" />
+            </Zoom>
+          </SwiperSlide>
+        ))}
       </Swiper>
     </>
   );

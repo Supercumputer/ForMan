@@ -1,20 +1,16 @@
-import { useState, useMemo, useEffect } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { HiHome } from "react-icons/hi";
-import {
-  Checkbox,
-  Table,
-  Button,
-  Dropdown,
-  Breadcrumb,
-  Pagination,
-  Select,
-} from "flowbite-react";
+import { Checkbox, Table, Button, Dropdown, Breadcrumb } from "flowbite-react";
 import { ButtonPro, Img } from "../../../components/common";
 import { pathAdmin } from "../../../utils/path";
 import { toast } from "react-toastify";
-import { apiDeleteVariant, apiGetAllVariantById, apiSoftDeleteVariants } from "../../../apis/axios";
+import {
+  apiDeleteVariant,
+  apiGetAllVariantById,
+  apiSoftDeleteVariants,
+} from "../../../apis/axios";
 import Swal from "sweetalert2";
 
 const ListVariant = () => {
@@ -220,8 +216,8 @@ const ListVariant = () => {
                         />
                       ))}
                     </Table.Cell>
-                    <Table.Cell>{item.color}</Table.Cell>
-                    <Table.Cell>{item.size}</Table.Cell>
+                    <Table.Cell>{item.color.colorName}</Table.Cell>
+                    <Table.Cell>{item.size.sizeName}</Table.Cell>
                     <Table.Cell>{item.sale}</Table.Cell>
                     <Table.Cell>{item.quantity}</Table.Cell>
                     <Table.Cell>{item.price}</Table.Cell>

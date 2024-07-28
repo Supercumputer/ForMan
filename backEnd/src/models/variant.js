@@ -6,8 +6,8 @@ const variant = new Schema(
   {
     product_id: { type: Schema.Types.ObjectId, ref: "Product" },
     mbt: { type: String, unique: true, required: true },
-    color: { type: String, required: true },
-    size: { type: String, required: true },
+    color: { type: Schema.Types.ObjectId, ref: "Color" },
+    size: { type: Schema.Types.ObjectId, ref: "Size" },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
     sale: { type: Number, default: 0 },

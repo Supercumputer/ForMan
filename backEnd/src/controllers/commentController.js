@@ -153,7 +153,8 @@ const getComments = async (req, res) => {
 
     const comments = await Comments.find({ variant_id: id }).populate({
       path: "comments",
-      populate: { path: "user_id", select: "firstName lastName email" },});
+      populate: { path: "user_id", select: "firstName lastName email" },
+    });
 
     return res.status(200).json({ status: true, comments });
   } catch (error) {

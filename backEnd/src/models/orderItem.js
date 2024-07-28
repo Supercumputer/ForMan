@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const orderItem = new Schema(
   {
-    order_Id: { type: Schema.Types.ObjectId, ref: "Order" },
-    variant_Id: { type: Schema.Types.ObjectId, ref: "Variant" },
+    order_id: { type: Schema.Types.ObjectId, ref: "Order" },
+    variant_id: { type: Schema.Types.ObjectId, ref: "Variant" },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
     sale: { type: Number, default: 0 },

@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { ProItem } from "../../components/clientComponent";
-import { Pagination, Spinner } from "flowbite-react";
+import { Spinner } from "flowbite-react";
 import { apiGetAllProductVariant } from "../../apis/axios";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 function Search() {
-  const [currentPage, setCurrentPage] = useState(1);
- 
-  const [result, setResult] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const onPageChange = (page) => setCurrentPage(page);
-
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get("keyword");
+  
+  const navigate = useNavigate();
+  const page = searchParams.get("page") || 1;
+
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState([]);
+
+  const handlePageClick = (data) => {
+    const selectedPage = data.selected + 1;
+    navigate(`/search?keyword=${keyword}&page=${selectedPage}`);
+  };
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
-        const res = await apiGetAllProductVariant(`?search=${keyword}&limit=8`);
+        const res = await apiGetAllProductVariant(
+          `?search=${keyword}&limit=4&page=${page}`
+        );
 
         if (res && res.status) {
           setTotalRecords(res.totalRecords);
+          setTotalPages(res.totalPages);
           setResult(res.listProducts);
         }
       } catch (error) {
@@ -31,7 +41,7 @@ function Search() {
         setLoading(false);
       }
     })();
-  }, [keyword]);
+  }, [keyword, page]);
 
   return (
     <div className="lg:px-[8%] px-2">
@@ -51,18 +61,25 @@ function Search() {
                 <ProItem item={item} />
               ))}
             </div>
-            <div className="flex justify-center mt-5">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={3}
-                onPageChange={onPageChange}
+            <div className="flex justify-center my-10">
+              <ReactPaginate
+                nextLabel={<i class="fa-solid fa-chevron-right"></i>}
+                previousLabel={<i class="fa-solid fa-chevron-left"></i>}
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={3}
+                marginPagesDisplayed={2}
+                pageCount={totalPages}
+                containerClassName="pagination"
+                activeClassName="active"
+                renderOnZeroPageCount={null}
+                forcePage={page - 1}
               />
             </div>
           </div>
         </div>
       ) : (
-        <div className="text-center">
-          <Spinner aria-label="Center-aligned spinner example" />
+        <div className="text-center h-[400px] flex items-center justify-center">
+          <Spinner aria-label="Center-aligned spinner example" color={"gray"}/>
         </div>
       )}
     </div>

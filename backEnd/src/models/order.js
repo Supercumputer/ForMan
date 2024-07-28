@@ -1,29 +1,30 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const mongooseDelete = require("mongoose-delete");
 
 const order = new Schema(
   {
     user_id: { type: Schema.Types.ObjectId, ref: "User" },
 
     sender: {
-      sender_name: { type: String, default: "" },
-      sender_phone: { type: String, default: "" },
-      sender_address: { type: String, default: "" },
-      sender_email: { type: String, default: "" },
+      name: { type: String, default: "" },
+      phone: { type: String, default: "" },
+      address: { type: String, default: "" },
+      email: { type: String, default: "" },
     },
 
     receiver: {
-      receiver_name: { type: String, default: "" },
-      receiver_phone: { type: String, default: "" },
-      receiver_address: { type: String, default: "" },
-      receiver_email: { type: String, default: "" },
+      name: { type: String, default: "" },
+      phone: { type: String, default: "" },
+      address: { type: String, default: "" },
+      email: { type: String, default: "" },
     },
 
     delivery: { type: String, enum: ["COD", "VNPAY", "MOMO"], default: "COD" },
 
     status: {
       type: String,
-      enum: ["Pending", "Shipping", "Success", "Cancel"],
+      enum: ["Pending", "Confirmed", "Preparing", "Shipping", "Delivered", "Cancelled", "Completed", "Failure"],
       default: "Pending",
     },
 
@@ -33,12 +34,7 @@ const order = new Schema(
       default: "Unpaid",
     },
 
-    payment_details: {
-      type: Object,
-      default: null,
-    },
-
-    total: { type: Number, default: 0 },
+    note: { type: String, default: "" },
 
     discount: { type: String, default: null },
 
@@ -48,5 +44,7 @@ const order = new Schema(
     timestamps: true,
   }
 );
+
+order.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 module.exports = mongoose.model("Order", order);

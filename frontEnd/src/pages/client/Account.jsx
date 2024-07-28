@@ -1,98 +1,102 @@
-import React, { useState } from "react";
-import { ButtonPro, Img, InputField } from "../../components/common";
-import { Button } from "flowbite-react";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { apiGetDetailUser, apiLogout } from "../../apis/axios";
+import { AddressDelivery, BtnOption, HistoryOrder, InforAccount, ResetPassword } from "../../components/clientComponent";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../redux/auth";
 
 function Account() {
   const [active, setActive] = useState(1);
-  return (
-    <div className="flex lg:px-[8%] px-2 my-10 gap-10">
-      <div className="flex flex-col gap-1 w-80">
-        <ButtonPro
-          name={
-            <div className="flex items-center gap-2 font-semibold">
-              <i class="fa-solid fa-user"> </i>
-              <span>Thông tin cá nhân</span>
-            </div>
-          }
-          to={"/login"}
-          className={`p-3 ${
-            active === 1 && "bg-[#f5f5f5]"
-          } rounded-md hover:bg-[#f5f5f5]`}
-        />
-        <ButtonPro
-          name={
-            <div className="flex items-center gap-2 font-semibold">
-              <i class="fa-solid fa-clock-rotate-left"></i>
-              <span>Lịch sử đơn hàng</span>
-            </div>
-          }
-          to={"/login"}
-          className={`p-3 ${
-            active === 2 && "bg-[#f5f5f5]"
-          } rounded-md hover:bg-[#f5f5f5]`}
-        />
 
-        <ButtonPro
-          name={
-            <div className="flex items-center gap-2 font-semibold">
-              <i class="fa-solid fa-key"></i>
-              <span>Đặt lại mật khẩu</span>
-            </div>
-          }
-          to={"/login"}
-          className={`p-3 ${
-            active === 4 && "bg-[#f5f5f5]"
-          } rounded-md hover:bg-[#f5f5f5]`}
+  const dispatch = useDispatch();
+  const {account} = useSelector((state) => state.auth);
+  const [user, setUser] = useState({});
+
+  const navigate = useNavigate();
+
+  const handlerLogout = async () => {
+    try {
+      const res = await apiLogout();
+
+      if (res && res.status) {
+        navigate("/");
+        dispatch(logout());
+        toast.success(res.message);
+      }
+
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    async function callApiGetUserInfo() {
+      try {
+        const res = await apiGetDetailUser(account.id);
+        if (res && res.status) {
+          setUser(res.user);
+        }
+      } catch (error) {
+        console.error('Error fetching user info:', error);
+      }
+    }
+
+    callApiGetUserInfo();
+  }, [account.id]);
+
+  return (
+    <div className="flex lg:flex-row flex-col lg:px-[8%] px-2 lg:my-10 my-5 gap-5">
+      <div className="flex lg:flex-col flex-row flex-wrap gap-3 lg:w-80 flex-shrink-0">
+        <BtnOption
+          active={active === 1}
+          name={"Thông tin cá nhân"}
+          setActive={() => setActive(1)}
+          icon={<i class="fa-solid fa-user"></i>}
         />
-        <ButtonPro
-          name={
-            <div className="flex items-center gap-2 font-semibold">
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span>Đăng xuất</span>
-            </div>
-          }
-          to={"/login"}
-          className={`p-3 ${
-            active === 5 && "bg-[#f5f5f5]"
-          } rounded-md hover:bg-[#f5f5f5]`}
+        <BtnOption
+          active={active === 2}
+          name={"Lịch sử đơn hàng"}
+          setActive={() => setActive(2)}
+          icon={<i class="fa-brands fa-jedi-order"></i>}
+        />
+        <BtnOption
+          active={active === 3}
+          name={"Đặt lại mật khẩu"}
+          setActive={() => setActive(3)}
+          icon={<i class="fa-solid fa-user-pen"></i>}
+        />
+        <BtnOption
+          active={active === 4}
+          name={"Địa chỉ giao hàng"}
+          setActive={() => setActive(4)}
+          icon={<i class="fa-solid fa-location-dot"></i>}
+        />
+        <BtnOption
+          active={false}
+          name={"Đăng xuất"}
+          setActive={handlerLogout}
+          icon={<i class="fa-solid fa-right-from-bracket"></i>}
         />
       </div>
-      <div className="flex-1">
-        <h1 className="font-semibold text-xl mb-5">Thông tin cá nhân</h1>
 
-        <div className="flex items-center gap-10">
-          <div className="flex-1 flex flex-col gap-3">
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="min-w-[150px]">Họ: </span>
-              <InputField />
-            </div>
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="min-w-[150px]">Tên: </span>
-              <InputField />
-            </div>
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="min-w-[150px]">Email: </span>
-              <InputField />
-            </div>
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="min-w-[150px]">Số điện thoại: </span>
-              <InputField />
-            </div>
-            <div className="flex items-center gap-2 font-semibold">
-              <span className="min-w-[150px]">Địa chỉ: </span>
-              <InputField />
-            </div>
-          </div>
-          <div className="w-36">
-            <Img src={"https://via.placeholder.com/300x300"} alt="avatar" />
-            <p className="flex justify-center">Avatar</p>
-          </div>
-        </div>
-        <div className="flex justify-center mt-5">
-          <Button size="sm" isProcessing={false} gradientDuoTone="purpleToBlue">
-            Save change
-          </Button>
-        </div>
+      <div className="flex-1 bg-white shadow-md rounded-lg p-6">
+
+        {active === 1 &&
+          <InforAccount data={user} account={account} />
+        }
+
+        {active === 2 &&
+          <HistoryOrder />
+        }
+
+        {active === 3 &&
+          <ResetPassword />
+        }
+
+        {active === 4 &&
+          <AddressDelivery  />
+        }
       </div>
     </div>
   );

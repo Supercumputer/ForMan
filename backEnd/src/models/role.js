@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const role = new Schema(
   {
     route: { type: String, required: true, unique: true },
-    description: { type: String, required: true, unique: true, unique: true },
+    description: { type: String, required: true, unique: true },
   },
   {
     timestamps: true,

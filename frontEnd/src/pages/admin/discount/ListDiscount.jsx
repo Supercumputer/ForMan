@@ -27,12 +27,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Swal from "sweetalert2";
+import { formatDate } from "../../../utils/helper";
 
 const schema = z.object({
   code: z.string().min(1, { message: "Code không hợp lệ." }),
   description: z.string().min(1, { message: "Description không hợp lệ." }),
   validFrom: z.string().min(1, { message: "Ngày bắt đầu không hợp lệ." }),
   validTo: z.string().min(1, { message: "Ngày kết thúc không hợp lệ." }),
+  status: z.string().min(1, { message: "Status không hợp lệ." }),
   quantity: z.preprocess((val) => {
     if (typeof val === "string") val = val.trim();
     return val === "" ? NaN : parseInt(val, 10);
@@ -70,7 +72,7 @@ function ListDiscount() {
       const res = await apiGetAllDiscount(currentPage, limit, keyword);
 
       if (res && res.status) {
-        console.log(res);
+
         setData(res.discounts);
         setCurrentPage(res?.currentPage);
         setTotalPages(res?.totalPages);
@@ -106,7 +108,7 @@ function ListDiscount() {
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
-        callApiGetAllDiscount();
+        callApiGetAllDiscount(currentPage, limit, keyword);
       } else {
         toast.error(res?.message);
       }
@@ -200,7 +202,7 @@ function ListDiscount() {
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
-            callApiGetAllDiscount();
+            callApiGetAllDiscount(currentPage, limit, keyword);
           } else {
             toast.error(res?.message);
           }
@@ -311,20 +313,19 @@ function ListDiscount() {
                   <Table.Cell>{item.description}</Table.Cell>
                   <Table.Cell>{item.quantity}</Table.Cell>
                   <Table.Cell>{item.percentage}%</Table.Cell>
-                  <Table.Cell>{item.validFrom}</Table.Cell>
-                  <Table.Cell>{item.validTo}</Table.Cell>
+                  <Table.Cell>{formatDate(item.validFrom)}</Table.Cell>
+                  <Table.Cell>{formatDate(item.validTo)}</Table.Cell>
                   <Table.Cell
-                    className={`${
-                      item.status === "Active"
-                        ? "text-green-500"
-                        : item.status === "Inactive"
+                    className={`${item.status === "Active"
+                      ? "text-green-500"
+                      : item.status === "Inactive"
                         ? "text-yellow-500"
                         : item.status === "Expired"
-                        ? "text-gray-500"
-                        : item.status === "Used"
-                        ? "text-blue-500"
-                        : ""
-                    } font-semibold`}
+                          ? "text-gray-500"
+                          : item.status === "Used"
+                            ? "text-blue-500"
+                            : ""
+                      } font-semibold`}
                   >
                     {item.status}
                   </Table.Cell>
@@ -414,6 +415,25 @@ function ListDiscount() {
                 errors={errors?.percentage?.message}
               />
             </div>
+
+            <div>
+              <label
+                htmlFor=""
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Status
+              </label>
+              <select
+                {...register("status")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="Active">Active</option>
+                <option value="InActive">InActive</option>
+                <option value="Expired">Expired</option>
+                <option value="Used">Used</option>
+              </select>
+            </div>
+
             <div className="w-full">
               <div className="mb-2 block">
                 <Label htmlFor="comment" value="Your message" />

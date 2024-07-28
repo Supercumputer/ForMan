@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputField, ButtonPro, Img } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import { Button } from "flowbite-react";
@@ -8,7 +8,11 @@ import * as z from "zod";
 import { useNavigate, useParams } from "react-router-dom";
 import { pathAdmin } from "../../../utils/path";
 import { toast } from "react-toastify";
-import { apiCreateVariant } from "../../../apis/axios";
+import {
+  apiCreateVariant,
+  apiGetAllColor,
+  apiGetAllSize,
+} from "../../../apis/axios";
 
 const schema = z.object({
   color: z.string().min(1, { message: "Màu không hợp lệ." }), // Color là một chuỗi không rỗng
@@ -42,6 +46,8 @@ function CreateVariant() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
   const [files, setFiles] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -98,6 +104,17 @@ function CreateVariant() {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      await Promise.all([apiGetAllColor(), apiGetAllSize()]).then(
+        ([colors, sizes]) => {
+          setColors(colors);
+          setSizes(sizes);
+        }
+      );
+    })();
+  }, []);
+
   return (
     <div className="max-w-3xl mx-auto bg-[#fff] rounded-md overflow-hidden dark:bg-gray-800 ">
       <div className="text-xl px-3 py-2 border-b font-semibold dark:text-[#fff]">
@@ -108,18 +125,48 @@ function CreateVariant() {
           className="flex flex-col gap-5"
           onSubmit={handleSubmit(handlerSubmit)}
         >
-          <InputField
-            filed="Color"
-            placeholder="Nhập vào màu sản phẩm"
-            register={register("color")}
-            errors={errors?.color?.message}
-          />
-          <InputField
-            filed="Size"
-            placeholder="Nhập vào kích thước sản phẩm"
-            register={register("size")}
-            errors={errors?.size?.message}
-          />
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label
+                htmlFor=""
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Color
+              </label>
+              <select
+                {...register("color")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="">-- Color --</option>
+                {colors.map((color) => (
+                  <option value={color._id}>{color.colorName}</option>
+                ))}
+              </select>
+              {errors.color && (
+                <p className="text-red-500">{errors.color.message}</p>
+              )}
+            </div>
+            <div className="flex-1">
+              <label
+                htmlFor=""
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Size
+              </label>
+              <select
+                {...register("size")}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="">-- Size --</option>
+                {sizes.map((size) => (
+                  <option value={size._id}>{size.sizeName}</option>
+                ))}
+              </select>
+              {errors.size && (
+                <p className="text-red-500">{errors.size.message}</p>
+              )}
+            </div>
+          </div>
 
           <InputField
             filed="Price"

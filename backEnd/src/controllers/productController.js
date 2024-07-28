@@ -36,7 +36,7 @@ const createProduct = async (req, res) => {
     const productNew = await Products.create({
       code: code.toUpperCase(),
       name,
-      category,
+      category: category.split(",") || [],
       brand,
       description,
     });
@@ -70,11 +70,10 @@ const createProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const getAllProducts = async (req, res) => {
   try {
     // Get query parameters for pagination and search
-    const { page = 1, limit = 10, keyword = '' } = req.query;
+    const { page = 1, limit = 10, keyword = "" } = req.query;
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
@@ -128,9 +127,9 @@ const getAllProducts = async (req, res) => {
       pipeline.unshift({
         $match: {
           $or: [
-            { code: { $regex: keyword, $options: 'i' } }, // Case insensitive search on codeco
-            { name: { $regex: keyword, $options: 'i' } }, // Case insensitive search on name
-            { description: { $regex: keyword, $options: 'i' } }, // Case insensitive search on description
+            { code: { $regex: keyword, $options: "i" } }, // Case insensitive search on codeco
+            { name: { $regex: keyword, $options: "i" } }, // Case insensitive search on name
+            { description: { $regex: keyword, $options: "i" } }, // Case insensitive search on description
           ],
         },
       });
@@ -203,7 +202,7 @@ const updateProduct = async (req, res) => {
       {
         _id: id,
       },
-      req.body,
+      { ...req.body, category: req.body.category.split(",") },
       { new: true }
     );
 
@@ -258,7 +257,7 @@ const softDeleteProduct = async (req, res) => {
 const softDeleteProducts = async (req, res) => {
   try {
     const ids = req.body;
-   
+
     if (ids.length === 0) {
       return res
         .status(400)
@@ -266,7 +265,7 @@ const softDeleteProducts = async (req, res) => {
     }
 
     const deletedProducts = await Products.delete({ _id: { $in: ids } });
-    
+
     if (deletedProducts) {
       return res
         .status(200)
@@ -290,6 +289,39 @@ const countProduct = async (req, res) => {
   }
 };
 
+const getProductBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    if (!slug) {
+      return res.status(400).json({ message: "Product slug is required" });
+    }
+
+    const product = await Products.findOne({ slug: slug });
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Product not found" });
+    }
+
+    const variants = await Variants.find({ product_id: product._id }).populate({ path: 'color size', select: 'colorName sizeName', }).populate({ path: 'product_id', populate: { path: 'category' } }).sort({
+      sale: -1,
+    });
+
+    if (!variants || variants.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No variants found for this product" });
+    }
+
+    const defaultVariant = variants[0];
+
+    return res.json({ variants, defaultVariant });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createProduct,
@@ -299,4 +331,5 @@ module.exports = {
   softDeleteProducts,
   softDeleteProduct,
   countProduct,
+  getProductBySlug,
 };

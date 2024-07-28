@@ -4,6 +4,8 @@ import { Img } from "../../../components/common";
 import { toast } from "react-toastify";
 import { apiGetDetailUser } from "../../../apis/axios";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux"
+import { formatDate } from "../../../utils/helper";
 function DetailAccount() {
   const { t } = useTranslation("admin");
 
@@ -11,12 +13,17 @@ function DetailAccount() {
 
   const [data, setData] = useState({});
 
+  const { account } = useSelector((state) => state.auth);
+
   const { id } = useParams();
 
+  console.log(
+    id
+  );
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetDetailUser(id);
+        const res = await apiGetDetailUser(id || account.id);
         if (res) {
           console.log(res);
           setData(res.user);
@@ -25,30 +32,30 @@ function DetailAccount() {
         toast.error(error);
       }
     })();
-  }, [id]);
+  }, [id, account.id]);
   return (
     <div className="rounded-md flex gap-3">
       <div className="w-64 p-5 bg-[#fff] dark:bg-slate-800 rounded-md">
         <button
           type="button"
           onClick={() => setActive("info")}
-          className={`flex items-center w-full gap-3 ${
-            active === "info" &&
-            "text-blue-700 border-blue-700 dark:text-blue-700 dark:border-blue-700"
-          } border hover:border-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-[#fff] dark:text-[#fff] dark:hover:text-white hover:dark:text-blue-700 hover:dark:border-blue-700`}
+          className={`flex items-center w-full gap-3 px-5 py-3 mb-3 rounded-lg text-md font-semibold transition-colors duration-300 ${active === "info"
+              ? "text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-slate-700"
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+            }`}
         >
-          <i class="fa-regular fa-user"></i>
+          <i className="fa-regular fa-user"></i>
           {t("profile.personalInfo")}
         </button>
         <button
           type="button"
           onClick={() => setActive("history")}
-          className={`flex items-center w-full gap-3 ${
-            active === "history" &&
-            "text-blue-700 border-blue-700 dark:text-blue-700 dark:border-blue-700"
-          } border hover:border-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-[#fff] dark:text-[#fff] dark:hover:text-white hover:dark:text-blue-700 hover:dark:border-blue-700`}
+          className={`flex items-center w-full gap-3 px-5 py-3 mb-3 rounded-lg text-md font-semibold transition-colors duration-300 ${active === "history"
+              ? "text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-slate-700"
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
+            }`}
         >
-          <i class="fa-solid fa-cart-shopping"></i>
+          <i className="fa-solid fa-cart-shopping"></i>
           {t("profile.historyOrder")}
         </button>
       </div>
@@ -120,9 +127,9 @@ function DetailAccount() {
                   >
                     {t("fields.birthDay")}
                   </th>
-                  <td class="px-6 py-4">{data?.birthDay}</td>
+                  <td class="px-6 py-4">{formatDate(data?.birthDay)}</td>
                 </tr>
-                
+
                 <tr class="border-b border-gray-200 dark:border-gray-700">
                   <th
                     scope="row"
@@ -159,7 +166,7 @@ function DetailAccount() {
                   </th>
                   <td class="px-6 py-4">{data?.status}</td>
                 </tr>
-                <tr class="border-b border-gray-200 dark:border-gray-700">
+                <tr >
                   <th
                     scope="row"
                     class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
@@ -168,16 +175,8 @@ function DetailAccount() {
                   </th>
                   <td class="px-6 py-4">{data?.role?.name}</td>
                 </tr>
-                <tr>
-                  <th
-                    scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
-                  >
-                    {t("fields.address")}
-                  </th>
-                  <td class="px-6 py-4">{data?.address}</td>
-                </tr>
-                
+
+
               </tbody>
             </table>
           </div>

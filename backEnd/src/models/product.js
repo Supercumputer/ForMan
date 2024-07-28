@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-var slug = require("mongoose-slug-generator");
 const mongooseDelete = require("mongoose-delete");
+const slugify = require("slugify");
 
 const product = new Schema(
   {
     code: { type: String, required: true, unique: true },
     name: { type: String, required: true },
-    slug: { type: String, slug: "name", unique: true },
+    slug: { type: String, required: true, unique: true },
     description: { type: String, default: "" },
-    category: { type: Schema.Types.ObjectId, ref: "Category" },
+    category: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     brand: { type: Schema.Types.ObjectId, ref: "Brand" },
     views: { type: Number, default: 0 },
   },
@@ -18,39 +18,26 @@ const product = new Schema(
   }
 );
 
-mongoose.plugin(slug);
+// Middleware để tự động tạo slug từ name
+product.pre("validate", function (next) {
+  if (this.isModified("name")) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+  next();
+});
+
+// update slug
+product.pre("findOneAndUpdate", function (next) {
+  if (this.getUpdate().name) {
+    this.getUpdate().slug = slugify(this.getUpdate().name, {
+      lower: true,
+      strict: true,
+    });
+  }
+  next();
+});
+
+
 product.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 module.exports = mongoose.model("Product", product);
-
-// const mongoose = require("mongoose");
-// const Schema = mongoose.Schema;
-// const mongooseDelete = require("mongoose-delete");
-
-// const product = new Schema(
-//   {
-//     code: { type: String, required: true, unique: true },
-//     name: { type: String, required: true },
-//     description: { type: String, default: "" },
-//     category: { type: Schema.Types.ObjectId, ref: "Category" },
-//     brand: { type: Schema.Types.ObjectId, ref: "Brand" },
-//     variants: [
-//       {
-//         mbt: { type: String, unique: true },
-//         color: String,
-//         size: String,
-//         price: Number,
-//         quantity: Number,
-//         sale: { type: Number, default: 0 },
-//         images: { type: Array, default: [] }, // URLs to product images
-//       },
-//     ],
-//     views: { type: Number, default: 0 },
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-// product.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
-
-// module.exports = mongoose.model("Product", product);

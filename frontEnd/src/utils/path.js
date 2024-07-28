@@ -11,14 +11,13 @@ const BRAND = "/brand";
 const DISCOUNTS = "/discounts";
 
 const pathAdmin = {
-  // Đăng nhập và xác thực
-  login: `${ADMIN}/login`,
 
   // Bảng điều khiển
   dashboard: `${ADMIN}/dashboard`,
 
   // Quản lý tài khoản
   accounts: `${ADMIN}${ACCOUNT}`,
+  profile: `${ADMIN}${ACCOUNT}/profile`,
   managers: `${ADMIN}${ACCOUNT}/managers`,
   managersCreate: `${ADMIN}${ACCOUNT}/managers/create`,
   managerEdit: `${ADMIN}${ACCOUNT}/managers/edit/:id`,
@@ -34,13 +33,13 @@ const pathAdmin = {
   products: `${ADMIN}${PRODUCT}`,
   productsCreate: `${ADMIN}${PRODUCT}/create`,
   productsEdit: `${ADMIN}${PRODUCT}/:id/edit`,
-  
+
   productsVariant: `${ADMIN}${PRODUCT}/:id/variants`,
   productsVariantcreate: `${ADMIN}${PRODUCT}/:id/variants/create`,
   productsVariantEdit: `${ADMIN}${PRODUCT}/variants/:id/edit`,
 
   variantComment: `${ADMIN}/${PRODUCT}/:id/variants/:idc/comments`,
- 
+
   // Quản lý đơn hàng
   orders: `${ADMIN}${ORDERS}`,
   ordersDetail: `${ADMIN}${ORDERS}/detail/:id`,
@@ -59,7 +58,7 @@ const pathAdmin = {
 
   // Mã giảm giá
   discounts: `${ADMIN}${DISCOUNTS}`,
-  
+
   // Thống kê
   statistical: `${ADMIN}${STATISTICAL}`,
   statisticalInventory: `${ADMIN}${STATISTICAL}/inventory`,
@@ -73,12 +72,17 @@ const CLIENT = "/";
 
 const pathClient = {
   client: CLIENT,
-  product: `/collections`,
-  // productDetail: `/slugCate/:slugPro`,
-  productDetail: `/detail`,
-  checkout: `/checkout`,
+  login: `/login`,
+  orderLookUp: `/orderlookup`,
+  register: `/register`,
+  product: `/collections/:slug`,
+  productDetail: `/products/:slug`,
+  checkout: `/checkouts`,
+  inventory: `/checkouts/stock_problems`,
   account: `/account`,
   search: `/search`,
+  cart: `/carts`,
+  thanks: `/thanks`,
 
 }
 

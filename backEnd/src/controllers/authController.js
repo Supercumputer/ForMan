@@ -1,7 +1,14 @@
 const Users = require("../models/user");
-const { hashPassword } = require("../services/authService");
+const { v4: uuidv4 } = require("uuid");
+require("dotenv").config();
+const {
+  hashPassword,
+  generateAccessToken,
+} = require("../services/authService");
 
-const Register = async (req, res) => {
+const role = require("../models/role");
+
+const register = async (req, res) => {
   try {
     const { userName, fullName, email, password } = req.body;
 
@@ -32,21 +39,14 @@ const Register = async (req, res) => {
   }
 };
 
-const Login = async (req, res) => {
+const login = async (req, res) => {
   try {
+    // req.session.isAuthenticated = true;
     if (req.isAuthenticated()) {
-      res.cookie("access-token", req.user.accessToken, {
-        httpOnly: true,
-        sameSite: true,
-      });
-
-      res.status(200).json({
+      return res.status(200).json({
         message: "Login successfully",
         status: true,
-        user: req.user.userData,
       });
-    } else {
-      console.log("ko biet");
     }
   } catch (error) {
     console.log(error);
@@ -54,21 +54,76 @@ const Login = async (req, res) => {
   }
 };
 
-const Logout = (req, res) => {
+const googleLogin = (req, res) => {
   try {
-    res.clearCookie("access-token");
-    res.status(200).json({ message: "Logout successfully" });
+    if (req.user && req.isAuthenticated()) {
+      res.redirect("http://localhost:3000");
+    } else {
+      res.redirect("http://localhost:3000/login");
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-const CheckLogin = (req, res) => {
+const logout = (req, res) => {
   try {
-    if (req.isAuthenticated()) {
-     
-      res.status(200).json({ status: true, user: req.user });
-      
+    req.session.destroy();
+    req.logout((err) => {
+      return res.status(200).json({status: true, message: "Logout successfully" });
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAccount = async (req, res) => {
+  try {
+    if (req.user && req.isAuthenticated()) {
+      const refreshToken = uuidv4();
+
+      await Users.updateOne(
+        { email: req.user.email },
+        { refreshToken },
+        { new: true }
+      );
+
+      let payLoad = {
+        email: req.user.email,
+        role: req.user.role,
+        userName: req.user.userName,
+      };
+
+      const accessToken = generateAccessToken(payLoad);
+
+      res.cookie("accessToken", accessToken, {
+        maxAge: process.env.MAX_AGE_ACCESS_TOKEN,
+        httpOnly: true,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        maxAge: process.env.MAX_AGE_REFRESH_TOKEN,
+        httpOnly: true,
+      });
+
+      const resData = {
+        refreshToken,
+        accessToken,
+        email: req.user.email,
+        role: req.user.role,
+        userName: req.user.userName,
+        id: req.user._id,
+      };
+
+      // req.session.destroy();
+
+      return res.status(200).json({
+        message: "Login successfully",
+        status: true,
+        resData,
+      });
+    } else {
+      return res.status(401).json({ message: "You are not logged in" });
     }
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -76,8 +131,9 @@ const CheckLogin = (req, res) => {
 };
 
 module.exports = {
-  Register,
-  Login,
-  Logout,
-  CheckLogin,
+  register,
+  login,
+  logout,
+  getAccount,
+  googleLogin,
 };

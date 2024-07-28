@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 function ButtonPro({ type, to, href, name, ...props }) {
   const handlerdelete = () => {
+    
     if (type === "button") {
       Swal.fire({
         title: "Are you sure?",

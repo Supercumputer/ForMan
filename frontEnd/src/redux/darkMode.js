@@ -10,7 +10,6 @@ export const darkMode = createSlice({
         lightDark: (state, action) => {
             state.dark = action.payload
         }
-        
     },
 });
 

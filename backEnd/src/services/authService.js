@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
+const Users = require("../models/user");
 var jwt = require('jsonwebtoken');
 const saltRounds = 10;
+
 require("dotenv").config();
 
 const hashPassword = (password) => {
@@ -44,10 +46,35 @@ const verifyToken = (token) => {
   return decode;
 };
 
+const upsertUserSocialMedia = async (type, rawData) => {
+  try {
+    let user = null;
+    if(type === "google") {
+       user = await Users.findOne({$and: [{email: rawData.email}, {type}]});
+
+      if(!user) {
+         user = await Users.create({
+          email: rawData.email,
+          userName: rawData.userName,
+          firstName: rawData.firstName,
+          lastName: rawData.lastName,
+          type: "google",
+         })
+      }
+    }
+
+    return user
+  
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   hashPassword,
   comparePassword,
   generateAccessToken,
   gennerateRefreshToken,
   verifyToken,
+  upsertUserSocialMedia
 };

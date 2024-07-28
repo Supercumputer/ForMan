@@ -11,6 +11,7 @@ import {
   apiDeleteGroupRole,
 } from "../../../apis/axios";
 import { useEffect, useState } from "react";
+import { formatDate } from "../../../utils/helper";
 
 function ListGroupRole() {
   const [data, setData] = useState([]);
@@ -273,8 +274,8 @@ function ListGroupRole() {
                     </Table.Cell>
                     <Table.Cell>{index + 1}</Table.Cell>
                     <Table.Cell>{item.name}</Table.Cell>
-                    <Table.Cell>{item.createdAt}</Table.Cell>
-                    <Table.Cell>{item.updatedAt}</Table.Cell>
+                    <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
+                    <Table.Cell>{formatDate(item.updatedAt)}</Table.Cell>
 
                     <Table.Cell>
                       <div className="flex gap-2">

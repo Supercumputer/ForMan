@@ -16,7 +16,7 @@ const RecursiveList = ({ item, isChild }) => {
         }`}
         onClick={toggleOpen}
       >
-        <Link to="#">{item.categoryName}</Link>
+        <Link to={`/collections/${item.slug}`}>{item.categoryName}</Link>
         {!isChild ? (
           !isOpen ? (
             <i class="fa-solid fa-plus"></i>

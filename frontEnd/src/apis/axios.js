@@ -1,11 +1,39 @@
+import axios from "axios";
 import instance from "./instance";
 
 export const apiLogin = (data) => {
   return instance.post("/api/auth/login", data);
 };
 
-export const apiCheckLogin = () => {
-  return instance.get("/api/auth/checklogin");
+export const apiGetAccount = () => {
+  return instance.get("/api/auth/account");
+};
+
+export const apiLogout = () => {
+  return instance.get("/api/auth/logout");
+};
+
+// ========================= api cart ===============================
+export const apiUpsertCart = (data) => {
+  return instance.put("/api/cart/upsertcart", data);
+};
+export const apiGetCartByUserId = (user_id) => {
+  return instance.get(`/api/cart?user_id=${user_id}`);
+};
+export const apiDeleteCart = (data) => {
+  return instance.put("/api/cart/deletecart", data);
+};
+export const apiDeleteAllCart = (id) => {
+  return instance.delete(`/api/cart/${id}/deleteallbyuserid`);
+};
+export const apiUpadteQuantiTy = (data) => {
+  return instance.put("/api/cart/updatequantity", data);
+};
+export const apiMergeCart = (data) => {
+  return instance.put("/api/cart/mergecart", data);
+};
+export const apiCheckInventory = (data) => {
+  return instance.put("/api/cart/checkinventory", data);
 };
 
 //========================== api role ===============================
@@ -40,7 +68,7 @@ export const apiUpdateRole = (id, data) => {
 //==========================` User api ===============================
 export const apiCountUser = () => {
   return instance.get(`/api/user/count`);
-}
+};
 export const apiGetAllUser = (page, limit, type, keyword) => {
   return instance.get(
     `/api/user/getall?page=${page}&limit=${limit}&type=${type}&keyword=${keyword}`
@@ -60,6 +88,9 @@ export const apiSoftDeleteUsers = (data) => {
 };
 export const apiUpdateUser = (data, id) => {
   return instance.put(`/api/user/${id}/update`, data);
+};
+export const apiUpdatePassword = (data, id) => {
+  return instance.put(`/api/user/${id}/resetpassword`, data);
 };
 
 //========================== Category api ================================
@@ -106,14 +137,19 @@ export const apiDeleteBrand = (id) => {
 };
 export const apiDeleteBrands = (data) => {
   return instance.post(`/api/brand/deletes`, data);
-}
+};
 //========================== Products api ================================
 
 export const apiCountProduct = () => {
   return instance.get(`/api/product/count`);
-}
+};
 export const apiGetAllProduct = (page, limit, keyword) => {
-  return instance.get(`/api/product/getall?page=${page}&limit=${limit}&keyword=${keyword}`);
+  return instance.get(
+    `/api/product/getall?page=${page}&limit=${limit}&keyword=${keyword}`
+  );
+};
+export const apiGetProductBySlug = (slug) => {
+  return instance.get(`/api/product/getProductBySlug/${slug}/detail`);
 };
 export const apiCreateProduct = (data) => {
   return instance.post("/api/product/create", data);
@@ -153,11 +189,22 @@ export const apiSoftDeleteVariants = (data) => {
 export const apiEditVariant = (data, id) => {
   return instance.put(`/api/variant/${id}/updatevariant`, data);
 };
+export const apiUpdateQuantityVariant = (data) => {
+  return instance.put(`/api/variant/updatequantity`, data);
+};
 export const apiGetVariant = (id) => {
   return instance.get(`/api/variant/${id}/detail`);
 };
 export const apiGetRatings = (id, page) => {
   return instance.get(`/api/variant/${id}/getratings?page=${page}`);
+};
+export const apiGetAverageRating = (id) => {
+  return instance.get(`/api/variant/${id}/getaveragerating`);
+};
+export const apiGetRatingsByStar = (id, star, page) => {
+  return instance.get(
+    `/api/variant/${id}/getratingbystar?star=${star}&page=${page}`
+  );
 };
 export const apiUpdateReply = (data, id) => {
   return instance.put(`/api/variant/${id}/updatereply`, data);
@@ -166,7 +213,9 @@ export const apiUpdateReply = (data, id) => {
 // ========================= Discount api ================================
 
 export const apiGetAllDiscount = (page, limit, keyword) => {
-  return instance.get(`/api/discount/getall?page=${page}&limit=${limit}&keyword=${keyword}`);
+  return instance.get(
+    `/api/discount/getall?page=${page}&limit=${limit}&keyword=${keyword}`
+  );
 };
 
 export const apiCreateDiscount = (data) => {
@@ -176,9 +225,15 @@ export const apiCreateDiscount = (data) => {
 export const apiGetDiscount = (id) => {
   return instance.get(`/api/discount/${id}/detail`);
 };
+export const apiGetDiscountByCode = (code) => {
+  return instance.get(`/api/discount/${code}/getdiscountbycode`);
+};
 
 export const apiUpdateDiscount = (data, id) => {
   return instance.put(`/api/discount/${id}/update`, data);
+};
+export const apiUpdateDiscountByCode = (data, id) => {
+  return instance.put(`/api/discount/${id}/updatebycode`, data);
 };
 
 export const apiDeleteDiscount = (id) => {
@@ -186,4 +241,86 @@ export const apiDeleteDiscount = (id) => {
 };
 export const apiDeleteDiscounts = (data) => {
   return instance.post(`/api/discount/deletes`, data);
-}
+};
+
+// ========================= Role Color ================================
+export const apiGetAllColor = () => {
+  return instance.get(`/api/color/getall`);
+};
+export const apiGetAllSize = () => {
+  return instance.get(`/api/size/getall`);
+};
+
+// ======================= Api tỉnh vn =================================
+
+
+export const apiGetProvinces = () => {
+  return axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
+};
+export const apiGetDistrict = (id) => {
+  return axios.get(`https://esgoo.net/api-tinhthanh/2/${id}.htm`);
+};
+export const apiGetCommune = (id) => {
+  return axios.get(`https://esgoo.net/api-tinhthanh/3/${id}.htm`);
+};
+export const apiGetFullAddress = (id) => {
+  return axios.get(`https://esgoo.net/api-tinhthanh/5/${id}.htm`);
+};
+
+//============================ Api Address ======================================
+
+export const apiGetAllAddress = (id) => {
+  return instance.get(`/api/address/${id}/getall`);
+};
+export const apiGetDefaultAddress = (id) => {
+  return instance.get(`/api/address/${id}/getdefault`);
+};
+export const apiUpdateAddress = (id, data) => {
+  return instance.put(`/api/address/${id}/update`, data);
+};
+export const apiUpdateDefaultAddress = (id) => {
+  return instance.put(`/api/address/${id}/updateDefault`);
+};
+export const apiDeleteAddress = (id) => {
+  return instance.delete(`/api/address/${id}/delete`);
+};
+export const apiCreateAddress = (data) => {
+  return instance.post(`/api/address/create`, data);
+};
+
+// ========================= Api order ==============================
+
+export const apiCreateOrder = (data) => {
+  return instance.post(`/api/order/create`, data);
+};
+export const apiGetOrderById = (id) => {
+  return instance.get(`/api/order/${id}/getorderbyId`);
+};
+export const apiGetOrderByUserId = (id) => {
+  return instance.get(`/api/order/${id}/getorderbyuserid`);
+};
+export const apiGetOrderDetailById = (id) => {
+  return instance.get(`/api/order/${id}/getorderdetailbyId`);
+};
+export const apiGetAllOrders = (page, limit) => {
+  return instance.get(`/api/order/getallorders?page=${page}&limit=${limit}`);
+};
+export const apiSendMailOrder = (data) => {
+  return instance.post(`/api/order/sendemail`, data);
+};
+export const apiUpdateOrder = (id, data) => {
+  return instance.put(`/api/order/${id}/updateOrder`, data);
+};
+export const apiCreatePaymentUrlVnpay = (data) => {
+  return instance.post(`/api/order/create_payment_url`, data);
+};
+export const apipaymentResult = () => {
+  return instance.get(`/api/order/payment-result`);
+};
+export const apiDeleteSoftOrder = (id) => {
+  return instance.delete(`/api/order/${id}/deletesoftorder`);
+};
+export const apiDeleteSoftsOrder = (data) => {
+  return instance.post(`/api/order/deletesoftorders`, data);
+};
+
