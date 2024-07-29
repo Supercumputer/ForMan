@@ -23,7 +23,6 @@ module.exports = passport.use(
       };
 
       const user = await upsertUserSocialMedia(type, rawData);
-
       return cb(null, user);
     }
   )

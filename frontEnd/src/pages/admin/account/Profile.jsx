@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Img } from "../../../components/common";
 import { toast } from "react-toastify";
-import { apiGetDetailUser, apiUpdateUser } from "../../../apis/axios";
+import { apiGetDetailUser, apiGetOrderByUserId, apiUpdateUser } from "../../../apis/axios";
 import { useSelector } from "react-redux";
-import { Button } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {formatDate} from "../../../utils/helper";
+import { formatDate, formatNumber } from "../../../utils/helper";
+import { Link } from "react-router-dom";
 
 const schema = z.object({
   userName: z.string().min(1, { message: "Username không hợp lệ." }),
@@ -32,6 +33,7 @@ function DetailAccountAdmin() {
   const { t } = useTranslation("admin");
   const [activeTab, setActiveTab] = useState("info");
   const [userData, setUserData] = useState({});
+  const [orderData, setOrderData] = useState([]);
   const { account } = useSelector((state) => state.auth);
   const [isEdit, setIsEdit] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -85,6 +87,7 @@ function DetailAccountAdmin() {
     (async () => {
       try {
         const res = await apiGetDetailUser(account.id);
+
         if (res) {
           setUserData(res.user);
           reset({
@@ -97,6 +100,22 @@ function DetailAccountAdmin() {
         toast.error(error.message);
       }
     })();
+
+  }, [account.id]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiGetOrderByUserId(account.id);
+
+        if (res && res.status) {
+          setOrderData(res.orders);
+        }
+
+      } catch (error) {
+        console.log(error);
+      }
+    })()
   }, [account.id]);
 
   return (
@@ -220,14 +239,13 @@ function DetailAccountAdmin() {
                     {[
                       { label: t("fields.userName"), value: userData.userName },
                       { label: t("fields.fullName"), value: `${userData.lastName} ${userData.firstName}` },
-                      { label: t("fields.birthDay"), value: formatDate(userData?.birthDay) },
+                      { label: t("fields.birthDay"), value: formatDate(userData?.birthDay || new Date()) },
                       { label: t("fields.emailAddress"), value: userData.email },
                       { label: t("fields.phoneNumber"), value: userData.phone },
                       { label: t("fields.sex"), value: userData.sex },
                       { label: t("fields.activated"), value: userData.status },
                       { label: t("fields.role"), value: userData.role?.name },
                       { label: t("fields.type"), value: userData.type },
-                      { label: t("fields.refreshToken"), value: userData.refreshToken },
                     ].map((field, index) => (
                       <div key={index} className="flex flex-col">
                         <span className="text-sm text-gray-500">{field.label}</span>
@@ -248,8 +266,36 @@ function DetailAccountAdmin() {
               <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                 {t("profile.historyOrder")}
               </h3>
-              {/* Implement order history details here */}
-              <p>{t("profile.historyOrderDetails")}</p>
+
+              <div className="overflow-x-auto">
+                <Table hoverable>
+                  <Table.Head>
+                    <Table.HeadCell>STT</Table.HeadCell>
+                    <Table.HeadCell>Mã Đơn</Table.HeadCell>
+                    <Table.HeadCell>Ngày Tạo</Table.HeadCell>
+                    <Table.HeadCell>Tổng Giá</Table.HeadCell>
+                    <Table.HeadCell>Trạng thái</Table.HeadCell>
+                    <Table.HeadCell>
+                      <span className="sr-only">Detail</span>
+                    </Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {orderData.map((item, index) => (
+                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                          {index + 1}
+                        </Table.Cell>
+                        <Table.Cell>{item._id}</Table.Cell>
+                        <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
+                        <Table.Cell>{formatNumber(item.total_payment)}đ</Table.Cell>
+                        <Table.Cell>{item.status}</Table.Cell>
+                        <Table.Cell><Link to={`/admin/orders/detail/${item._id}`}><i class="fa-solid fa-angle-right hover:text-blue-500 hover:transform hover:scale-150"></i></Link></Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+              </div>
+
             </div>
           )}
         </div>

@@ -1,29 +1,28 @@
-
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { apiRegister } from "../../apis/axios"; 
+import { apiRegister } from "../../apis/axios";
 
-
-const schema = z.object({
-  email: z.string().email({ message: "Email không hợp lệ." }),
-  password: z
-    .string()
-    .min(8, { message: "Password phải tối thiểu là 8 kí tự." }),
-  confirmPassword: z
-    .string()
-    .min(8, { message: "Password phải tối thiểu là 8 kí tự." })
-    .refine((value, context) => value === context.parent.password, {
-      message: "Mật khẩu không khớp.",
-    }),
-  username: z
-    .string()
-    .min(3, { message: "Username phải tối thiểu là 3 kí tự." }),
-});
-
+const schema = z
+  .object({
+    firstName: z.string().min(1, { message: "Firstname hợp lệ." }), // Đúng tên biến
+    lastName: z.string().min(1, { message: "Lastname hợp lệ." }),
+    email: z.string().email({ message: "Email không hợp lệ." }),
+    password: z
+      .string()
+      .min(8, { message: "Password phải tối thiểu là 8 kí tự." }),
+    confirmPassword: z
+      .string()
+      .min(8, { message: "Password phải tối thiểu là 8 kí tự." }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Mật khẩu không khớp.",
+    path: ["confirmPassword"], // Gắn lỗi vào field confirmPassword
+  });
 const Register = () => {
+
   const navigate = useNavigate();
 
   const {
@@ -35,9 +34,16 @@ const Register = () => {
   });
 
   const handlerSubmit = async (data) => {
+
     try {
-      toast.success("Đăng kí thành công!");
-      navigate("/login");
+      const res = await apiRegister(data);
+
+      if (res && res.status) {
+        toast.success(res.message);
+        navigate("/login");
+      } else {
+        toast.error(res.message);
+      }
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -64,24 +70,47 @@ const Register = () => {
         </h1>
 
         <form onSubmit={handleSubmit(handlerSubmit)} className="p-8">
-          <div className="relative z-0 w-full mb-6 group">
-            <input
-              type="text"
-              name="floating_username"
-              id="floating_username"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              {...register("username")}
-            />
-            <label
-              htmlFor="floating_username"
-              className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-0 peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              Username
-            </label>
-            {errors.username && (
-              <p className="text-red-500 text-sm">{errors.username.message}</p>
-            )}
+
+          <div className="grid md:grid-cols-2 md:gap-6">
+            <div className="relative z-0 w-full mb-6 group">
+              <input
+                type="text"
+                name="floating_lastName" // Đúng tên biến
+                id="floating_lastName"
+                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                placeholder=" "
+                {...register("lastName")}
+              />
+              <label
+                htmlFor="floating_lastName"
+                className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-0 peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              >
+                LastName
+              </label>
+              {errors.lastName && (
+                <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+              )}
+            </div>
+
+            <div className="relative z-0 w-full mb-6 group">
+              <input
+                type="text"
+                name="floating_firstName" // Đúng tên biến
+                id="floating_firstName"
+                className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                placeholder=" "
+                {...register("firstName")}
+              />
+              <label
+                htmlFor="floating_firstName"
+                className="absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-0 peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              >
+                FirstName
+              </label>
+              {errors.firstName && (
+                <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+              )}
+            </div>
           </div>
 
           <div className="relative z-0 w-full mb-6 group">
@@ -151,7 +180,7 @@ const Register = () => {
               type="button"
               className="flex gap-2 items-center justify-center w-full py-2.5 px-4 mb-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
             >
-              <i class="fa-brands fa-google"></i>
+              <i className="fa-brands fa-google"></i>
               <span>Register with Google</span>
             </button>
 
@@ -159,7 +188,7 @@ const Register = () => {
               type="button"
               className="flex gap-2 items-center justify-center w-full py-2.5 px-4 mb-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
             >
-              <i class="fa-brands fa-facebook"></i>
+              <i className="fa-brands fa-facebook"></i>
               <span>Register with Facebook</span>
             </button>
           </div>

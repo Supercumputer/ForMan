@@ -4,8 +4,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { adminRouter } from "./routes";
 import { publicClientRouter, privateClientRouter } from "./routes/clientRouter";
 import { Fragment, useEffect } from "react";
-import { Login } from "./pages/client";
-import { pathClient } from "./utils/path";
 import { apiGetAccount } from "./apis/axios";
 import {
   PrivateRouterAdmin,
@@ -36,9 +34,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          {/* path public */}
-          <Route path={`${pathClient.login}`} element={<Login />} />
-
+        
           {/* path private admin */}
           <Route path="/admin" element={<PrivateRouterAdmin />}>
             {adminRouter.map((item, index) => {

@@ -40,31 +40,39 @@ const verifyToken = (token) => {
   let decode = null;
   try {
     decode = jwt.verify(token, key);
+    return decode;
   } catch (error) {
-    console.log(error);
+    return { error };
   }
-  return decode;
 };
 
 const upsertUserSocialMedia = async (type, rawData) => {
   try {
     let user = null;
-    if(type === "google") {
-       user = await Users.findOne({$and: [{email: rawData.email}, {type}]});
 
-      if(!user) {
-         user = await Users.create({
+    if (type === "google") {
+      user = await Users.findOne({ $and: [{ email: rawData.email }, { type }] });
+
+      if (!user) {
+        user = await Users.create({
           email: rawData.email,
           userName: rawData.userName,
           firstName: rawData.firstName,
           lastName: rawData.lastName,
           type: "google",
-         })
+        })
       }
     }
 
-    return user
-  
+    const accessToken = generateAccessToken(rawData)
+    const refreshToken = gennerateRefreshToken(rawData)
+
+    // user = await Users.findOneAndUpdate({email: rawData.email}, {refreshToken}, {new: true})
+    user.refreshToken = refreshToken
+    await user.save()
+
+    return { accessToken, refreshToken }
+
   } catch (error) {
     console.log(error);
   }

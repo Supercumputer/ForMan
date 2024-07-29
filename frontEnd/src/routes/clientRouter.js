@@ -1,3 +1,5 @@
+import { AuthSuccess } from "../components/clientComponent";
+import { PageNotFound } from "../components/common";
 import DefaultLayout from "../layouts/layoutClient/DefaultLayout";
 import {
   Account,
@@ -20,6 +22,16 @@ export const publicClientRouter = [
     //router login
     path: pathClient.login,
     component: Login,
+  },
+  {
+    //router login
+    path: pathClient.pageNotFound,
+    component: PageNotFound,
+  },
+  {
+    //router login
+    path: pathClient.authSuccess,
+    component: AuthSuccess,
   },
   {
     //router Register

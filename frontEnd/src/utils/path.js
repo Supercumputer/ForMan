@@ -73,6 +73,7 @@ const CLIENT = "/";
 const pathClient = {
   client: CLIENT,
   login: `/login`,
+  authSuccess: `/auth-success`, 
   orderLookUp: `/orderlookup`,
   register: `/register`,
   product: `/collections/:slug`,
@@ -83,7 +84,7 @@ const pathClient = {
   search: `/search`,
   cart: `/carts`,
   thanks: `/thanks`,
-
+  pageNotFound: "*"
 }
 
 export { pathAdmin, pathClient };

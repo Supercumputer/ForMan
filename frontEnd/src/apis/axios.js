@@ -4,9 +4,15 @@ import instance from "./instance";
 export const apiLogin = (data) => {
   return instance.post("/api/auth/login", data);
 };
+export const apiRegister = (data) => {
+  return instance.post("/api/auth/register", data);
+};
 
 export const apiGetAccount = () => {
   return instance.get("/api/auth/account");
+};
+export const apiRefreshToken = () => {
+  return instance.get("/api/auth/refreshtoken");
 };
 
 export const apiLogout = () => {

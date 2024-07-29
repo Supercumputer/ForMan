@@ -18,8 +18,7 @@ passport.deserializeUser(async (user, done) => {
     const findUser = await Users.findOne({ email: user.email });
 
     if (!findUser) {
-      throw new Error("User not found");
-      // return done(null, false, { message: "User not found" });
+      return done(null, false, { message: "User not found" });
     }
 
     const data = {
@@ -35,32 +34,20 @@ passport.deserializeUser(async (user, done) => {
   }
 });
 
-// passport.deserializeUser((user, done) => {
-//   process.nextTick(() => {
-//     done(null, user);
-//   });
-// });
-
 module.exports = passport.use(
   new Strategy({ usernameField: "email" }, async (email, password, done) => {
     try {
       const findUser = await Users.findOne({ email });
-
+     
       if (!findUser) {
         return done(null, false, { message: "User not found" });
-        // throw new Error("User not found");
       }
 
       if (!comparePassword(password, findUser.password)) {
-        // throw new Error("Incorrect password");
         return done(null, false, { message: "Incorrect password" });
       }
-
-      const data = {
-        email: findUser.email,
-      };
-
-      done(null, data);
+      
+      done(null, findUser);
     } catch (error) {
       done(error, null);
     }

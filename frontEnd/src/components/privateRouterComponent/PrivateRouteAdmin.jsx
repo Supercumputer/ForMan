@@ -14,7 +14,7 @@ function PrivateRouteAdmin() {
       <Spinner aria-label="Center-aligned spinner example" />
     </div>
   ) : isAuthenticated && Object.keys(account).length > 0 ? (
-    <Outlet />
+    (account.role === "66a65a1f99d2a4a1c0a42289" ? <Navigate to="/" /> : <Outlet />)
   ) : (
     <Navigate to="/login" />
   );

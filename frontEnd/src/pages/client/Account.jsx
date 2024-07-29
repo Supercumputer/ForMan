@@ -10,7 +10,7 @@ function Account() {
   const [active, setActive] = useState(1);
 
   const dispatch = useDispatch();
-  const {account} = useSelector((state) => state.auth);
+  const { account } = useSelector((state) => state.auth);
   const [user, setUser] = useState({});
 
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ function Account() {
       const res = await apiLogout();
 
       if (res && res.status) {
+        localStorage.removeItem("accessToken");
         navigate("/");
         dispatch(logout());
         toast.success(res.message);
@@ -95,7 +96,7 @@ function Account() {
         }
 
         {active === 4 &&
-          <AddressDelivery  />
+          <AddressDelivery />
         }
       </div>
     </div>

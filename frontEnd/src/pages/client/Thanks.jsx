@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { apiDeleteAllCart, apiSendMailOrder, apiUpdateDiscountByCode, apiUpdateOrder, apiUpdateQuantityVariant } from '../../apis/axios';
 import { setCarts } from '../../redux/cart';
 import { Spinner } from 'flowbite-react';
+import { pathClient } from '../../utils/path';
 
 function Thanks() {
     const { carts } = useSelector((state) => state.cart);
@@ -95,7 +96,7 @@ function Thanks() {
                             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
                                 <Link
                                     className={`px-4 py-2 ${isSuccess ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} text-white font-semibold rounded-lg transition duration-300`}
-                                    to="/carts"
+                                    to={pathClient.orderLookUp}
                                 >
                                     {isSuccess ? 'Tra cứu đơn hàng' : 'Quay lại trang chủ'}
                                 </Link>
