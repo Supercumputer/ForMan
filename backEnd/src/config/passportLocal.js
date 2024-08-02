@@ -5,7 +5,6 @@ const { Strategy } = require("passport-local");
 const Users = require("../models/user");
 
 const { comparePassword } = require("../services/authService");
-const role = require("../models/role");
 
 passport.serializeUser((user, done) => {
   process.nextTick(() => {

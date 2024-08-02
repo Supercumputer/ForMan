@@ -17,6 +17,7 @@ import {
   apiSoftDeleteProduct,
   apiSoftDeleteProducts,
   apiGetAllProductVariant,
+  apiGetAllProduct,
 } from "../../../apis/axios";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -62,12 +63,12 @@ const ListProduct = () => {
 
   const callApiGetAllProduct = async (currentPage, limit, keyword) => {
     try {
-      const res = await apiGetAllProductVariant(
+      const res = await apiGetAllProduct(
         `?search=${keyword}&limit=${limit}&page=${currentPage}&sort=latest`);
-      
+
       if (res && res.status) {
         setTotalPages(res.totalPages);
-        setData(res.listProducts);
+        setData(res.products);
       }
     } catch (err) {
       console.log(err);
@@ -134,22 +135,27 @@ const ListProduct = () => {
         <Breadcrumb.Item href="#">Inventory</Breadcrumb.Item>
         <Breadcrumb.Item>Manager</Breadcrumb.Item>
       </Breadcrumb>
+
       <div className="rounded-md p-2 bg-[#fff] dark:bg-slate-800">
         <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
-          <Dropdown
-            label="Actions"
-            dismissOnClick={false}
-            renderTrigger={() => (
-              <Button color="light">{t("fields.actions")}</Button>
-            )}
-          >
-            <Dropdown.Item>
-              <Link to={`${pathAdmin.products}/create`}>Create</Link>
-            </Dropdown.Item>
+          <div className="flex items-center space-x-2">
+            <Dropdown
+              label="Actions"
+              dismissOnClick={false}
+              renderTrigger={() => (
+                <Button color="light">{t("fields.actions")}</Button>
+              )}
+            >
+              <Dropdown.Item>
+                <Link to={`${pathAdmin.products}/create`}>Create</Link>
+              </Dropdown.Item>
 
-            <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
-            <Dropdown.Item>Update</Dropdown.Item>
-          </Dropdown>
+              <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
+              <Dropdown.Item>Update</Dropdown.Item>
+            </Dropdown>
+            <Link to={pathAdmin.productsTrash} className="text-blue-500 underline">Thùng rác</Link>
+
+          </div>
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>
@@ -181,6 +187,7 @@ const ListProduct = () => {
             />
           </div>
         </div>
+
         <div className="overflow-x-auto border-y border-[#ccc] py-2">
           <Table hoverable>
             <Table.Head>
@@ -190,9 +197,6 @@ const ListProduct = () => {
               <Table.HeadCell className="text-nowrap">MSP</Table.HeadCell>
               <Table.HeadCell className="text-nowrap">
                 {t("fields.productName")}
-              </Table.HeadCell>
-              <Table.HeadCell className="text-nowrap">
-                {t("fields.image")}
               </Table.HeadCell>
               <Table.HeadCell className="text-nowrap">
                 {t("fields.category")}
@@ -215,42 +219,34 @@ const ListProduct = () => {
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
-                      checked={dataCheck.includes(item?.product_id._id)}
-                      onChange={() => handleCheckbox(item?.product_id._id)}
+                      checked={dataCheck.includes(item._id)}
+                      onChange={() => handleCheckbox(item._id)}
                     />
                   </Table.Cell>
-                  <Table.Cell>{item.product_id.code}</Table.Cell>
-                  <Table.Cell>{item.product_id.name}</Table.Cell>
-                  <Table.Cell>
-                    <div className="w-20 h-20">
-                      <Img
-                        src={item?.images[0]}
-                        className="object-cover w-full h-full rounded-md"
-                      />
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>{item?.product_id.category.map(item => item.categoryName).join(", ") ?? "Chưa xác định"}</Table.Cell>
-                  <Table.Cell>{item?.product_id.brand.brandName ?? "Chưa xác định"}</Table.Cell>
-                  <Table.Cell>{item.product_id.views}</Table.Cell>
-                  <Table.Cell>{formatDate(item.product_id.createdAt)}</Table.Cell>
+                  <Table.Cell>{item.code}</Table.Cell>
+                  <Table.Cell>{item.name}</Table.Cell>
+                  <Table.Cell>{item.category.map(item => item.categoryName).join(", ") ?? "Chưa xác định"}</Table.Cell>
+                  <Table.Cell>{item.brand.brandName ?? "Chưa xác định"}</Table.Cell>
+                  <Table.Cell>{item.views}</Table.Cell>
+                  <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
                   <Table.Cell>
                     <div className="flex gap-2">
                       <ButtonPro
                         type="button"
-                        dataId={item.product_id._id}
+                        dataId={item._id}
                         actionDelete={handlerDelete}
                         name={<i className="fa-solid fa-trash"></i>}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                       />
 
                       <ButtonPro
-                        to={`${pathAdmin.products}/${item.product_id._id}/edit`}
+                        to={`${pathAdmin.products}/${item._id}/edit`}
                         name={<i className="fa-solid fa-pen-to-square"></i>}
                         className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                       />
 
                       <ButtonPro
-                        to={`${pathAdmin.products}/${item.product_id._id}/variants`}
+                        to={`${pathAdmin.products}/${item._id}/variants`}
                         name={<i className="fa-solid fa-eye"></i>}
                         className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                       />

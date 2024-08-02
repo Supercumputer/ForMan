@@ -70,93 +70,30 @@ const createProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-const getAllProducts = async (req, res) => {
+const getAllProductsTrash = async (req, res) => {
   try {
-    // Get query parameters for pagination and search
-    const { page = 1, limit = 10, keyword = "" } = req.query;
-    const pageNumber = parseInt(page);
-    const limitNumber = parseInt(limit);
-    const skip = (pageNumber - 1) * limitNumber;
 
-    // Aggregation pipeline
-    const pipeline = [
-      {
-        $lookup: {
-          from: "variants",
-          localField: "_id",
-          foreignField: "product_id",
-          as: "variants",
-        },
-      },
-      {
-        $unwind: {
-          path: "$variants",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$_id",
-          name: { $first: "$name" },
-          description: { $first: "$description" },
-          category: { $first: "$category" },
-          brand: { $first: "$brand" },
-          code: { $first: "$code" },
-          views: { $first: "$views" },
-          createdAt: { $first: "$createdAt" },
-          image: { $first: "$variants.images" },
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          description: 1,
-          category: 1,
-          brand: 1,
-          code: 1,
-          views: 1,
-          createdAt: 1,
-          image: { $arrayElemAt: ["$image", 0] }, // Get the first image from the variants' images array
-        },
-      },
-    ];
+    const vproducts = await Products.findWithDeleted({}).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" })
 
-    // Add match stage for search if a keyword is provided
-    if (keyword) {
-      pipeline.unshift({
-        $match: {
-          $or: [
-            { code: { $regex: keyword, $options: "i" } }, // Case insensitive search on codeco
-            { name: { $regex: keyword, $options: "i" } }, // Case insensitive search on name
-            { description: { $regex: keyword, $options: "i" } }, // Case insensitive search on description
-          ],
-        },
-      });
-    }
+    let products = vproducts.filter(product => product.deleted === true)
 
-    const countPipeline = [...pipeline, { $count: "totalCount" }];
-    const countResult = await Products.aggregate(countPipeline);
-    const totalCount = countResult.length > 0 ? countResult[0].totalCount : 0;
-    const totalPage = Math.ceil(totalCount / limitNumber);
+    return res.status(200).json({ status: true, products })
 
-    // Add sort, skip, and limit stages for pagination
-    pipeline.push(
-      { $sort: { createdAt: -1 } }, // Sort by createdAt descending
-      { $skip: skip }, // Skip documents for pagination
-      { $limit: limitNumber } // Limit the number of documents
-    );
-
-    const products = await Products.aggregate(pipeline);
-
-    await Products.populate(products, { path: "category brand" });
-
-    return res.status(200).json({ status: true, products, totalPage });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
+const getAllProducts = async (req, res) => {
+  try {
 
+    const products = await Products.find({}).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" })
+
+    return res.status(200).json({ status: true, products })
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -279,7 +216,72 @@ const softDeleteProducts = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const restoreProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    await Products.restore({ _id: id });
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Product restored successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const destroyProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Product id is required" });
+    }
+
+    const product = await Products.deleteOne({ _id: id });
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Product not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Product deleted successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const destroyProducts = async (req, res) => {
+  try {
+    const ids = req.body;
+
+    if (ids.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Product ids is required" });
+    }
+
+    const deletedProducts = await Products.deleteMany({ _id: { $in: ids } });
+
+    if (deletedProducts) {
+      return res
+        .status(200)
+        .json({ status: true, message: "Product deleted successfully" });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "Failed to delete Product" });
+    }
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 const countProduct = async (req, res) => {
   try {
     const count = await Products.countDocumentsWithDeleted();
@@ -288,7 +290,6 @@ const countProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -332,4 +333,8 @@ module.exports = {
   softDeleteProduct,
   countProduct,
   getProductBySlug,
+  restoreProduct,
+  destroyProduct,
+  destroyProducts,
+  getAllProductsTrash
 };

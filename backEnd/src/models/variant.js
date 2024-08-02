@@ -17,6 +17,7 @@ const variant = new Schema(
     timestamps: true,
   }
 );
+
 variant.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 module.exports = mongoose.model("Variant", variant);

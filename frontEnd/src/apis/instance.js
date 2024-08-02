@@ -29,21 +29,21 @@ instance.interceptors.response.use(
   },
   async function (error) {
 
-    const originalRequest = error.config;
+    // const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    // if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    //   originalRequest._retry = true;
 
-      const newAccessToken = await apiRefreshToken();
+    //   const newAccessToken = await apiRefreshToken();
       
-      if (newAccessToken) {
-        localStorage.setItem('accessToken', newAccessToken);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        return axios(originalRequest);
-      }
+    //   if (newAccessToken) {
+    //     localStorage.setItem('accessToken', newAccessToken);
+    //     axios.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+    //     originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+    //     return axios(originalRequest);
+    //   }
 
-    }
+    // }
 
     if (error && error.response && error.response.data)
       return error.response.data;

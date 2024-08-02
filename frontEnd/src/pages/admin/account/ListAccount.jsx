@@ -20,6 +20,7 @@ import {
 } from "../../../apis/axios";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const ListAccount = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +31,7 @@ const ListAccount = () => {
   const [dataCheck, setDataCheck] = useState([]);
 
   const onPageChange = (page) => setCurrentPage(page);
-
+  const { userOnline } = useSelector((state) => state.auth)
   const [data, setData] = useState([]);
 
   const { t } = useTranslation("admin");
@@ -255,18 +256,18 @@ const ListAccount = () => {
                   <Table.Cell>10</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center">
-                      <div className="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
-                      Online
+                      
+                      <div className={`h-2.5 w-2.5 rounded-full ${userOnline.includes(item?._id) ? "bg-green-500" : "bg-red-500"} me-2`}></div>
+                      {userOnline.includes(item?._id) ? "Online" : "Offline"}
                     </div>
                   </Table.Cell>
                   <Table.Cell
-                    className={`${
-                      item?.status === "Active"
+                    className={`${item?.status === "Active"
                         ? "text-green-500"
                         : item?.status === "InActive"
-                        ? "text-yellow-500"
-                        : "text-red-500"
-                    } font-semibold`}
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      } font-semibold`}
                   >
                     {item?.status}
                   </Table.Cell>

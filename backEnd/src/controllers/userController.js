@@ -186,7 +186,7 @@ const update = async (req, res) => {
     if (!user) {
       return res.status(404).json({ status: false, message: "User not found" });
     }
-    
+
     const password = req.body.password
       ? hashPassword(req.body.password)
       : user.password;
@@ -227,7 +227,7 @@ const countUser = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const {email, password, newPassword } = req.body;
+    const { email, password, newPassword } = req.body;
     const id = req.params.id
 
     if (!email || !password || !newPassword) {
@@ -243,8 +243,8 @@ const resetPassword = async (req, res) => {
         .status(404)
         .json({ status: false, message: "User not found" });
     }
-   
-    if(user._id != id) {
+
+    if (user._id != id) {
       return res
         .status(400)
         .json({ status: false, message: "Tài khoản không khớp với tài khoản đang đăng nhập." });

@@ -2,6 +2,8 @@ const Orders = require("../models/order")
 const Discounts = require("../models/discount");
 const Payments = require("../models/payment");
 const Users = require("../models/user");
+const Ratings = require("../models/comment");
+
 const OrderItems = require("../models/orderItem");
 const { checkDiscountValidity } = require("../services/discountService");
 const moment = require('moment');
@@ -32,6 +34,32 @@ const getAllOrders = async (req, res) => {
     res
       .status(200)
       .json({ status: true, orders, totalPages, currentPage: pageNumber });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const getAllOrdersTrash = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const orders = await Orders.findWithDeleted({})
+      .skip(skip)
+      .limit(limitNumber)
+      .sort({ createdAt: -1 })
+
+
+    let newOrders = orders.filter((item) => item.deleted === true);
+
+    const totalPages = Math.ceil(newOrders.length / limit);
+
+    res
+      .status(200)
+      .json({ status: true, orders: newOrders, totalPages, currentPage: pageNumber });
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -219,7 +247,7 @@ const deleteSoftOrder = async (req, res) => {
     }
 
     const order = await Orders.delete({ _id: id });
-    console.log(order);
+
     if (!order) {
       return res
         .status(404)
@@ -230,6 +258,100 @@ const deleteSoftOrder = async (req, res) => {
       .status(200)
       .json({ status: true, message: "Order deleted successfully" });
 
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const destroyOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ status: false, message: "Order id is required" });
+    }
+
+    const order = await Orders.deleteOne({ _id: id });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Order not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Order deleted successfully" });
+
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const restoreOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ status: false, message: "Order id is required" });
+    }
+
+    const order = await Orders.restore({ _id: id });
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Order not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Order restored successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const checkRatingOrderStatus = async (req, res) => {
+  try {
+    const { user_id, variant_id } = req.body;
+
+    if (!user_id || !variant_id) {
+      return res.status(400).json({ status: false, message: "User id and variant id are required" });
+    }
+
+    const [orders, ratings] = await Promise.all([Orders.find({
+      user_id,
+      status: { $in: ["Delivered", "Completed"] }
+    }), Ratings.find({ variant_id })]);
+
+    let newRatings = ratings.flatMap((rating) => {
+      return rating.comments
+    })
+
+    let checkUserRating = newRatings.find(rating => rating.user_id.toString() === user_id.toString());
+
+    if (orders.length === 0) {
+      return res.status(200).json({ status: false });
+    }
+
+    const orderIds = orders.map(order => order._id);
+
+    // Tìm OrderItem với variant_id và order_id trong danh sách orderIds
+    const data = await OrderItems.findOne({
+      variant_id,
+      order_id: { $in: orderIds }
+    });
+
+    if (!data) {
+      return res.status(200).json({ status: false });
+    }
+
+    if (!checkUserRating && data) {
+      return res.status(200).json({ status: true });
+    } else {
+      return res.status(200).json({ status: false });
+    }
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -487,7 +609,46 @@ function sortObject(obj) {
   }
   return sorted;
 }
+const getAllOrdersStatistic = async (req, res) => {
+  try {
 
+    const { page = 1, limit = 10, status, startDate, endDate } = req.query;
+    console.log(req.query);
+    const filter = {}
+
+    if (status && status !== 'all') {
+      filter.status = status
+    }
+
+    if (startDate && endDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      }
+    } else if (startDate && !endDate) {
+      filter.createdAt = {
+        $gte: new Date(startDate)
+      }
+    } else if (!startDate && endDate) {
+      filter.createdAt = {
+        $lte: new Date(endDate)
+      }
+    }
+console.log(filter);
+    let skip = (page - 1) * limit;
+
+    const orders = await Orders.findWithDeleted(filter).skip(skip).limit(limit).sort({ createdAt: 1 });
+
+    const totalRecords = await Orders.countDocumentsWithDeleted(filter)
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return res.status(200).json({ status: true, orders, totalPages, currentPage: page });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 module.exports = {
   createOrder,
   createPaymentUrlVnPay,
@@ -500,5 +661,10 @@ module.exports = {
   getOrderByUserId,
   getOrderDetialById,
   deleteSoftOrder,
-  deleteSoftOrders
+  deleteSoftOrders,
+  checkRatingOrderStatus,
+  getAllOrdersTrash,
+  destroyOrder,
+  restoreOrder,
+  getAllOrdersStatistic
 };

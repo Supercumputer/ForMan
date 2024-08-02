@@ -6,9 +6,10 @@ const ORDERS = "/orders";
 const CATEGORY = "/category";
 const COMMENTS = "/comments";
 const STATISTICAL = "/statistical";
-const MESSENGER = "/messenger";
 const BRAND = "/brand";
 const DISCOUNTS = "/discounts";
+const COLORS = "/colors";
+const SIZES = "/sizes";
 
 const pathAdmin = {
 
@@ -33,7 +34,8 @@ const pathAdmin = {
   products: `${ADMIN}${PRODUCT}`,
   productsCreate: `${ADMIN}${PRODUCT}/create`,
   productsEdit: `${ADMIN}${PRODUCT}/:id/edit`,
-
+  productsTrash: `${ADMIN}${PRODUCT}/trash`,
+  ptoductsVariantTrash: `${ADMIN}${PRODUCT}/:id/variants/trash`,
   productsVariant: `${ADMIN}${PRODUCT}/:id/variants`,
   productsVariantcreate: `${ADMIN}${PRODUCT}/:id/variants/create`,
   productsVariantEdit: `${ADMIN}${PRODUCT}/variants/:id/edit`,
@@ -42,6 +44,7 @@ const pathAdmin = {
 
   // Quản lý đơn hàng
   orders: `${ADMIN}${ORDERS}`,
+  ordersTrash: `${ADMIN}${ORDERS}/trash`,
   ordersDetail: `${ADMIN}${ORDERS}/detail/:id`,
 
   // Quản lý danh mục
@@ -60,12 +63,12 @@ const pathAdmin = {
   discounts: `${ADMIN}${DISCOUNTS}`,
 
   // Thống kê
-  statistical: `${ADMIN}${STATISTICAL}`,
-  statisticalInventory: `${ADMIN}${STATISTICAL}/inventory`,
-  statisticalSelling: `${ADMIN}${STATISTICAL}/selling`,
+  statisticProduct: `${ADMIN}${STATISTICAL}${PRODUCT}`,
+  statisticOrder:  `${ADMIN}${STATISTICAL}${ORDERS}`,
 
-  // Tin nhắn
-  messenger: `${ADMIN}${MESSENGER}`,
+  // color
+  colors: `${ADMIN}${COLORS}`,
+  sizes: `${ADMIN}${SIZES}`,
 };
 
 const CLIENT = "/";
@@ -73,7 +76,7 @@ const CLIENT = "/";
 const pathClient = {
   client: CLIENT,
   login: `/login`,
-  authSuccess: `/auth-success`, 
+  authSuccess: `/auth-success`,
   orderLookUp: `/orderlookup`,
   register: `/register`,
   product: `/collections/:slug`,

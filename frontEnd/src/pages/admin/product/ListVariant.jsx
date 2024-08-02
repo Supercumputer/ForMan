@@ -52,7 +52,7 @@ const ListVariant = () => {
       const res = await apiGetAllVariantById(id);
 
       if (res && res.status) {
-        setData(res.products);
+        setData(res.variants);
       }
     } catch (error) {
       toast.error(error);
@@ -121,22 +121,26 @@ const ListVariant = () => {
       </Breadcrumb>
       <div className="rounded-md p-2 bg-[#fff] dark:bg-slate-800">
         <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
-          <Dropdown
-            label="Actions"
-            dismissOnClick={false}
-            renderTrigger={() => (
-              <Button color="light">{t("fields.actions")}</Button>
-            )}
-          >
-            <Dropdown.Item>
-              <Link to={`${pathAdmin.products}/${id}/variants/create`}>
-                Create
-              </Link>
-            </Dropdown.Item>
+          <div className="flex items-center space-x-2">
+            <Dropdown
+              label="Actions"
+              dismissOnClick={false}
+              renderTrigger={() => (
+                <Button color="light">{t("fields.actions")}</Button>
+              )}
+            >
+              <Dropdown.Item>
+                <Link to={`${pathAdmin.products}/${id}/variants/create`}>
+                  Create
+                </Link>
+              </Dropdown.Item>
 
-            <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
-            <Dropdown.Item>Update</Dropdown.Item>
-          </Dropdown>
+              <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
+              <Dropdown.Item>Update</Dropdown.Item>
+            </Dropdown>
+            <Link to={`${pathAdmin.products}/${id}/variants/trash`} className="text-blue-500 underline">Thùng rác</Link>
+
+          </div>
           <label htmlFor="table-search" className="sr-only">
             Search
           </label>

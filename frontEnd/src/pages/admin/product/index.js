@@ -5,3 +5,5 @@ export {default as CreateVariant} from './CreateVariant';
 export {default as EditProduct} from './EditProduct';
 export {default as EditVariant} from './EditVariant';
 export {default as ListRating} from './ListRating';
+export {default as TrashProducts} from './TrashProducts';
+export {default as TrashVariants} from './TrashVariants';

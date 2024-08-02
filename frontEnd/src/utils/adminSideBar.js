@@ -26,6 +26,20 @@ export const menu = [
     children: [],
   },
   {
+    // Product
+    path: pathAdmin.colors,
+    icon: "fa-solid fa-droplet",
+    title: "sidebar.colors",
+    children: [],
+  },
+  {
+    // Product
+    path: pathAdmin.sizes,
+    icon: "fa-solid fa-wand-magic-sparkles",
+    title: "sidebar.sizes",
+    children: [],
+  },
+  {
     // Orders
     path: pathAdmin.orders,
     icon: "fa-solid fa-clipboard",
@@ -61,20 +75,13 @@ export const menu = [
     children: [],
   },
   {
-    // Comments
-    path: pathAdmin.messenger,
-    icon: "fa-regular fa-snowflake",
-    title: "sidebar.feedback",
-    children: [],
-  },
-  {
     // Statistical
-    path: pathAdmin.statistical,
+    path: pathAdmin.statisticProduct,
     icon: "fa-solid fa-chart-pie",
     title: "sidebar.statistical",
     children: [
-      { path: pathAdmin.statisticalInventory, title: "sidebar.inventory" },
-      { path: pathAdmin.statisticalSelling, title: "sidebar.selling" },
+      { path: pathAdmin.statisticProduct, title: "sidebar.products" },
+      { path: pathAdmin.statisticOrder, title: "sidebar.orders" },
     ],
   },
 ];

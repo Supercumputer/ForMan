@@ -19,7 +19,9 @@
     "inventory": "Tồn kho",
     "selling": "Bán chạy",
     "feedback": "Phản hồi",
-    "brand": "Nhãn hàng"
+    "brand": "Nhãn hàng",
+    "colors": "Màu sắc",
+    "sizes": "Kích thước"
   },
   "fields": {
     "fullName": "Họ và tên",

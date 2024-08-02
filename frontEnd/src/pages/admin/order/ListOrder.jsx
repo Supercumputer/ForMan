@@ -11,7 +11,7 @@ import {
 import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { pathAdmin } from "../../../utils/path";
-import { ButtonPro, Img } from "../../../components/common";
+import { ButtonPro } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
 import { apiDeleteSoftOrder, apiDeleteSoftsOrder, apiGetAllOrders, apiUpdateOrder } from "../../../apis/axios";
@@ -148,17 +148,21 @@ function ListOrder() {
       </div>
       <div className="rounded-md p-2 bg-white dark:bg-slate-800">
         <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
-          <Dropdown
-            label="Actions"
-            dismissOnClick={false}
-            renderTrigger={() => <Button color="light">Actions</Button>}
-          >
-            <Dropdown.Item>
-              <Link to={`${pathAdmin.category}/create`}>Create</Link>
-            </Dropdown.Item>
-            <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
-            <Dropdown.Item>Activated</Dropdown.Item>
-          </Dropdown>
+          <div className="flex items-center gap-2">
+            <Dropdown
+              label="Actions"
+              dismissOnClick={false}
+              renderTrigger={() => <Button color="light">Actions</Button>}
+            >
+              <Dropdown.Item>
+                <Link to={`${pathAdmin.category}/create`}>Create</Link>
+              </Dropdown.Item>
+              <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
+              <Dropdown.Item>Activated</Dropdown.Item>
+            </Dropdown>
+            <Link to={pathAdmin.ordersTrash} className="text-blue-500 underline">Thùng rác</Link>
+
+          </div>
 
           <label for="table-search" class="sr-only">
             Search

@@ -22,6 +22,7 @@ function FilterSideBar({ isOpen, setIsOpen }) {
     minPrice: 0,
     maxPrice: 10000000,
   });
+  
   const [variant, setVariant] = useState({
     colors: [],
     sizes: [],

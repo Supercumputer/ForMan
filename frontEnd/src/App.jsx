@@ -11,10 +11,13 @@ import {
 } from "./components/privateRouterComponent";
 import { useDispatch } from "react-redux";
 import { login, setLoading } from "./redux/auth";
+import useSocket from "./hooks/useSocket";
 
 function App() {
   const dispatch = useDispatch();
-
+  
+  useSocket();
+  
   useEffect(() => {
     (async () => {
       try {

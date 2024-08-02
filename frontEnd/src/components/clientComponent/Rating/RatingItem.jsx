@@ -1,7 +1,7 @@
 import React from "react";
-import { start } from "../../../utils/helper";
+import { formatDate, start } from "../../../utils/helper";
 
-function RatingItem({rating}) {
+function RatingItem({ rating }) {
   return (
     <div className="flex flex-col gap-5 mt-3 p-6 bg-white shadow-lg rounded-xl">
       <div className="flex items-start gap-5">
@@ -16,7 +16,7 @@ function RatingItem({rating}) {
             {start(rating?.rating)}
           </div>
           <span className="text-sm text-gray-500">
-            {new Date(rating?.createdAt).toLocaleDateString()}
+            {formatDate(rating?.createdAt)}
           </span>
           <p className="text-gray-700 mt-2">{rating?.content}</p>
         </div>

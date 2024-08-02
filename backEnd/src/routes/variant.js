@@ -5,6 +5,7 @@ const uploadCloud = require("../config/cloudinary");
 const variantController = require("../controllers/variantController");
 
 router.get("/:id/getall", variantController.getAllVariantById);
+router.get("/:id/getallSoft", variantController.getAllVariantByIdSoft);
 router.get("/:id/detail", variantController.getVariant);
 
 router.post(
@@ -28,5 +29,9 @@ router.put("/:id/updateReply", variantController.updatereply);
 router.get("/getAllProductVariant", variantController.getAllProductVariant);
 router.put("/updatequantity", variantController.updateQuantityAfterOrder);
 
+router.put("/:id/restore", variantController.restoreVariant);
+router.delete("/:id/destroy", variantController.destroyVariant);
+router.post("/destroys", variantController.destroyVariants);
+router.get("/getallvariants", variantController.getAllVariant);
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import DefaultLayout from "../layouts/layoutAdmin/DefaultLayout";
-import { Dasboard, Messenger } from "../pages/admin";
+import { Dasboard } from "../pages/admin";
 import { CreateCategory, ListCategory } from "../pages/admin/category";
 import {
   ListAccount,
@@ -19,12 +19,16 @@ import {
   ListProduct,
   ListRating,
   ListVariant,
+  TrashProducts,
+  TrashVariants,
 } from "../pages/admin/product";
-import { DetailOrder, ListOrder } from "../pages/admin/order";
-import { ListStatistical } from "../pages/admin/statistical";
+import { DetailOrder, ListOrder, TrashOrders } from "../pages/admin/order";
+import { ListStatistical, OrderStatistical } from "../pages/admin/statistical";
 import { ListGroupRole, ListRole } from "../pages/admin/role";
 import { CreateBrand, ListBrand } from "../pages/admin/brand";
 import { ListDiscount } from "../pages/admin/discount";
+import { ListColor } from "../pages/admin/color";
+import { ListSize } from "../pages/admin/size";
 
 const adminRouter = [
 
@@ -114,6 +118,18 @@ const adminRouter = [
   },
   {
     //router product
+    path: pathAdmin.productsTrash,
+    component: TrashProducts,
+    layout: DefaultLayout,
+  },
+  {
+    //router product
+    path: pathAdmin.ptoductsVariantTrash,
+    component: TrashVariants,
+    layout: DefaultLayout,
+  },
+  {
+    //router product
     path: pathAdmin.productsVariant,
     component: ListVariant,
     layout: DefaultLayout,
@@ -192,28 +208,45 @@ const adminRouter = [
     layout: DefaultLayout,
   },
   {
+    //router order
+    path: pathAdmin.ordersTrash,
+    component: TrashOrders,
+    layout: DefaultLayout,
+  },
+  {
     //router order detail
     path: pathAdmin.ordersDetail,
     component: DetailOrder,
     layout: DefaultLayout,
   },
   {
-    //router order detail
-    path: pathAdmin.messenger,
-    component: Messenger,
+    //router comments
+    path: pathAdmin.statisticProduct,
+    component: ListStatistical,
     layout: DefaultLayout,
   },
-
   {
     //router comments
-    path: pathAdmin.statistical,
-    component: ListStatistical,
+    path: pathAdmin.statisticOrder,
+    component: OrderStatistical,
     layout: DefaultLayout,
   },
   {
     //router Discount
     path: pathAdmin.discounts,
     component: ListDiscount,
+    layout: DefaultLayout,
+  },
+  {
+    //router Discount
+    path: pathAdmin.colors,
+    component: ListColor,
+    layout: DefaultLayout,
+  },
+  {
+    //router Discount
+    path: pathAdmin.sizes,
+    component: ListSize,
     layout: DefaultLayout,
   }
 ];

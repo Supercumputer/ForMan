@@ -19,8 +19,9 @@
     "inventory": "Inventory",
     "selling": "Selling",
     "feedback": "Feedback",
-    "brand": "Brand"
-
+    "brand": "Brand",
+    "colors": "Colors",
+    "sizes": "Sizes"
   },
   "fields": {
     "fullName": "Full Name",

@@ -13,6 +13,7 @@ const color = require("./color");
 const order = require("./order");
 const cart = require("./cart");
 const address = require("./address");
+const rating = require("./rating");
 
 const router = (app) => {
   app.use("/api/auth", auth);
@@ -23,6 +24,7 @@ const router = (app) => {
   app.use("/api/brand", brand);
   app.use("/api/product", product);
   app.use("/api/variant", variant);
+  app.use("/api/rating", rating);
   app.use("/api/comment", comment);
   app.use("/api/discount", discount);
   app.use("/api/order", order);

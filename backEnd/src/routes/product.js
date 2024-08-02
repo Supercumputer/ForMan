@@ -10,6 +10,7 @@ router.post(
   productController.createProduct
 );
 router.get("/getall", productController.getAllProducts);
+router.get("/getalltrash", productController.getAllProductsTrash);
 router.get("/:id/detail", productController.getProduct);
 router.put(
   "/:id/update",
@@ -24,5 +25,9 @@ router.get(
   "/getProductBySlug/:slug/detail",
   productController.getProductBySlug
 );
+
+router.put("/:id/restore", productController.restoreProduct);
+router.delete("/:id/destroy", productController.destroyProduct);
+router.post("/destroys", productController.destroyProducts);
 
 module.exports = router;

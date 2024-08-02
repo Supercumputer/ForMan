@@ -18,7 +18,8 @@ const createsize = async (req, res) => {
         .json({ status: false, message: "sizeName already exists" });
     }
 
-    const newsize = new Sizes(req.body);
+    const newsize = new Sizes({
+      sizeName: sizeName.toUpperCase(), description});
 
     await newsize.save();
 
@@ -103,9 +104,64 @@ const updatesize = async (req, res) => {
   }
 };
 
+const deleteSize = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Size id is required" });
+    }
+
+    const deletedSize = await Sizes.findByIdAndDelete(id);
+
+    if (!deletedSize) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Size not found" });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Size deleted successfully",
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteSizes = async (req, res) => {
+  try {
+    const ids = req.body;
+
+    if (ids.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Size ids is required" });
+    }
+
+    const deletedSizes = await Sizes.deleteMany({ _id: { $in: ids } });
+
+    if (deletedSizes) {
+      return res
+        .status(200)
+        .json({ status: true, message: "Size deleted successfully" });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "Failed to delete size" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 module.exports = {
   createsize,
   getAllSizes,
   updatesize,
   detail,
+  deleteSize,
+  deleteSizes
 };

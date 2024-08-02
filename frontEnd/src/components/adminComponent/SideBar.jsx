@@ -7,7 +7,7 @@ function SideBar({ hidden, darkMode, setHidden }) {
 
   return (
     <div
-      className={`lg:sticky absolute top-0 bottom-0 left-0 z-30 bg-[#fff] dark:bg-slate-800 flex-shrink-0 dark:text-[#fff] h-full text-nowrap transition-all overflow-hidden ${
+      className={`lg:sticky absolute top-0 bottom-0 left-0 z-30 bg-[#fff] dark:bg-slate-800 flex-shrink-0 dark:text-[#fff] h-full text-nowrap transition-all overflow-hidden overflow-y-scroll custom-scroll ${
         hidden ? "w-0" : "w-64"
       }`}
     >

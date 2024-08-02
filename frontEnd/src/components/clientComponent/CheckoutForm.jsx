@@ -2,16 +2,23 @@ import { useEffect, useState } from 'react';
 import InputOutlined from './InputOutlined'
 import AddressSelector from './AddressSelector';
 import { apiGetDefaultAddress } from '../../apis/axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const CheckoutForm = ({ account, register, errors, reset }) => {
 
     const [thx, setThx] = useState({})
+    const navigate = useNavigate()
 
     const callApiGetDefaultAddress = async (id) => {
         try {
             const res = await apiGetDefaultAddress(id);
-            if (res && res.status) {
+            console.log(res);
+            if (res && res.status && res.address) {
                 reset(res.address);
+            }else{
+                toast.error("Cần it nhất 1 địa chỉ nhận hàng.")
+                navigate('/account')
             }
         } catch (error) {
             console.log(error);

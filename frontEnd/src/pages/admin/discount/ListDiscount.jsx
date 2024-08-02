@@ -309,7 +309,7 @@ function ListDiscount() {
                       onChange={() => handleCheckbox(item?._id)}
                     />
                   </Table.Cell>
-                  <Table.Cell>{item.code}</Table.Cell>
+                  <Table.Cell className="font-semibold text-green-500">{item.code}</Table.Cell>
                   <Table.Cell>{item.description}</Table.Cell>
                   <Table.Cell>{item.quantity}</Table.Cell>
                   <Table.Cell>{item.percentage}%</Table.Cell>

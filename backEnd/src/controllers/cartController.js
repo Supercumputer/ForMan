@@ -1,6 +1,6 @@
 const Carts = require("../models/cart");
 const Variants = require("../models/variant");
-
+const { io } = require("../config/socket.io");
 const upsertCart = async (req, res) => {
   try {
     const { user_id, variant_id, quantity } = req.body;
@@ -39,6 +39,8 @@ const upsertCart = async (req, res) => {
     variantById.quantity -= quantity;
     await variantById.save();
 
+    io.emit("updateCart");
+
     return res
       .status(200)
       .json({ status: true, message: "Cart updated successfully" });
@@ -74,6 +76,8 @@ const upDateQuantity = async (req, res) => {
       variant.save(),
     ]);
 
+    io.emit("updateCart");
+
     return res
       .status(200)
       .json({ status: true, message: "Cart updated successfully" });
@@ -103,7 +107,7 @@ const deleteCart = async (req, res) => {
     if (!cart) {
       return res.status(404).json({ status: false, message: "Cart not found" });
     }
-
+    io.emit("updateCart");
     return res
       .status(200)
       .json({ status: true, message: "Cart deleted successfully" });
@@ -169,6 +173,8 @@ const mergeCart = async (req, res) => {
       checkQuantity.quantity -= quantity;
       await checkQuantity.save();
     });
+
+    io.emit("updateCart");
 
     return res
       .status(200)

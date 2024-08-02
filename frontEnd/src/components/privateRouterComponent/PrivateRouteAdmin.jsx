@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Outlet, Navigate } from "react-router-dom";
-import { checkAdminOrUser } from "../../utils/helper";
 import { Spinner } from "flowbite-react";
 
 function PrivateRouteAdmin() {
@@ -10,7 +9,7 @@ function PrivateRouteAdmin() {
   );
 
   return isLoading ? (
-    <div className="text-center">
+    <div className="h-screen w-screen flex items-center justify-center">
       <Spinner aria-label="Center-aligned spinner example" />
     </div>
   ) : isAuthenticated && Object.keys(account).length > 0 ? (

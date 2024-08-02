@@ -1,19 +1,17 @@
-const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
-const connectDb = require("./config/connectDb");
+const connectDb = require("./config/connectDb.js");
 const router = require("./routes/index.js");
-const configCors = require("./config/cors");
-
+const configCors = require("./config/cors.js");
+const { app, io, server } = require("./config/socket.io.js");
 require("dotenv").config();
+
 require("./config/passportLocal.js");
 require("./config/passportGoogle.js")
 
-const app = express();
-
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 configCors(app);
 
@@ -37,6 +35,6 @@ app.use(passport.session());
 
 router(app);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

@@ -3,7 +3,7 @@ const configCors = (app) => {
     res.header("Access-Control-Allow-Origin", process.env.URL_CLIENT);
     res.header(
       "Access-Control-Allow-Methods",
-      "POST, GET, PUT,PATCH, DELETE, OPTIONS, "
+      "POST, GET, PUT, PATCH, DELETE, OPTIONS"
     );
 
     res.header("Access-Control-Allow-Credentials", true);

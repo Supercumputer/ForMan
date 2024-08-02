@@ -37,7 +37,6 @@ product.pre("findOneAndUpdate", function (next) {
   next();
 });
 
-
 product.plugin(mongooseDelete, { deletedAt: true, overrideMethods: "all" });
 
 module.exports = mongoose.model("Product", product);

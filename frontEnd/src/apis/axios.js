@@ -149,10 +149,20 @@ export const apiDeleteBrands = (data) => {
 export const apiCountProduct = () => {
   return instance.get(`/api/product/count`);
 };
-export const apiGetAllProduct = (page, limit, keyword) => {
-  return instance.get(
-    `/api/product/getall?page=${page}&limit=${limit}&keyword=${keyword}`
-  );
+export const apiDestroyProduct = (id) => {
+  return instance.delete(`/api/product/${id}/destroy`);
+};
+export const apiDestroysProduct = (data) => {
+  return instance.post(`/api/product/destroys`, data);
+};
+export const apiRestoreProduct = (id) => {
+  return instance.put(`/api/product/${id}/restore`);
+};
+export const apiGetAllProduct = () => {
+  return instance.get(`/api/product/getall`);
+};
+export const apiGetAllProductTrash = () => {
+  return instance.get(`/api/product/getalltrash`);
 };
 export const apiGetProductBySlug = (slug) => {
   return instance.get(`/api/product/getProductBySlug/${slug}/detail`);
@@ -177,8 +187,14 @@ export const apiSoftDeleteProducts = (data) => {
 export const apiGetAllVariantById = (id) => {
   return instance.get(`/api/variant/${id}/getall`);
 };
+export const apiGetAllVariantByIdSoft = (id) => {
+  return instance.get(`/api/variant/${id}/getallSoft`);
+};
 export const apiGetAllProductVariant = (query) => {
   return instance.get(`/api/variant/getAllProductVariant${query}`);
+};
+export const apiGetAllVariants = (query) => {
+  return instance.get(`/api/variant/getallvariants${query}`);
 };
 export const apiCreateVariant = (data, id) => {
   return instance.post(`/api/variant/${id}/createvariant`, data);
@@ -215,7 +231,15 @@ export const apiGetRatingsByStar = (id, star, page) => {
 export const apiUpdateReply = (data, id) => {
   return instance.put(`/api/variant/${id}/updatereply`, data);
 };
-
+export const apiDestroyVariant = (id) => {
+  return instance.delete(`/api/variant/${id}/destroy`);
+};
+export const apiDestroysVariant = (data) => {
+  return instance.post(`/api/variant/destroys`, data);
+};
+export const apiRestoreVariant = (id) => {
+  return instance.put(`/api/variant/${id}/restore`);
+}
 // ========================= Discount api ================================
 
 export const apiGetAllDiscount = (page, limit, keyword) => {
@@ -253,8 +277,40 @@ export const apiDeleteDiscounts = (data) => {
 export const apiGetAllColor = () => {
   return instance.get(`/api/color/getall`);
 };
+export const apiCreateColor = (data) => {
+  return instance.post(`/api/color/create`, data);
+};
+export const apiUpdateColor = (data, id) => {
+  return instance.put(`/api/color/${id}/update`, data);
+};
+export const apiDeleteColor = (id) => {
+  return instance.delete(`/api/color/${id}/delete`);
+};
+export const apiDeletesColor = (data) => {
+  return instance.post(`/api/color/deletes`, data);
+};
+export const apiGetColor = (id) => {
+  return instance.get(`/api/color/${id}/detail`);
+};
+
+// ======================= Size api ================================
 export const apiGetAllSize = () => {
   return instance.get(`/api/size/getall`);
+};
+export const apiCreateSize = (data) => {
+  return instance.post(`/api/size/create`, data);
+};
+export const apiUpdateSize = (data, id) => {
+  return instance.put(`/api/size/${id}/update`, data);
+};
+export const apiDeleteSize = (id) => {
+  return instance.delete(`/api/size/${id}/delete`);
+};
+export const apiDeletesSize = (data) => {
+  return instance.post(`/api/size/deletes`, data);
+};
+export const apiGetSize = (id) => {
+  return instance.get(`/api/size/${id}/detail`);
 };
 
 // ======================= Api tỉnh vn =================================
@@ -311,6 +367,12 @@ export const apiGetOrderDetailById = (id) => {
 export const apiGetAllOrders = (page, limit) => {
   return instance.get(`/api/order/getallorders?page=${page}&limit=${limit}`);
 };
+export const apiGetAllOrdersStatistic = (query) => {
+  return instance.get(`/api/order/getallordersstatistic${query}`);
+};
+export const apiGetAllOrdersTrash = (page, limit) => {
+  return instance.get(`/api/order/getallorderstrash?page=${page}&limit=${limit}`);
+};
 export const apiSendMailOrder = (data) => {
   return instance.post(`/api/order/sendemail`, data);
 };
@@ -326,7 +388,22 @@ export const apipaymentResult = () => {
 export const apiDeleteSoftOrder = (id) => {
   return instance.delete(`/api/order/${id}/deletesoftorder`);
 };
+export const apiDestroyOrder = (id) => {
+  return instance.delete(`/api/order/${id}/destroy`);
+};
+export const apiRestoreOrder = (id) => {
+  return instance.put(`/api/order/${id}/restore`);
+};
 export const apiDeleteSoftsOrder = (data) => {
   return instance.post(`/api/order/deletesoftorders`, data);
 };
+
+// ========================= Api rating ==============================
+
+export const apiCreateRating = (data, id) => {
+  return instance.post(`/api/rating/create?variant_id=${id}`, data);
+}
+export const apiCheckRating = (data) => {
+  return instance.post(`/api/order/checkratingorderstatus`, data);
+}
 

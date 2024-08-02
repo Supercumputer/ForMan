@@ -4,6 +4,7 @@ import dark from "./darkMode";
 import auth from "./auth";
 import filter from "./filter";
 import cart from "./cart";
+import statistical from "./statistical";
 
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     auth: auth,
     filter: filter,
     cart: cart,
+    statistical: statistical,
   },
 });
 

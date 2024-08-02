@@ -17,7 +17,7 @@ const checkToken = (req, res, next) => {
   }
 
   const decode = verifyToken(token);
-  console.log(decode);
+ 
   if (decode.error) {
     if (decode.error.name === 'TokenExpiredError') {
       return res.status(401).json({ message: "Token expired." });
