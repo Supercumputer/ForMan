@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatNumber } from '../../../utils/helper';
 import { apiGetAllOrdersStatistic } from '../../../apis/axios';
+import { InputField } from '../../common';
 
 function StatisticalOrder({ active }) {
 
@@ -10,7 +11,7 @@ function StatisticalOrder({ active }) {
     const onPageChange = (page) => setCurrentPage(page);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState(new Date());
     const [data, setData] = useState([]);
     const [limit, setLimit] = useState(5);
@@ -29,24 +30,24 @@ function StatisticalOrder({ active }) {
             console.log(error);
         }
     }
-    
+
     useEffect(() => {
         callApiGetAllOrders(currentPage, limit, active, startDate, endDate);
     }, [currentPage, limit, active, startDate, endDate]);
 
     return (
         <div className="rounded-md p-2 bg-white dark:bg-slate-800">
-            <div className="flex gap-2 items-center mb-2">
-                <Datepicker
-                    id="start-date"
-                    selected={startDate}
-                    onChange={(date) => setStartDate(date)}
+            <div className="flex gap-2 items-center mb-2 max-w-md">
+                <InputField
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    type="date"
                 />
                 To
-                <Datepicker
-                    id="end-date"
-                    selected={endDate}
-                    onChange={(date) => setEndDate(date)}
+                <InputField
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    type="date"
                 />
             </div>
             <div className="overflow-x-auto border-y border-[#ccc] py-2">
@@ -85,7 +86,8 @@ function StatisticalOrder({ active }) {
                                 <Table.Cell>
                                     <Badge
                                         size="sm"
-                                        color="green"
+                                        color={(item?.status === "Completed" || item?.status === "Completed")  
+                                            ? "success" : ((item?.status === "Failure" || item?.status === "Cancelled") ? "failure" : "dark")}
                                     >
                                         {item?.status}
                                     </Badge>

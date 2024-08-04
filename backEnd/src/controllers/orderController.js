@@ -11,22 +11,29 @@ const crypto = require('crypto');
 const querystring = require('qs');
 const sendEmail = require("../config/mail");
 const orderItem = require("../models/orderItem");
+const { log } = require("console");
 require("dotenv").config();
 
 const getAllOrders = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, order_id } = req.query;
 
+    let filter = {};
+
+    if (order_id) {
+      filter._id = order_id;
+    }
+  
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
     const skip = (pageNumber - 1) * limitNumber;
 
     const [orders, totalCount] = await Promise.all([
-      Orders.find({})
+      Orders.find(filter)
         .skip(skip)
         .limit(limitNumber)
         .sort({ createdAt: -1 }),
-      Orders.countDocuments({}),
+      Orders.countDocuments(filter),
     ]);
 
     const totalPages = Math.ceil(totalCount / limit);
@@ -613,7 +620,7 @@ const getAllOrdersStatistic = async (req, res) => {
   try {
 
     const { page = 1, limit = 10, status, startDate, endDate } = req.query;
-    console.log(req.query);
+
     const filter = {}
 
     if (status && status !== 'all') {
@@ -634,7 +641,7 @@ const getAllOrdersStatistic = async (req, res) => {
         $lte: new Date(endDate)
       }
     }
-console.log(filter);
+
     let skip = (page - 1) * limit;
 
     const orders = await Orders.findWithDeleted(filter).skip(skip).limit(limit).sort({ createdAt: 1 });
@@ -649,6 +656,126 @@ console.log(filter);
     return res.status(500).json({ message: error.message });
   }
 }
+const statisticsBestSeller = async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+
+    // Find orders with Delivered or Completed status
+    const orderSuccess = await Orders.findWithDeleted({
+      $or: [{ status: "Delivered" }, { status: "Completed" }]
+    });
+
+    // Extract the order IDs
+    const newOrderSuccess = orderSuccess.map((order) => order._id);
+
+    // Find order items for each successful order
+    let orderItems = await Promise.all(
+      newOrderSuccess.map(async (order) => {
+        return orderItem.find({ order_id: order }).populate({ path: "variant_id", populate: { path: "product_id" } });
+      })
+    );
+
+    // Flatten the array of arrays
+    orderItems = orderItems.flat();
+
+    const bestSellers = orderItems.reduce((acc, item) => {
+      const { variant_id, quantity } = item;
+      if (!acc[variant_id]) {
+        acc[variant_id] = { variant_id, totalQuantity: 0 };
+      }
+      acc[variant_id].totalQuantity += quantity;
+      return acc;
+    }, {});
+
+    // Convert the object to an array and sort by totalQuantity
+    const sortedBestSellers = Object.values(bestSellers).sort((a, b) => b.totalQuantity - a.totalQuantity);
+
+    let newData = sortedBestSellers.filter(item => item.variant_id !== null).map((item, index) => {
+      return item.variant_id
+    }).slice(0, limit)
+
+    return res.status(200).json({ status: true, variants: newData });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const statisticsQuantityOrdersByDay = async (req, res) => {
+  const startOfMonth = moment().startOf('month').toDate();
+  const endOfMonth = moment().endOf('month').toDate();
+
+  try {
+    const orders = await Orders.aggregate([
+      { $match: { createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+      {
+        $group: {
+          _id: { $dayOfMonth: "$createdAt" },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const orderData = Array.from({ length: moment().daysInMonth() }, (_, i) => {
+      const day = i + 1;
+      const dayOrder = orders.find(o => o._id === day);
+      return dayOrder ? dayOrder.count : 0;
+    });
+
+    res.json(orderData);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching order data' });
+  }
+}
+const statisticsRevenuesOrdersByDay = async (req, res) => {
+  const startOfMonth = moment().startOf('month').toDate();
+  const endOfMonth = moment().endOf('month').toDate();
+
+  try {
+    const revenues = await Orders.aggregate([
+      { $match: { createdAt: { $gte: startOfMonth, $lte: endOfMonth } } },
+      {
+        $group: {
+          _id: { $dayOfMonth: "$createdAt" },
+          totalRevenue: { $sum: "$total_payment" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    const revenueData = Array.from({ length: moment().daysInMonth() }, (_, i) => {
+      const day = i + 1;
+      const dayRevenue = revenues.find(r => r._id === day);
+      return dayRevenue ? dayRevenue.totalRevenue : 0;
+    });
+
+    res.json(revenueData);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching revenue data' });
+  }
+}
+const countOrder = async (req, res) => {
+  try {
+
+    const count = await Orders.countDocumentsWithDeleted();
+
+    return res.status(200).json(count);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+const totalPaymentSuccessOrder = async (req, res) => {
+  try {
+    const orderSuccess = await Orders.findWithDeleted({ $or: [{ status: "Delivered" }, { status: "Completed" }] });
+
+    const totalPaymentSuccess = orderSuccess.reduce((total, order) => total + order.total_payment, 0);
+
+    return res.status(200).json(totalPaymentSuccess);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   createOrder,
   createPaymentUrlVnPay,
@@ -666,5 +793,10 @@ module.exports = {
   getAllOrdersTrash,
   destroyOrder,
   restoreOrder,
-  getAllOrdersStatistic
+  getAllOrdersStatistic,
+  statisticsQuantityOrdersByDay,
+  statisticsRevenuesOrdersByDay,
+  countOrder,
+  totalPaymentSuccessOrder,
+  statisticsBestSeller
 };

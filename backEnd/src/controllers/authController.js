@@ -7,8 +7,6 @@ const {
   verifyToken,
 } = require("../services/authService");
 
-const role = require("../models/role");
-
 const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;

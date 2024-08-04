@@ -4,7 +4,7 @@ const ACCOUNT = "/accounts";
 const PRODUCT = "/products";
 const ORDERS = "/orders";
 const CATEGORY = "/category";
-const COMMENTS = "/comments";
+const FEEDBACK = "/feedback";
 const STATISTICAL = "/statistical";
 const BRAND = "/brand";
 const DISCOUNTS = "/discounts";
@@ -56,9 +56,8 @@ const pathAdmin = {
   brandCreate: `${ADMIN}${BRAND}/create`,
 
   // Quản lý bình luận
-  comments: `${ADMIN}${COMMENTS}`,
-  commentsDetail: `${ADMIN}${COMMENTS}/detail/:id`,
-
+  feedBack: `${ADMIN}${FEEDBACK}`,
+  
   // Mã giảm giá
   discounts: `${ADMIN}${DISCOUNTS}`,
 

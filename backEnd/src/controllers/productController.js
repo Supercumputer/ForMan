@@ -72,12 +72,29 @@ const createProduct = async (req, res) => {
 };
 const getAllProductsTrash = async (req, res) => {
   try {
+    const { limit = 10, page = 1, name } = req.query
+    console.log(req.query);
 
-    const vproducts = await Products.findWithDeleted({}).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" })
+    const filter = {}
 
-    let products = vproducts.filter(product => product.deleted === true)
+    if (name) {
+      filter.name = { $regex: name, $options: "i" }
+    }
 
-    return res.status(200).json({ status: true, products })
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const vproducts = await Products.findWithDeleted(filter).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" })
+
+    let listProductDeleted = vproducts.filter(product => product.deleted === true)
+
+    let totalPages = Math.ceil(listProductDeleted.length / limitNumber)
+
+
+    let products = listProductDeleted.slice(skip, (skip + limit))
+
+    return res.status(200).json({ status: true, products, totalPages, currentPage: pageNumber })
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -85,10 +102,46 @@ const getAllProductsTrash = async (req, res) => {
 };
 const getAllProducts = async (req, res) => {
   try {
+    const { limit = 10, page = 1, category, brand, createdAt, name } = req.query
 
-    const products = await Products.find({}).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" })
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
-    return res.status(200).json({ status: true, products })
+    const filter = {}
+
+    if (category) {
+      filter.category = { $in: [category] };
+    }
+
+    if (brand) {
+      filter.brand = brand
+    }
+
+    if (createdAt) {
+      const inputDate = new Date(createdAt);
+      const startDate = inputDate;
+      const endDate = new Date(inputDate);
+      endDate.setDate(endDate.getDate() + 1); // Tăng 1 ngày
+
+      filter.createdAt = {
+        $gte: startDate,
+        $lt: endDate
+      };
+    }
+
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+
+    const products = await Products.find(filter).populate({ path: "category", select: "categoryName" }).populate({ path: "brand", select: "brandName" }).skip(skip).limit(limitNumber).sort({ createdAt: -1 })
+
+    const totalRecords = await Products.countDocuments({})
+
+    const totalPages = Math.ceil(totalRecords / limitNumber);
+
+    return res.status(200).json({ status: true, products, totalPages, currentPage: pageNumber });
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -116,7 +169,6 @@ const getProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -156,7 +208,6 @@ const updateProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const softDeleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -190,7 +241,6 @@ const softDeleteProduct = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 const softDeleteProducts = async (req, res) => {
   try {
     const ids = req.body;
@@ -247,6 +297,8 @@ const destroyProduct = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Product not found" });
     }
+
+    await Variants.deleteMany({ product_id: id });
 
     return res
       .status(200)

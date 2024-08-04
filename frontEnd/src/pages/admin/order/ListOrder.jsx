@@ -28,6 +28,7 @@ function ListOrder() {
   const [limit, setLimit] = useState(5);
   const [dataCheck, setDataCheck] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
+  const [keyword, setKeyword] = useState("");
 
   const handleCheckbox = (id) => {
     setDataCheck((prev) => {
@@ -116,12 +117,11 @@ function ListOrder() {
     }
   }
 
-  const callApiGetAllOrders = async (currentPage, limit) => {
+  const callApiGetAllOrders = async (currentPage, limit, keyword) => {
     try {
-      const res = await apiGetAllOrders(currentPage, limit)
+      const res = await apiGetAllOrders(`?limit=${limit}&page=${currentPage}&order_id=${keyword}`);
 
       if (res && res.status) {
-        console.log(res);
         setData(res.orders);
         setCurrentPage(res?.currentPage);
         setTotalPages(res?.totalPages);
@@ -132,8 +132,8 @@ function ListOrder() {
   }
 
   useEffect(() => {
-    callApiGetAllOrders(currentPage, limit)
-  }, [currentPage, limit]);
+    callApiGetAllOrders(currentPage, limit, keyword);
+  }, [currentPage, limit, keyword]);
 
   return (
     <>
@@ -186,10 +186,12 @@ function ListOrder() {
               </svg>
             </div>
             <input
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               type="text"
               id="table-search-users"
               class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search for users"
+              placeholder="Nhập vào order id"
             />
           </div>
         </div>
@@ -228,7 +230,7 @@ function ListOrder() {
                     <Checkbox checked={dataCheck.includes(item?._id)}
                       onChange={() => handleCheckbox(item?._id)} />
                   </Table.Cell>
-                  <Table.Cell>{item?._id}</Table.Cell>
+                  <Table.Cell className="text-green-500 font-semibold">{item?._id}</Table.Cell>
                   <Table.Cell>{formatDate(item?.createdAt)}</Table.Cell>
                   <Table.Cell>{item?.discount || "Không có"}</Table.Cell>
                   <Table.Cell>{formatNumber(+item?.total_payment)}</Table.Cell>

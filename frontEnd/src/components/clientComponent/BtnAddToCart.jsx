@@ -29,7 +29,7 @@ function BtnAddToCart({ className, quantity, variant, onClose = null }) {
 
     if (isAuthenticated && Object.keys(account).length > 0) {
       const data = {
-        user_id: account.id,
+        user_id: account?.id,
         variant_id: variant._id,
         quantity,
       };

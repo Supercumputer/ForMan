@@ -16,7 +16,7 @@ function HistoryOrder() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await apiGetOrderByUserId(account.id);
+                const res = await apiGetOrderByUserId(account?.id);
 
                 if (res && res.status) {
                     setData(res.orders);
@@ -26,7 +26,7 @@ function HistoryOrder() {
                 console.log(error);
             }
         })()
-    }, [account.id]);
+    }, [account?.id]);
 
     return (
         <div>

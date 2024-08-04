@@ -62,7 +62,7 @@ export const menu = [
   },
   {
     // Comments
-    path: pathAdmin.comments,
+    path: pathAdmin.feedBack,
     icon: "fa-solid fa-comments",
     title: "sidebar.comments",
     children: [],

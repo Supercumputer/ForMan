@@ -20,7 +20,7 @@ function RatingComment({ openModal, setOpenModal, variant_id }) {
     
     const handlerSubmit = async () => {
         try {
-            const res = await apiCreateRating({ rating, content, user_id: account.id }, variant_id);
+            const res = await apiCreateRating({ rating, content, user_id: account?.id }, variant_id);
 
             if (res && res.status) {
                 toast.success(res.message);

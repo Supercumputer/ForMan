@@ -29,6 +29,7 @@ const ListProduct = () => {
     const [data, setData] = useState([]);
     const [dataCheck, setDataCheck] = useState([]);
     const [checkAll, setCheckAll] = useState(false);
+    
     const onPageChange = (page) => setCurrentPage(page);
 
     const { t } = useTranslation("admin");
@@ -59,12 +60,17 @@ const ListProduct = () => {
         }
     };
 
-    const callApiGetAllProduct = async () => {
+    const callApiGetAllProduct = async (limit, currentPage, keyword) => {
         try {
-            const res = await apiGetAllProductTrash();
+            console.log(keyword);
+            
+            const res = await apiGetAllProductTrash(`?limit=${limit}&page=${currentPage}&name=${keyword}`);
 
             if (res && res.status) {
-                setTotalPages(6);
+                console.log(res);
+                
+                setTotalPages(res.totalPages);
+                setCurrentPage(res.currentPage)
                 setData(res.products);
             }
         } catch (err) {
@@ -108,7 +114,7 @@ const ListProduct = () => {
 
                     if (res && res.status) {
                         Swal.fire("Deleted!", "Your file has been deleted.", "success");
-                        callApiGetAllProduct();
+                        callApiGetAllProduct(limit, currentPage, keyword);
                     } else {
                         toast.error(res?.message);
                     }
@@ -120,15 +126,15 @@ const ListProduct = () => {
     };
 
     useEffect(() => {
-        callApiGetAllProduct();
-    }, []);
+        callApiGetAllProduct(limit, currentPage, keyword);
+    }, [limit, currentPage, keyword]);
 
     const handlerRestore = async (id) => {
         try {
             const res = await apiRestoreProduct(id);
             if (res && res.status) {
                 toast.success(res.message);
-                callApiGetAllProduct();
+                callApiGetAllProduct(limit, currentPage, keyword);
             } else {
                 toast.error(res?.message);
             }

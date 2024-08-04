@@ -1,37 +1,27 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import useBreadcrumbs from "use-react-router-breadcrumbs";
+import { pathClient } from "../../utils/path";
 
-const BreadcrumbComponent = ({ className }) => {
-  const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+const BreadcrumbComponent = ({ categoryName, productName }) => {
+  const routes = [
+    { path: pathClient.product, breadcrumb: categoryName },
+    { path: pathClient.productDetail, breadcrumb: productName },
+    { path: "/", breadcrumb: "Home" },
+  ];
+
+  const breadcrumbs = useBreadcrumbs(routes);
 
   return (
-    <nav className={className} aria-label="Breadcrumb">
-      <ol class="inline-flex items-center space-x-2 md:space-x-3 rtl:space-x-reverse">
-        <li class="inline-flex items-center">
-          <Link
-            to="/"
-            class="flex gap-2 items-center text-sm font-normal text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
-          >
-            Home
-          </Link>
-        </li>
-
-        {pathnames.map((name, index) => (
-          <li>
-            <div class="flex items-center">
-              <i class="fa-solid fa-angle-right text-sm text-gray-400"></i>
-              <Link
-                to={`/${pathnames.slice(0, index + 1).join("/")}/`}
-                class="ms-1 text-sm font-normal text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-              >
-                {name}
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ol>
-    </nav>
+    <div className="lg:px-[8%] px-2 bg-gray-50 py-3 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+      {breadcrumbs.filter(el => !el.match.route === false).map(({ match, breadcrumb}, index, breadcrumbs) => (
+        <Link className="flex gap-2 items-center hover:text-blue-500" key={match.pathname} to={match.pathname}>
+          <span className="capitalize">{breadcrumb}</span>
+          {index !== breadcrumbs.length - 1 && <i class="fa-solid fa-chevron-right text-gray-700"></i>}
+        </Link>
+      ))}
+    </div>
   );
 };
 
 export default BreadcrumbComponent;
+

@@ -19,6 +19,11 @@ const ListProduct = () => {
             </button>
           </li>
           <li class="me-2">
+            <button onClick={() => setActive('banchay')} class={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 'banchay' ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} group`}>
+              Bán chạy
+            </button>
+          </li>
+          <li class="me-2">
             <button onClick={() => setActive('dahethang')} class={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 'dahethang' ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} group`}>
               Đã hết hàng
             </button>

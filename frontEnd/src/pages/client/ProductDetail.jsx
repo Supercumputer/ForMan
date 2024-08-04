@@ -80,7 +80,7 @@ function ProductDetail() {
 
   return (
     <>
-      <Breadcrumb className="lg:px-[8%] px-2 bg-gray-50 py-3 dark:bg-gray-800" />
+      <Breadcrumb productName={defaultVariant?.product_id?.name}/>
 
       <div className="lg:px-[8%] px-2 my-5 font-roboto">
         <ProductInfo

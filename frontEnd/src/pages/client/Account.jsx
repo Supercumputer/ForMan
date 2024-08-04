@@ -34,7 +34,7 @@ function Account() {
   useEffect(() => {
     async function callApiGetUserInfo() {
       try {
-        const res = await apiGetDetailUser(account.id);
+        const res = await apiGetDetailUser(account?.id);
         if (res && res.status) {
           setUser(res.user);
         }

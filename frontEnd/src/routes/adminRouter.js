@@ -10,7 +10,7 @@ import {
   Profile,
 } from "../pages/admin/account";
 import { pathAdmin } from "../utils/path";
-import { DetailComment, ListComment } from "../pages/admin/comment";
+import { FeedBack } from "../pages/admin/feedBack";
 import {
   CreateProduct,
   CreateVariant,
@@ -190,17 +190,11 @@ const adminRouter = [
   },
   {
     //router comments
-    path: pathAdmin.comments,
-    component: ListComment,
+    path: pathAdmin.feedBack,
+    component: FeedBack,
     layout: DefaultLayout,
   },
-  {
-    //router comments detail
-    path: pathAdmin.commentsDetail,
-    component: DetailComment,
-    layout: DefaultLayout,
-  },
-
+ 
   {
     //router order
     path: pathAdmin.orders,

@@ -52,7 +52,7 @@ function Header() {
 
   useEffect(() => {
     const callApiGetCartByUserId = async () => {
-      const res = await apiGetCartByUserId(account.id);
+      const res = await apiGetCartByUserId(account?.id);
 
       if (res && res.status) {
         dispatch(setCarts(res.carts));
@@ -153,7 +153,7 @@ function Header() {
       }).then((result) => {
         if (result.isConfirmed) {
           callApiMergeCart({
-            user_id: account.id,
+            user_id: account?.id,
             data: JSON.parse(sessionStorage.getItem("carts")),
           });
         }

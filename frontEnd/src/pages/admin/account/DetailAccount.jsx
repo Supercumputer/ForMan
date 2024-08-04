@@ -21,7 +21,7 @@ function DetailAccount() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetDetailUser(id || account.id);
+        const res = await apiGetDetailUser(id || account?.id);
         if (res) {
           console.log(res);
           setData(res.user);
@@ -30,12 +30,12 @@ function DetailAccount() {
         toast.error(error);
       }
     })();
-  }, [id, account.id]);
+  }, [id, account?.id]);
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetOrderByUserId(account.id);
+        const res = await apiGetOrderByUserId(account?.id);
 
         if (res && res.status) {
           setOrderData(res.orders);
@@ -45,7 +45,7 @@ function DetailAccount() {
         console.log(error);
       }
     })()
-  }, [account.id]);
+  }, [account?.id]);
   return (
     <div className="rounded-md flex flex-col md:flex-row gap-3">
       <div className="md:w-64 w-full p-5 bg-[#fff] dark:bg-slate-800 rounded-md">

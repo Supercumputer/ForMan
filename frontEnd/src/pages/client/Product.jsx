@@ -19,7 +19,7 @@ function Product() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState([]);
   const [searchParams] = useSearchParams();
-
+  const [categoryName, setCategoryName] = useState([]);
   const { slug: category } = useParams();
 
   const data = useSelector((state) => state.filter);
@@ -48,6 +48,7 @@ function Product() {
         );
 
         if (res && res.status) {
+          setCategoryName(res.categoryName);
           setTotalRecords(res.totalRecords);
           setTotalPages(res.totalPages);
           setResult(res.listProducts);
@@ -62,14 +63,14 @@ function Product() {
 
   return (
     <>
-      <Breadcrumb className="lg:px-[8%] px-2 bg-gray-50 py-3 dark:bg-gray-800"/>
+      <Breadcrumb categoryName={categoryName[0]?.categoryName}/>
       <div className="font-roboto w-full h-full flex mt-5 mb-10 lg:px-[8%] px-2">
         <FilterSideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
         <div className="flex-1">
           <div className="flex lg:flex-row flex-col justify-between lg:items-center mb-5">
             <div className="flex gap-2 items-center">
-              <p className="text-[#333333] font-bold text-xl">Sơ mi ngắn tay</p>
+              <p className="text-[#333333] font-bold text-xl">{categoryName[0]?.categoryName}</p>
               <span>/</span>
               <div class="text-[16px]">
                 <b>{totalRecords}</b> sản phẩm

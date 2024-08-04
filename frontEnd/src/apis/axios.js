@@ -83,8 +83,14 @@ export const apiGetAllUser = (page, limit, type, keyword) => {
 export const apiGetDetailUser = (id) => {
   return instance.get(`/api/user/${id}/detail`);
 };
+export const apiGetUserByEmail= (query) => {
+  return instance.get(`/api/user/findByEmail${query}`);
+};
 export const apiCreateAccount = (data) => {
   return instance.post("/api/user/create", data);
+};
+export const apiSendFeedback = (data) => {
+  return instance.post("/api/user/sendfeedback", data);
 };
 export const apiSoftDeleteUser = (id) => {
   return instance.delete(`/api/user/${id}/softdelete`);
@@ -158,11 +164,11 @@ export const apiDestroysProduct = (data) => {
 export const apiRestoreProduct = (id) => {
   return instance.put(`/api/product/${id}/restore`);
 };
-export const apiGetAllProduct = () => {
-  return instance.get(`/api/product/getall`);
+export const apiGetAllProduct = (query) => {
+  return instance.get(`/api/product/getall${query}`);
 };
-export const apiGetAllProductTrash = () => {
-  return instance.get(`/api/product/getalltrash`);
+export const apiGetAllProductTrash = (query) => {
+  return instance.get(`/api/product/getalltrash${query}`);
 };
 export const apiGetProductBySlug = (slug) => {
   return instance.get(`/api/product/getProductBySlug/${slug}/detail`);
@@ -364,8 +370,8 @@ export const apiGetOrderByUserId = (id) => {
 export const apiGetOrderDetailById = (id) => {
   return instance.get(`/api/order/${id}/getorderdetailbyId`);
 };
-export const apiGetAllOrders = (page, limit) => {
-  return instance.get(`/api/order/getallorders?page=${page}&limit=${limit}`);
+export const apiGetAllOrders = (query) => {
+  return instance.get(`/api/order/getallorders${query}`);
 };
 export const apiGetAllOrdersStatistic = (query) => {
   return instance.get(`/api/order/getallordersstatistic${query}`);
@@ -396,6 +402,21 @@ export const apiRestoreOrder = (id) => {
 };
 export const apiDeleteSoftsOrder = (data) => {
   return instance.post(`/api/order/deletesoftorders`, data);
+};
+export const apiRevenuesOrdersByDay = () => {
+  return instance.get(`/api/order/statisticsRevenuesOrdersByDay`);
+};
+export const apiQuantityOrdersByDay = () => {
+  return instance.get(`/api/order/statisticsQuantityOrdersByDay`);
+};
+export const apiTotalPaymentSuccessOrder = () => {
+  return instance.get(`/api/order/totalPaymentSuccessOrder`);
+};
+export const apiCountOrder = () => {
+  return instance.get(`/api/order/countOrder`);
+};
+export const apiStatisticsBestSeller = (query) => {
+  return instance.get(`/api/order/statisticsBestSeller${query}`);
 };
 
 // ========================= Api rating ==============================

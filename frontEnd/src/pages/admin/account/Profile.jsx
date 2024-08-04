@@ -67,7 +67,7 @@ function DetailAccountAdmin() {
 
       formData.append("avatar", avatarPreview);
 
-      const res = await apiUpdateUser(formData, account.id);
+      const res = await apiUpdateUser(formData, account?.id);
 
       if (res && !res.status) {
         toast.error(res.message);
@@ -86,7 +86,7 @@ function DetailAccountAdmin() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetDetailUser(account.id);
+        const res = await apiGetDetailUser(account?.id);
 
         if (res) {
           setUserData(res.user);
@@ -101,12 +101,12 @@ function DetailAccountAdmin() {
       }
     })();
 
-  }, [account.id]);
+  }, [account?.id]);
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetOrderByUserId(account.id);
+        const res = await apiGetOrderByUserId(account?.id);
 
         if (res && res.status) {
           setOrderData(res.orders);
@@ -116,7 +116,7 @@ function DetailAccountAdmin() {
         console.log(error);
       }
     })()
-  }, [account.id]);
+  }, [account?.id]);
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 rounded-lg">

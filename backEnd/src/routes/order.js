@@ -20,5 +20,10 @@ router.put("/:id/restore", orderController.restoreOrder);
 router.post("/deletesoftorders", orderController.deleteSoftOrders);
 router.post("/checkratingorderstatus", orderController.checkRatingOrderStatus);
 router.get("/getallordersstatistic", orderController.getAllOrdersStatistic);
+router.get("/statisticsRevenuesOrdersByDay", orderController.statisticsRevenuesOrdersByDay);
+router.get("/statisticsQuantityOrdersByDay", orderController.statisticsQuantityOrdersByDay);
+router.get("/totalPaymentSuccessOrder", orderController.totalPaymentSuccessOrder);
+router.get("/countOrder", orderController.countOrder);
+router.get("/statisticsBestSeller", orderController.statisticsBestSeller);
 
 module.exports = router

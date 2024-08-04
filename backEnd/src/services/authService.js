@@ -17,7 +17,7 @@ const generateAccessToken = (data) => {
   let key = process.env.JWT_SERVICE;
   let token = null;
   try {
-    token = jwt.sign(data, key, { expiresIn: "3d" });
+    token = jwt.sign(data, key, { expiresIn: process.env.ACCESS_TOKEN_EXPIRATION });
   } catch (error) {
     console.log(error);
   }
@@ -28,7 +28,7 @@ const gennerateRefreshToken = (data) => {
   let key = process.env.JWT_SERVICE;
   let token = null;
   try {
-    token = jwt.sign(data, key, { expiresIn: "7d" });
+    token = jwt.sign(data, key, { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION });
   } catch (error) {
     console.log(error);
   }

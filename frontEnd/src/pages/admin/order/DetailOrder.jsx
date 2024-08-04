@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import { HiHome } from "react-icons/hi";
 import { Table, Breadcrumb } from "flowbite-react";
 import { Img } from "../../../components/common";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiGetOrderById, apiGetOrderDetailById } from "../../../apis/axios";
-import { calculateSalePrice, formatNumber } from "../../../utils/helper";
+import { calculateSalePrice, formatDate, formatNumber } from "../../../utils/helper";
 
 const DetailOrder = () => {
   const { t } = useTranslation("admin");
@@ -63,7 +63,7 @@ const DetailOrder = () => {
               <h2 className="text-lg bg-[#F8FAFC] p-3 rounded font-semibold mb-4">THÔNG TIN ĐƠN HÀNG</h2>
               <div className="flex flex-col gap-3 px-3">
                 <p className="flex"><span className="min-w-56">Mã đơn hàng:</span> <span className="font-medium">{orderInfo._id}</span></p>
-                <p className="flex"><span className="min-w-56">Ngày taọ đơn:</span> <span className="font-medium">{orderInfo.createdAt}</span></p>
+                <p className="flex"><span className="min-w-56">Ngày taọ đơn:</span> <span className="font-medium">{formatDate(orderInfo.createdAt || new Date())}</span></p>
                 <p className="flex"><span className="min-w-56">Hình Thức thanh toán:</span> <span className="font-medium">{orderInfo.delivery}</span></p>
                 <p className="flex"><span className="min-w-56">Trạng thái thanh toán:</span> <span className="font-medium">{orderInfo.status_payment}</span></p>
                 <p className="flex"><span className="min-w-56">Mã giảm giá:</span> <span className="font-medium">{orderInfo.discount || "Không có"}</span></p>

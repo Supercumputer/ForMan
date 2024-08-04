@@ -32,7 +32,7 @@ function ResetPassword() {
 
     const onSubmit = async (data) => {
         try {
-            const res = await apiUpdatePassword(data, account.id);
+            const res = await apiUpdatePassword(data, account?.id);
             if (res && res.status) {
                 toast.success(res.message);
             }else{

@@ -2,7 +2,7 @@ import { Badge, Pagination, Select, Table } from 'flowbite-react'
 import React, { useEffect, useState } from 'react'
 import { Img } from '../../common'
 import { useTranslation } from 'react-i18next';
-import { apiGetAllVariants } from '../../../apis/axios';
+import { apiGetAllVariants, apiStatisticsBestSeller } from '../../../apis/axios';
 import { calculateSalePrice, formatDate, formatNumber } from '../../../utils/helper';
 import { Link } from 'react-router-dom';
 import { pathAdmin } from '../../../utils/path';
@@ -20,11 +20,11 @@ function StatisticalAll({ active }) {
 
     const callApiGetAllVariant = async () => {
         try {
-            const res = await apiGetAllVariants(`?limit=${limit}&page=${currentPage}&type=${active}&sort=${active === 'tonkho' ? 'desc' : 'asc'}`);
+            const res = await (active === "banchay" ? apiStatisticsBestSeller(`?limit=${limit}`) : apiGetAllVariants(`?limit=${limit}&page=${currentPage}&type=${active}&sort=${active === 'tonkho' ? 'desc' : 'asc'}`));
             if (res && res.status) {
                 setData(res.variants);
-                setTotalPages(res.totalPages);
-                setCurrentPage(res.currentPage);
+                setTotalPages(res.totalPages || 0);
+                setCurrentPage((res.currentPage && res.variants.length > 0) ? res.currentPage : 1);
             }
         } catch (error) {
             console.log(error);
@@ -51,7 +51,7 @@ function StatisticalAll({ active }) {
                         <Table.HeadCell className='text-nowrap'>Giá trị tồn kho</Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
-                        {data && data.map((item, index) => (
+                        {data && data?.map((item, index) => (
                             <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
 
                                 <Table.Cell>

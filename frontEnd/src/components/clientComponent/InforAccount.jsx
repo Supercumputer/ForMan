@@ -59,7 +59,7 @@ function InforAccount({ data, account }) {
 
       formData.append("avatar", avatarPreview);
 
-      const res = await apiUpdateUser(formData, account.id);
+      const res = await apiUpdateUser(formData, account?.id);
 
       if (res && !res.status) {
         toast.error(res.message);

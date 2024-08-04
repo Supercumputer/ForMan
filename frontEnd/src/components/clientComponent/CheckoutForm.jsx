@@ -26,8 +26,8 @@ const CheckoutForm = ({ account, register, errors, reset }) => {
     };
 
     useEffect(() => {
-        if (account.id) {
-            callApiGetDefaultAddress(account.id);
+        if (account?.id) {
+            callApiGetDefaultAddress(account?.id);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [account]);
@@ -44,15 +44,15 @@ const CheckoutForm = ({ account, register, errors, reset }) => {
             </h1>
             <div className="flex flex-col gap-3">
 
-                <InputOutlined readOnly={!!account.id} register={register("name")} label="Họ Và tên" errors={errors?.name?.message} />
-                <InputOutlined readOnly={!!account.id} register={register("email")} label="Email" errors={errors?.email?.message} />
-                <InputOutlined readOnly={!!account.id} register={register("phone")} label="Phone" errors={errors?.phone?.message} />
+                <InputOutlined readOnly={!!account?.id} register={register("name")} label="Họ Và tên" errors={errors?.name?.message} />
+                <InputOutlined readOnly={!!account?.id} register={register("email")} label="Email" errors={errors?.email?.message} />
+                <InputOutlined readOnly={!!account?.id} register={register("phone")} label="Phone" errors={errors?.phone?.message} />
 
-                {!account.id &&
+                {!account?.id &&
                     <AddressSelector setFullAddress={setThx} label="Address" />
                 }
                 {
-                    (Object.keys(thx).length > 0 || account.id) &&
+                    (Object.keys(thx).length > 0 || account?.id) &&
                     <InputOutlined register={register("address")} readOnly label="Địa chỉ đầy đủ" errors={errors?.address?.message} />
                 }
 

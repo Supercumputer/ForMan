@@ -63,7 +63,7 @@ function AddressDelivery() {
         try {
             const res = await (
                 idAddress ? apiUpdateAddress(idAddress, data) :
-                    apiCreateAddress({ ...data, user_id: account.id }));
+                    apiCreateAddress({ ...data, user_id: account?.id }));
 
             if (res && res.status) {
                 toast.success(res.message);
@@ -77,7 +77,7 @@ function AddressDelivery() {
 
     const callApiGetAllAddress = async () => {
         try {
-            const res = await apiGetAllAddress(account.id);
+            const res = await apiGetAllAddress(account?.id);
             if (res && res.status) {
                 setAddresses(res.addresses);
             }

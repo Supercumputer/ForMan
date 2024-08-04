@@ -37,7 +37,7 @@ const RatingParent = ({ variantId, ratings }) => {
 
   useEffect(() => {
     (async () => {
-      const res = await apiCheckRating({ variant_id: variantId, user_id: account.id });
+      const res = await apiCheckRating({ variant_id: variantId, user_id: account?.id });
       if (res && res.status) {
         setCheckRating(res.status);
       } else {

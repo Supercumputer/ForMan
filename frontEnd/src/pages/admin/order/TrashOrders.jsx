@@ -226,7 +226,7 @@ function TrashOrders() {
                                         <Checkbox checked={dataCheck.includes(item?._id)}
                                             onChange={() => handleCheckbox(item?._id)} />
                                     </Table.Cell>
-                                    <Table.Cell>{item?._id}</Table.Cell>
+                                    <Table.Cell className="text-green-500 font-semibold">{item?._id}</Table.Cell>
                                     <Table.Cell>{formatDate(item?.createdAt)}</Table.Cell>
                                     <Table.Cell>{item?.discount || "Không có"}</Table.Cell>
                                     <Table.Cell>{formatNumber(+item?.total_payment)}</Table.Cell>

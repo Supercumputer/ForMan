@@ -1,6 +1,7 @@
 const Variants = require("../models/variant");
 const Products = require("../models/product");
 const Comments = require("../models/comment");
+const Categories = require("../models/category");
 
 const getAllVariantById = async (req, res) => {
   try {
@@ -422,6 +423,108 @@ const updateQuantityAfterOrder = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 }
+const restoreVariant = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Variants.restore({ _id: id });
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Variant restored successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const destroyVariant = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Variant id is required" });
+    }
+
+    const Variant = await Variants.deleteOne({ _id: id });
+
+    if (!Variant) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Variant not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ status: true, message: "Variant deleted successfully" });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const destroyVariants = async (req, res) => {
+  try {
+    const ids = req.body;
+
+    if (ids.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Variant ids is required" });
+    }
+
+    const deletedVariants = await Variants.deleteMany({ _id: { $in: ids } });
+
+    if (deletedVariants) {
+      return res
+        .status(200)
+        .json({ status: true, message: "Variant deleted successfully" });
+    } else {
+      return res
+        .status(400)
+        .json({ status: false, message: "Failed to delete Variant" });
+    }
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+const getAllVariant = async (req, res) => {
+  try {
+    const { limit = 10, page = 1, type = 'all' } = req.query;
+
+    const filter = {}
+    let sort = 1
+
+    if (type === 'dahethang') {
+      filter.quantity = 0
+    }
+
+    if (type === 'saphethang') {
+      filter.quantity = { $gt: 0, $lte: 10 }
+      sort = 1
+    }
+
+    if (type === 'tonkho') {
+      filter.quantity = { $gt: 0 }
+      sort = -1
+    }
+
+    const skip = (page - 1) * limit;
+
+    const variants = await Variants.findWithDeleted(filter).populate("product_id").skip(skip).limit(limit).sort({ quantity: sort });
+
+    const totalRecords = await Variants.countDocumentsWithDeleted(filter)
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return res.status(200).json({ status: true, variants, totalPages, currentPage: page });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+
+
+}
 const getVariantById = async (id, filters) => {
   try {
     const variants = await Variants.find({ product_id: id })
@@ -496,7 +599,7 @@ const getAllProductVariant = async (req, res) => {
     } = req.query;
 
     const filters = {};
-
+    
     if (color) {
       filters.color = color.split(","); // Chuyển đổi từ chuỗi thành mảng ObjectId
     }
@@ -523,6 +626,8 @@ const getAllProductVariant = async (req, res) => {
 
     let dataProduct = await Products.find();
 
+    let categoryName = await Categories.find({ slug: {$in: filters.categorySlug} }, {categoryName: 1});
+    
     const listPro = await Promise.all(
       dataProduct.map(async (product) => {
         return await getVariantById(product._id, filters);
@@ -564,6 +669,7 @@ const getAllProductVariant = async (req, res) => {
 
     return res.status(200).json({
       status: true,
+      categoryName,
       totalRecords,
       totalPages,
       currentPage: page,
@@ -573,131 +679,6 @@ const getAllProductVariant = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-const restoreVariant = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    await Variants.restore({ _id: id });
-
-    return res
-      .status(200)
-      .json({ status: true, message: "Variant restored successfully" });
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-const destroyVariant = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    if (!id) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Variant id is required" });
-    }
-
-    const Variant = await Variants.deleteOne({ _id: id });
-
-    if (!Variant) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Variant not found" });
-    }
-
-    return res
-      .status(200)
-      .json({ status: true, message: "Variant deleted successfully" });
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-}
-const destroyVariants = async (req, res) => {
-  try {
-    const ids = req.body;
-
-    if (ids.length === 0) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Variant ids is required" });
-    }
-
-    const deletedVariants = await Variants.deleteMany({ _id: { $in: ids } });
-
-    if (deletedVariants) {
-      return res
-        .status(200)
-        .json({ status: true, message: "Variant deleted successfully" });
-    } else {
-      return res
-        .status(400)
-        .json({ status: false, message: "Failed to delete Variant" });
-    }
-
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-}
-const getAllVariant = async (req, res) => {
-
-  const { limit = 10, page = 1, type = 'all' } = req.query;
-
-  const filter = {}
-  let sort = 1
-
-  if (type === 'dahethang') {
-    filter.quantity = 0
-  }
-
-  if (type === 'saphethang') {
-    filter.quantity = { $gt: 0, $lte: 10 }
-    sort = 1
-  }
-
-  if (type === 'tonkho') {
-    filter.quantity = { $gt: 0 }
-    sort = -1
-  }
-
-  const skip = (page - 1) * limit;
-
-  const variants = await Variants.findWithDeleted(filter).populate("product_id").skip(skip).limit(limit).sort({ quantity: sort });
-
-  const totalRecords = await Variants.countDocumentsWithDeleted(filter)
-
-  const totalPages = Math.ceil(totalRecords / limit);
-
-  return res.status(200).json({ status: true, variants, totalPages, currentPage: page });
-
-  // Cach 2
-  // const { limit = 10, page = 1, type = 'all', sort = 1 } = req.query;
-
-  // if (type === 'desc') {
-  //   sort = -1
-  // }
-
-  // const variants = await Variants.findWithDeleted().populate("product_id").sort({ quantity: sort });
-
-  // let newData
-
-  // if (type === 'dahethang') {
-  //   newData = variants.filter(variant => variant.quantity === 0)
-  // }else if (type === 'saphethang') {
-  //   newData = variants.filter(variant => variant.quantity > 0 && variant.quantity < 10)
-  // }else{
-  //   newData = variants
-  // }
-
-  // const totalRecords = newData.length
-  // const totalPages = Math.ceil(totalRecords / limit);
-  // const startIndex = (page - 1) * limit;
-  // const endIndex = startIndex + limit;
-  // const paginatedVariants = newData.slice(startIndex, endIndex);
-
-
-  // return res.status(200).json({ status: true, variants: paginatedVariants, totalPages, currentPage: page });
-}
 
 module.exports = {
   getAllVariantById,

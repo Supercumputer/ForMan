@@ -24,8 +24,8 @@ function Thanks() {
         setLoading(true);
         if (isSuccess) {
             (async () => {
-                if (account && account.id) {
-                    await apiDeleteAllCart(account.id);
+                if (account && account?.id) {
+                    await apiDeleteAllCart(account?.id);
                     const res = await apiUpdateOrder(orderId, { status: "Confirmed", status_payment: type === 'COD' ? "Unpaid" : "Paid" });
 
                     if (res && res.status) {
@@ -85,7 +85,7 @@ function Thanks() {
                             </p>
                             <p className={`text-md mb-6 ${isSuccess ? 'text-gray-600' : 'text-red-500'}`}>
 
-                                {isSuccess ? (account && account.id ? 'Thông tin chi tiết về đơn hàng của bạn sẽ được gửi về email của bạn.' : 'Vui lòng kiểm tra email và bấm xác nhận đơn hàng của bạn')
+                                {isSuccess ? (account && account?.id ? 'Thông tin chi tiết về đơn hàng của bạn sẽ được gửi về email của bạn.' : 'Vui lòng kiểm tra email và bấm xác nhận đơn hàng của bạn')
                                     :
                                     'Vui lòng kiểm tra lại thông tin thanh toán của bạn hoặc thử lại sau.'
                                 }
