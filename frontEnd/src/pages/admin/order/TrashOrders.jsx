@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Button,
     Checkbox,
@@ -10,13 +10,13 @@ import {
 } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
-import { ButtonPro, Img } from "../../../components/common";
+import pathAdmin from "../../../utils/pathAdmin";
+import { ButtonPro } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
-import { apiDeleteSoftOrder, apiDeleteSoftsOrder, apiDestroyOrder, apiGetAllOrders, apiGetAllOrdersTrash, apiRestoreOrder, apiUpdateOrder } from "../../../apis/axios";
 import { formatDate, formatNumber } from "../../../utils/helper";
 import { toast } from "react-toastify";
+import { deleteSoftOrders, destroyOrder, getAllOrdersTrash, restoreOrder } from "../../../apis/orderApi";
 
 function TrashOrders() {
 
@@ -72,7 +72,7 @@ function TrashOrders() {
                         return;
                     }
 
-                    const res = await apiDeleteSoftsOrder(dataCheck);
+                    const res = await deleteSoftOrders(dataCheck);
 
                     if (res && res.status) {
                         Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -89,7 +89,7 @@ function TrashOrders() {
 
     const handlerDelete = async (id) => {
         try {
-            const res = await apiDestroyOrder(id);
+            const res = await destroyOrder(id);
 
             if (res && res.status) {
                 Swal.fire("Deleted!", res.message, "success");
@@ -104,7 +104,7 @@ function TrashOrders() {
 
     const handlerRestore = async (id) => {
         try {
-            const res = await apiRestoreOrder(id)
+            const res = await restoreOrder(id)
 
             if (res && res.status) {
                 toast.success(res.message);
@@ -119,7 +119,7 @@ function TrashOrders() {
 
     const callApiGetAllOrders = async (currentPage, limit) => {
         try {
-            const res = await apiGetAllOrdersTrash(currentPage, limit)
+            const res = await getAllOrdersTrash(currentPage, limit)
 
             if (res && res.status) {
                 console.log(res);
@@ -162,13 +162,13 @@ function TrashOrders() {
                         <Dropdown.Item>Activated</Dropdown.Item>
                     </Dropdown>
 
-                    <label for="table-search" class="sr-only">
+                    <label htmlFor="table-search" className="sr-only">
                         Search
                     </label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg
-                                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                                className="w-4 h-4 text-gray-500 dark:text-gray-400"
                                 aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -176,9 +176,9 @@ function TrashOrders() {
                             >
                                 <path
                                     stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
                                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                                 />
                             </svg>
@@ -186,7 +186,7 @@ function TrashOrders() {
                         <input
                             type="text"
                             id="table-search-users"
-                            class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             placeholder="Search for users"
                         />
                     </div>
@@ -221,7 +221,7 @@ function TrashOrders() {
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {data?.map((item) => (
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                     <Table.Cell className="p-4">
                                         <Checkbox checked={dataCheck.includes(item?._id)}
                                             onChange={() => handleCheckbox(item?._id)} />
@@ -236,7 +236,7 @@ function TrashOrders() {
                                         <div className="flex gap-2">
                                             <ButtonPro
                                                 type="button"
-                                                name={<i class="fa-solid fa-trash"></i>}
+                                                name={<i className="fa-solid fa-trash"></i>}
                                                 dataId={item?._id}
                                                 actionDelete={handlerDelete}
                                                 className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
@@ -244,7 +244,7 @@ function TrashOrders() {
 
                                             <ButtonPro
                                                 onClick={() => handlerRestore(item._id)}
-                                                name={<i class="fa-solid fa-trash-can-arrow-up"></i>}
+                                                name={<i className="fa-solid fa-trash-can-arrow-up"></i>}
                                                 className="focus:outline-none text-white bg-green-400 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-green-900"
                                             />
                                         </div>

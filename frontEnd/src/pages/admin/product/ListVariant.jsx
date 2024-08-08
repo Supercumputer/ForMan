@@ -4,14 +4,10 @@ import { useTranslation } from "react-i18next";
 import { HiHome } from "react-icons/hi";
 import { Checkbox, Table, Button, Dropdown, Breadcrumb } from "flowbite-react";
 import { ButtonPro, Img } from "../../../components/common";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 import { toast } from "react-toastify";
-import {
-  apiDeleteVariant,
-  apiGetAllVariantById,
-  apiSoftDeleteVariants,
-} from "../../../apis/axios";
 import Swal from "sweetalert2";
+import { getVariantsByProductId, softDeleteVariant, softDeleteVariants } from "../../../apis/variantApi";
 
 const ListVariant = () => {
   const [data, setData] = useState([]);
@@ -49,7 +45,7 @@ const ListVariant = () => {
 
   const callApiGetAllVariant = async () => {
     try {
-      const res = await apiGetAllVariantById(id);
+      const res = await getVariantsByProductId(id);
 
       if (res && res.status) {
         setData(res.variants);
@@ -61,7 +57,7 @@ const ListVariant = () => {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteVariant(id);
+      const res = await softDeleteVariant(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -91,7 +87,7 @@ const ListVariant = () => {
             return;
           }
 
-          const res = await apiSoftDeleteVariants(dataCheck);
+          const res = await softDeleteVariants(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -204,7 +200,7 @@ const ListVariant = () => {
             <Table.Body className="divide-y">
               {data?.length > 0 ? (
                 data?.map((item) => (
-                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell className="p-4">
                       <Checkbox
                         checked={dataCheck.includes(item?._id)}
@@ -215,6 +211,7 @@ const ListVariant = () => {
                     <Table.Cell className="flex flex-wrap gap-2 min-w-64">
                       {item.images.map((img) => (
                         <Img
+                          key={img}
                           src={img}
                           className="object-cover w-14 h-14 rounded-md border "
                         />

@@ -1,41 +1,16 @@
 import { useEffect, useState } from "react";
-import { InputField, ButtonPro, Img } from "../../../components/common";
+import { InputField, Img } from "../../../components/common";
 import { Button } from "flowbite-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  apiEditVariant,
-  apiGetAllColor,
-  apiGetAllSize,
-  apiGetProduct,
-  apiGetVariant,
-} from "../../../apis/axios";
+import variantSchema from "../../../schema/variantSchema";
+import { getVariantById, updateVariant } from "../../../apis/variantApi";
+import { getAllSizes } from "../../../apis/sizeApi";
+import { getAllColors } from "../../../apis/colorApi";
 
-const schema = z.object({
-  color: z.string().min(1, { message: "Màu không hợp lệ." }), // Color là một chuỗi không rỗng
-  price: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseFloat(val);
-  }, z.number({ invalid_type_error: "Giá phải là một số." }).positive({ message: "Giá phải là một số dương." })), // Chuyển đổi giá trị thành số và kiểm tra giá trị dương
-  quantity: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseInt(val, 10);
-  }, z.number({ invalid_type_error: "Số lượng phải là một số." }).int({ message: "Số lượng phải là số nguyên." }).positive({ message: "Số lượng phải là số nguyên dương." })),
-  sale: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseInt(val, 10);
-  }, z.number({ invalid_type_error: "Sale phải là một số." }).int({ message: "Sale phải là số nguyên." }).positive({ message: "Số lượng phải là số nguyên dương." })),
-  size: z.string().min(1, { message: "Size không hợp lệ." }), // Size là một chuỗi không rỗng
-  images: z.custom((value) => {
-    if (value instanceof FileList) {
-      return value.length > 0;
-    }
-    return true;
-  }, "Ảnh không hợp lệ."),
-});
+
 function EditVariant() {
   const {
     register,
@@ -43,7 +18,7 @@ function EditVariant() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(variantSchema),
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -92,7 +67,7 @@ function EditVariant() {
         }
       }
 
-      const res = await apiEditVariant(formData, id);
+      const res = await updateVariant(formData, id);
       if (res && res.status) {
         toast.success(res.message);
       } else {
@@ -108,7 +83,7 @@ function EditVariant() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetVariant(id);
+        const res = await getVariantById(id);
         if (res && res.status) {
           setFiles(res.variant.images);
           reset(res.variant);
@@ -123,7 +98,7 @@ function EditVariant() {
 
   useEffect(() => {
     (async () => {
-      await Promise.all([apiGetAllColor(), apiGetAllSize()]).then(
+      await Promise.all([getAllColors(), getAllSizes()]).then(
         ([colors, sizes]) => {
           setColors(colors);
           setSizes(sizes);
@@ -156,7 +131,7 @@ function EditVariant() {
               >
                 <option value="">-- Color --</option>
                 {colors.map((color) => (
-                  <option value={color._id}>{color.colorName}</option>
+                  <option key={color._id} value={color._id}>{color.colorName}</option>
                 ))}
               </select>
               {errors.color && (
@@ -176,7 +151,7 @@ function EditVariant() {
               >
                 <option value="">-- Size --</option>
                 {sizes.map((size) => (
-                  <option value={size._id}>{size.sizeName}</option>
+                  <option key={size._id} value={size._id}>{size.sizeName}</option>
                 ))}
               </select>
               {errors.size && (

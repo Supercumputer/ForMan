@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Pagination,
@@ -14,16 +14,14 @@ import {
 import { HiHome } from "react-icons/hi";
 import { useParams } from "react-router-dom";
 import { ButtonPro, Img } from "../../../components/common";
-import { useTranslation } from "react-i18next";
 import { start } from "../../../utils/helper";
-import { apiGetRatings, apiUpdateReply } from "../../../apis/axios";
 import { toast } from "react-toastify";
+import { getVariantRatings, updateRatingReply } from "../../../apis/variantApi";
 
 function ListRating() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [data, setData] = useState({});
-  const { t } = useTranslation("admin");
   const [item, setIitem] = useState({});
   const [reply, setReply] = useState("");
   const { idc } = useParams();
@@ -32,7 +30,7 @@ function ListRating() {
   const onPageChange = (page) => setCurrentPage(page);
   const apiGetRating = async () => {
     try {
-      const res = await apiGetRatings(idc, currentPage);
+      const res = await getVariantRatings(idc, currentPage);
 
       if (res && res.status) {
         setData(res.comments);
@@ -51,7 +49,7 @@ function ListRating() {
   }, [currentPage]);
   const handlerSubmit = async (id) => {
     try {
-      const res = await apiUpdateReply({ reply, item_id: id }, data._id);
+      const res = await updateRatingReply({ reply, item_id: id }, data._id);
       if (res && res.status) {
         setOpenModal(false);
         setReply("");
@@ -85,13 +83,13 @@ function ListRating() {
       <div className="rounded-md p-2 bg-white dark:bg-slate-800">
         <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
           <div></div>
-          <label for="table-search" class="sr-only">
+          <label htmlFor="table-search" className="sr-only">
             Search
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="relative">
+            <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
-                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -99,9 +97,9 @@ function ListRating() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -109,7 +107,7 @@ function ListRating() {
             <input
               type="text"
               id="table-search-users"
-              class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search for users"
             />
           </div>
@@ -131,7 +129,7 @@ function ListRating() {
             <Table.Body className="divide-y">
               {data?.comments?.length > 0 ? (
                 data?.comments?.map((item, index) => (
-                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell>{index + 1}</Table.Cell>
                     <Table.Cell>
                       <div className="flex items-center text-gray-900 whitespace-nowrap dark:text-white">
@@ -160,7 +158,7 @@ function ListRating() {
                       <div className="flex gap-2">
                         <ButtonPro
                           onClick={() => handlerModelShow(item._id)}
-                          name={<i class="fa-solid fa-reply"></i>}
+                          name={<i className="fa-solid fa-reply"></i>}
                           className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                         />
                       </div>
@@ -204,7 +202,7 @@ function ListRating() {
               </div>
               <Blockquote>
                 <p className="text-xl font-semibold text-gray-800 dark:text-white">
-                  "{item?.content}"
+                  {item?.content}
                 </p>
               </Blockquote>
               <figcaption className="mt-6 flex items-center space-x-3">
@@ -227,7 +225,7 @@ function ListRating() {
 
             <div className="">
               <div className="mb-2 block">
-                <Label htmlFor="comment" value="Your message" />
+                <Label htmlhtmlFor="comment" value="Your message" />
               </div>
               <Textarea
                 id="comment"

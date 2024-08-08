@@ -1,7 +1,7 @@
 import { noCart } from "../../assets/images";
-import { BtnCheckout, CartItem } from "../../components/clientComponent";
+import { BtnCheckout, CartItem } from "../../components/client";
 import { Breadcrumb, Img } from "../../components/common";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { calculateSalePrice, formatNumber } from "../../utils/helper";
 import { useSelector } from "react-redux";
 
@@ -36,11 +36,11 @@ function Cart() {
               </p>
             </div>
 
-            <div class="flex-1 border p-3 rounded-md mt-3">
-              <ul class="">
+            <div className="flex-1 border p-3 rounded-md mt-3">
+              <ul className="">
                 {carts.length > 0 ? (
                   carts?.map((item) => (
-                    <CartItem item={item} isBtnQuantity={true} sizeBtnQuantity="md" />
+                    <CartItem key={item.id} item={item} isBtnQuantity={true} sizeBtnQuantity="md" />
                   ))
                 ) : (
                   <Img

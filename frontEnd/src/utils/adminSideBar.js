@@ -1,4 +1,4 @@
-import { pathAdmin } from "./path";
+import pathAdmin from "./pathAdmin";
 
 export const menu = [
   {
@@ -14,8 +14,8 @@ export const menu = [
     icon: "fa-solid fa-user",
     title: "sidebar.accounts",
     children: [
-      { path: pathAdmin.managers, title: "sidebar.managers" },
-      { path: pathAdmin.users, title: "sidebar.users" },
+      { path: pathAdmin.accountManagers, title: "sidebar.managers" },
+      { path: pathAdmin.accountUsers, title: "sidebar.users" },
     ],
   },
   {
@@ -48,21 +48,21 @@ export const menu = [
   },
   {
     // Category
-    path: pathAdmin.category,
+    path: pathAdmin.categories,
     icon: "fa-solid fa-layer-group",
     title: "sidebar.category",
     children: [],
   },
   {
     // Brand
-    path: pathAdmin.brand,
+    path: pathAdmin.brands,
     icon: "fa-brands fa-brave",
     title: "sidebar.brand",
     children: [],
   },
   {
     // Comments
-    path: pathAdmin.feedBack,
+    path: pathAdmin.feedback,
     icon: "fa-solid fa-comments",
     title: "sidebar.comments",
     children: [],

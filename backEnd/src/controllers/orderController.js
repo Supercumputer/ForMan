@@ -3,7 +3,6 @@ const Discounts = require("../models/discount");
 const Payments = require("../models/payment");
 const Users = require("../models/user");
 const Ratings = require("../models/comment");
-
 const OrderItems = require("../models/orderItem");
 const { checkDiscountValidity } = require("../services/discountService");
 const moment = require('moment');
@@ -11,7 +10,6 @@ const crypto = require('crypto');
 const querystring = require('qs');
 const sendEmail = require("../config/mail");
 const orderItem = require("../models/orderItem");
-const { log } = require("console");
 require("dotenv").config();
 
 const getAllOrders = async (req, res) => {

@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Img } from "../../components/common";
 import { inventory } from "../../assets/images";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { CartItem } from "../../components/clientComponent";
+import { CartItem } from "../../components/client";
 
 function Inventory() {
 
@@ -30,15 +30,15 @@ function Inventory() {
         Dưới đây là giỏ hàng hợp lệ sau khi update
       </p>
 
-      <div class="flex-1 border p-3 rounded-md mt-10">
-        <ul class="">
+      <div className="flex-1 border p-3 rounded-md mt-10">
+        <ul className="">
           {carts?.map((item) => (
-            <CartItem item={item} isBtnQuantity={false} />
+            <CartItem key={item._id} item={item} isBtnQuantity={false} />
           ))}
         </ul>
       </div>
       <div className="flex items-center justify-between mt-4">
-        <Link to="/carts" className="text-blue-500"><i class="fa-solid fa-chevron-left"></i> Quay lại giỏ hàng</Link>
+        <Link to="/carts" className="text-blue-500"><i className="fa-solid fa-chevron-left"></i> Quay lại giỏ hàng</Link>
         <Link to="/checkouts" className="p-3 bg-[#333] rounded-md text-white">Thanh toán</Link>
       </div>
     </div>

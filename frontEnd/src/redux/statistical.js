@@ -6,7 +6,7 @@ export const statisticalSlice = createSlice({
         isChange: false,
     },
     reducers: {
-        setIsChange: (state, action) => {
+        setIsChange: (state) => {
            state.isChange = !state.isChange
         },
     },

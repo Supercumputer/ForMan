@@ -1,5 +1,4 @@
-import { Top5UserOrderNew, OrderRevenueChart, StatisticsCards } from "../../components/adminComponent/dashBoard";
-
+import { Top5UserOrderNew, OrderRevenueChart, StatisticsCards } from "../../components/admin/dashBoard";
 
 function Dasboard() {
 

@@ -4,8 +4,8 @@ import { Table, Breadcrumb } from "flowbite-react";
 import { Img } from "../../../components/common";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { apiGetOrderById, apiGetOrderDetailById } from "../../../apis/axios";
 import { calculateSalePrice, formatDate, formatNumber } from "../../../utils/helper";
+import { getOrderById, getOrderDetailById } from "../../../apis/orderApi";
 
 const DetailOrder = () => {
   const { t } = useTranslation("admin");
@@ -19,11 +19,10 @@ const DetailOrder = () => {
   useEffect(() => {
     (async () => {
       const [order, orderDetail] = await Promise.all([
-        apiGetOrderById(id),
-        apiGetOrderDetailById(id)
+        getOrderById(id),
+        getOrderDetailById(id)
       ])
-      console.log(order, orderDetail);
-
+    
       setOrderInfo(order.order)
       setOrderDetails(orderDetail.orderDetails)
 
@@ -40,16 +39,16 @@ const DetailOrder = () => {
         <Breadcrumb.Item>Manager</Breadcrumb.Item>
       </Breadcrumb>
 
-      <div class="border-b border-gray-200 bg-[#fff] rounded-md dark:border-gray-700 mb-3">
-        <ul class="flex flex-wrap -mb-px text-sm font-mediumtext-center text-gray-500 dark:text-gray-400">
-          <li class="me-2">
-            <button onClick={() => setActive(1)} class={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 1 ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} `}>
-              <i class="fa-brands fa-jedi-order"></i> <span>Thông tin đơn hàng</span>
+      <div className="border-b border-gray-200 bg-[#fff] rounded-md dark:border-gray-700 mb-3">
+        <ul className="flex flex-wrap -mb-px text-sm font-mediumtext-center text-gray-500 dark:text-gray-400">
+          <li className="me-2">
+            <button onClick={() => setActive(1)} className={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 1 ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} `}>
+              <i className="fa-brands fa-jedi-order"></i> <span>Thông tin đơn hàng</span>
             </button>
           </li>
-          <li class="me-2">
-            <button onClick={() => setActive(2)} class={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 2 ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} group`}>
-              <i class="fa-solid fa-list"></i> <span>Danh sách sản phẩm</span>
+          <li className="me-2">
+            <button onClick={() => setActive(2)} className={`flex items-center gap-2 justify-center p-4 border-b-2 ${active === 2 ? "text-blue-600 border-blue-600 dark:text-blue-500 dark:border-blue-500" : "hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 group"} group`}>
+              <i className="fa-solid fa-list"></i> <span>Danh sách sản phẩm</span>
             </button>
           </li>
         </ul>
@@ -155,7 +154,7 @@ const DetailOrder = () => {
             <Table.Body className="divide-y">
               {orderDetails?.map((item, index) => (
 
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell>1</Table.Cell>
                   <Table.Cell>{item.variant_id.mbt}</Table.Cell>
                   <Table.Cell>

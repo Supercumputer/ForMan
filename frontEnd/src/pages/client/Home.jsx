@@ -2,13 +2,14 @@ import {
   SlideBanner,
   SlideBrand,
   SlideProduct,
-} from "../../components/clientComponent/Slide";
+} from "../../components/client/Slide";
 
-import { ProItem, SectionHeader } from "../../components/clientComponent";
+import { ProItem, SectionHeader } from "../../components/client";
 import { Img } from "../../components/common";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { apiGetAllBrand, apiGetAllProductVariant } from "../../apis/axios";
+import { getAllProductVariants } from "../../apis/variantApi";
+import { getAllBrands } from "../../apis/brandApi";
 
 const slides = [
   "https://4menshop.com/images/thumbs/slides/slide-2-trang-chu-slide-2.png?t=1716575843",
@@ -23,8 +24,8 @@ function Home() {
   useEffect(() => {
     (async () => {
       await Promise.all([
-        apiGetAllProductVariant("?limit=8&category=hang-moi-ve"),
-        apiGetAllBrand(),
+        getAllProductVariants("?limit=8&category=hang-moi-ve"),
+        getAllBrands(),
       ])
         .then(([listProNew, listBrand]) => {
           setProductNews(listProNew.listProducts);
@@ -34,7 +35,7 @@ function Home() {
         .finally();
     })();
   }, []);
- 
+
   return (
     <>
       <div className="">
@@ -45,14 +46,14 @@ function Home() {
           <SlideProduct data={productNews} />
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            {productNews.map((item) => (
-              <ProItem item={item} />
+            {productNews?.map((item) => (
+              <ProItem key={item.id} item={item} />
             ))}
           </div>
           <SectionHeader title={"SẢN PHẨM MỚI NHẤT"} />
           <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
-            {productNews.map((item) => (
-              <ProItem item={item} />
+            {productNews?.map((item) => (
+              <ProItem key={item.id} item={item} />
             ))}
           </div>
           <SectionHeader title={"THƯƠNG HIỆU ĐỒNG HÀNH"} />
@@ -61,101 +62,101 @@ function Home() {
 
           <SectionHeader title={"TIN TỨC"} />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="#" class="flex flex-col border-gray-200 rounded-lg">
+            <Link href="#" className="flex flex-col border-gray-200 rounded-lg">
               <div className="lg:h-40 w-full overflow-hidden">
                 <img
-                  class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
+                  className="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
                   src="https://i.ytimg.com/vi/xWopu7e2V1I/hqdefault.jpg?sqp=-oaymwE2CNACELwBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhsIBMofzAP&rs=AOn4CLANh56-m6lsWAEaGFhNq-1r63IdNQ"
                   alt=""
                 />
               </div>
-              <div class="flex flex-col my-2">
-                <h1 class="text-[#333333] font-semibold mb-1 line-clamp-2">
+              <div className="flex flex-col my-2">
+                <h1 className="text-[#333333] font-semibold mb-1 line-clamp-2">
                   Noteworthy technology acquisitions 2021
                 </h1>
-                <div class="flex justify-between text-[#333333] text-sm">
+                <div className="flex justify-between text-[#333333] text-sm">
                   <span>20/10/2021</span>
                   <div className="flex gap-3">
                     <span>
-                      200 <i class="fa-regular fa-eye"></i>
+                      200 <i className="fa-regular fa-eye"></i>
                     </span>
                     <span>
-                      200 <i class="fa-regular fa-heart"></i>
+                      200 <i className="fa-regular fa-heart"></i>
                     </span>
                   </div>
                 </div>
               </div>
             </Link>
-            <Link href="#" class="flex flex-col border-gray-200 rounded-lg">
+            <Link href="#" className="flex flex-col border-gray-200 rounded-lg">
               <div className="lg:h-40 w-full overflow-hidden">
                 <img
-                  class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
+                  className="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
                   src="https://i.ytimg.com/vi/xWopu7e2V1I/hqdefault.jpg?sqp=-oaymwE2CNACELwBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhsIBMofzAP&rs=AOn4CLANh56-m6lsWAEaGFhNq-1r63IdNQ"
                   alt=""
                 />
               </div>
-              <div class="flex flex-col my-2">
-                <h1 class="text-[#333333] font-semibold mb-1 line-clamp-2">
+              <div className="flex flex-col my-2">
+                <h1 className="text-[#333333] font-semibold mb-1 line-clamp-2">
                   Noteworthy technology acquisitions 2021
                 </h1>
-                <div class="flex justify-between text-[#333333] text-sm">
+                <div className="flex justify-between text-[#333333] text-sm">
                   <span>20/10/2021</span>
                   <div className="flex gap-3">
                     <span>
-                      200 <i class="fa-regular fa-eye"></i>
+                      200 <i className="fa-regular fa-eye"></i>
                     </span>
                     <span>
-                      200 <i class="fa-regular fa-heart"></i>
+                      200 <i className="fa-regular fa-heart"></i>
                     </span>
                   </div>
                 </div>
               </div>
             </Link>
-            <Link href="#" class="flex flex-col border-gray-200 rounded-lg">
+            <Link href="#" className="flex flex-col border-gray-200 rounded-lg">
               <div className="lg:h-40 w-full overflow-hidden">
                 <img
-                  class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
+                  className="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
                   src="https://i.ytimg.com/vi/xWopu7e2V1I/hqdefault.jpg?sqp=-oaymwE2CNACELwBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhsIBMofzAP&rs=AOn4CLANh56-m6lsWAEaGFhNq-1r63IdNQ"
                   alt=""
                 />
               </div>
-              <div class="flex flex-col my-2">
-                <h1 class="text-[#333333] font-semibold mb-1 line-clamp-2">
+              <div className="flex flex-col my-2">
+                <h1 className="text-[#333333] font-semibold mb-1 line-clamp-2">
                   Noteworthy technology acquisitions 2021
                 </h1>
-                <div class="flex justify-between text-[#333333] text-sm">
+                <div className="flex justify-between text-[#333333] text-sm">
                   <span>20/10/2021</span>
                   <div className="flex gap-3">
                     <span>
-                      200 <i class="fa-regular fa-eye"></i>
+                      200 <i className="fa-regular fa-eye"></i>
                     </span>
                     <span>
-                      200 <i class="fa-regular fa-heart"></i>
+                      200 <i className="fa-regular fa-heart"></i>
                     </span>
                   </div>
                 </div>
               </div>
             </Link>
-            <Link href="#" class="flex flex-col border-gray-200 rounded-lg">
+            <Link href="#" className="flex flex-col border-gray-200 rounded-lg">
               <div className="lg:h-40 w-full overflow-hidden">
                 <img
-                  class="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
+                  className="w-full h-full object-cover transform hover:scale-110 transition-all duration-700"
                   src="https://i.ytimg.com/vi/xWopu7e2V1I/hqdefault.jpg?sqp=-oaymwE2CNACELwBSFXyq4qpAygIARUAAIhCGAFwAcABBvABAfgB_gmAAtAFigIMCAAQARhsIBMofzAP&rs=AOn4CLANh56-m6lsWAEaGFhNq-1r63IdNQ"
                   alt=""
                 />
               </div>
-              <div class="flex flex-col my-2">
-                <h1 class="text-[#333333] font-semibold mb-1 line-clamp-2">
+              <div className="flex flex-col my-2">
+                <h1 className="text-[#333333] font-semibold mb-1 line-clamp-2">
                   Noteworthy technology acquisitions 2021
                 </h1>
-                <div class="flex justify-between text-[#333333] text-sm">
+                <div className="flex justify-between text-[#333333] text-sm">
                   <span>20/10/2021</span>
                   <div className="flex gap-3">
                     <span>
-                      200 <i class="fa-regular fa-eye"></i>
+                      200 <i className="fa-regular fa-eye"></i>
                     </span>
                     <span>
-                      200 <i class="fa-regular fa-heart"></i>
+                      200 <i className="fa-regular fa-heart"></i>
                     </span>
                   </div>
                 </div>

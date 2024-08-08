@@ -1,15 +1,10 @@
-import { ProductInfo, ProductTabs, SectionHeader } from "../../components/clientComponent";
-import { SlideProduct } from "../../components/clientComponent/Slide";
+import { ProductInfo, ProductTabs, SectionHeader } from "../../components/client";
+import { SlideProduct } from "../../components/client/Slide";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
-import {
-  apiGetAllProductVariant,
-  apiGetAverageRating,
-  apiGetProductBySlug,
-} from "../../apis/axios";
-
 import { Breadcrumb } from "../../components/common";
+import { getAllProductVariants, getAverageVariantRating } from "../../apis/variantApi";
+import { getProductBySlug } from "../../apis/productApi";
 
 function ProductDetail() {
   const { slug: productSlug } = useParams();
@@ -24,7 +19,7 @@ function ProductDetail() {
 
   const callApiGetProductsByCategory = async (category) => {
     try {
-      const res = await apiGetAllProductVariant(
+      const res = await getAllProductVariants(
         `?category=${category.map((item) => item.slug).join(",")}&limit=10`
       );
 
@@ -38,7 +33,7 @@ function ProductDetail() {
 
   const callApiGetAverageRating = async (variantId) => {
     try {
-      const rating = await apiGetAverageRating(variantId);
+      const rating = await getAverageVariantRating(variantId);
 
       if (rating && rating.status === true) {
         setRatings({
@@ -51,10 +46,10 @@ function ProductDetail() {
       console.error(err);
     }
   };
-
+  
   useEffect(() => {
     (async () => {
-      await apiGetProductBySlug(productSlug)
+      await getProductBySlug(productSlug)
         .then((variant) => {
           setVariants(variant.variants);
           setDefaultVariant(variant.defaultVariant);
@@ -63,7 +58,6 @@ function ProductDetail() {
           );
         })
         .catch((err) => console.log(err))
-        .finally(() => console.log("done"));
     })();
   }, [productSlug]);
 
@@ -72,15 +66,14 @@ function ProductDetail() {
       callApiGetAverageRating(defaultVariant._id);
     }
   }, [defaultVariant]);
-
-
+  
   const handlerSetDefaultVariant = (variant) => {
     setDefaultVariant(variant);
   };
 
   return (
     <>
-      <Breadcrumb productName={defaultVariant?.product_id?.name}/>
+      <Breadcrumb productName={defaultVariant?.product_id?.name} />
 
       <div className="lg:px-[8%] px-2 my-5 font-roboto">
         <ProductInfo

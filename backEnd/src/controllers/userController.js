@@ -6,26 +6,28 @@ const sendEmail = require("../config/mail");
 const paginate = async (req, res) => {
   try {
     const {
-      type = "",
+      type = "users",
       keyword = "",
       page = 1,
       limit = process.env.PAGE_SIZE,
     } = req.query;
-
-    let typeRegex = new RegExp(`^${type}`, "i");
-
+    
     let keywordRegex = new RegExp(keyword, "i");
 
-    const roles = await GroupRoles.find({ name: { $regex: typeRegex } });
+    const filterRole = {};
 
-    const roleIds = roles.map((role) => role._id);
+    if(type === "users") {
+      filterRole.role = "66a65a1f99d2a4a1c0a42289"
+    }else{
+      filterRole.role = "66a65a0599d2a4a1c0a42285"
+    }
 
     let skip = (page - 1) * limit;
 
     // Điều kiện chung
     const searchCondition = {
       $and: [
-        { role: { $in: roleIds } },
+        filterRole,
         {
           $or: [
             { fullName: { $regex: keywordRegex } },

@@ -20,12 +20,12 @@ export const authSlice = createSlice({
       state.userOnline = action.payload;
     },
 
-    logout: (state, action) => {
+    logout: (state) => {
       state.isAuthenticated = false;
       state.account = {};
     },
 
-    setLoading: (state, action) => {
+    setLoading: (state) => {
       state.isLoading = false;
     }
   },

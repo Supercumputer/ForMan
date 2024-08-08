@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -15,35 +15,13 @@ import { HiHome } from "react-icons/hi";
 import { ButtonPro, InputField } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import {
-  apiCreateDiscount,
-  apiDeleteDiscount,
-  apiDeleteDiscounts,
-  apiGetAllDiscount,
-  apiGetDiscount,
-  apiUpdateDiscount,
-} from "../../../apis/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import Swal from "sweetalert2";
 import { formatDate } from "../../../utils/helper";
+import discountSchema from "../../../schema/discountSchema";
+import { createDiscount, deleteDiscount, deleteDiscounts, getAllDiscounts, getDiscountById, updateDiscount } from "../../../apis/discountApi";
 
-const schema = z.object({
-  code: z.string().min(1, { message: "Code không hợp lệ." }),
-  description: z.string().min(1, { message: "Description không hợp lệ." }),
-  validFrom: z.string().min(1, { message: "Ngày bắt đầu không hợp lệ." }),
-  validTo: z.string().min(1, { message: "Ngày kết thúc không hợp lệ." }),
-  status: z.string().min(1, { message: "Status không hợp lệ." }),
-  quantity: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseInt(val, 10);
-  }, z.number({ invalid_type_error: "Số lượng phải là một số." }).int({ message: "Số lượng phải là số nguyên." }).positive({ message: "Số lượng phải là số nguyên dương." })),
-  percentage: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseInt(val, 10);
-  }, z.number({ invalid_type_error: "Số lượng phải là một số." }).int({ message: "Số lượng phải là số nguyên." }).positive({ message: "Số lượng phải là số nguyên dương." })),
-});
 
 function ListDiscount() {
   const {
@@ -52,7 +30,7 @@ function ListDiscount() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(discountSchema),
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,7 +47,7 @@ function ListDiscount() {
 
   const callApiGetAllDiscount = async (currentPage, limit, keyword) => {
     try {
-      const res = await apiGetAllDiscount(currentPage, limit, keyword);
+      const res = await getAllDiscounts(currentPage, limit, keyword);
 
       if (res && res.status) {
 
@@ -87,8 +65,8 @@ function ListDiscount() {
   const handlerSubmit = async (data) => {
     try {
       const res = id
-        ? await apiUpdateDiscount(data, id)
-        : await apiCreateDiscount(data);
+        ? await updateDiscount(data, id)
+        : await createDiscount(data);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -104,7 +82,7 @@ function ListDiscount() {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteDiscount(id);
+      const res = await deleteDiscount(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -119,7 +97,7 @@ function ListDiscount() {
 
   const callApiGetDiscount = async (id) => {
     try {
-      const res = await apiGetDiscount(id);
+      const res = await getDiscountById(id);
 
       if (res && res.status) {
         setId(id);
@@ -198,7 +176,7 @@ function ListDiscount() {
             return;
           }
 
-          const res = await apiDeleteDiscounts(dataCheck);
+          const res = await deleteDiscounts(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -241,13 +219,13 @@ function ListDiscount() {
             <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
             <Dropdown.Item>Activated</Dropdown.Item>
           </Dropdown>
-          <label for="table-search" class="sr-only">
+          <label htmlFor="table-search" className="sr-only">
             Search
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="relative">
+            <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
-                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -255,9 +233,9 @@ function ListDiscount() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -267,7 +245,7 @@ function ListDiscount() {
               onChange={(e) => setKeyword(e.target.value)}
               type="text"
               id="table-search-users"
-              class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search for users"
             />
           </div>
@@ -301,8 +279,8 @@ function ListDiscount() {
             </Table.Head>
 
             <Table.Body className="divide-y">
-              {data.map((item, index) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+              {data.map((item) => (
+                <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
                       checked={dataCheck.includes(item?._id)}
@@ -335,13 +313,13 @@ function ListDiscount() {
                         type={"button"}
                         dataId={item?._id}
                         actionDelete={handlerDelete}
-                        name={<i class="fa-solid fa-trash"></i>}
+                        name={<i className="fa-solid fa-trash"></i>}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                       />
 
                       <ButtonPro
                         onClick={() => callApiGetDiscount(item._id)}
-                        name={<i class="fa-solid fa-pen-to-square"></i>}
+                        name={<i className="fa-solid fa-pen-to-square"></i>}
                         className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                       />
                     </div>
@@ -436,7 +414,7 @@ function ListDiscount() {
 
             <div className="w-full">
               <div className="mb-2 block">
-                <Label htmlFor="comment" value="Your message" />
+                <Label htmlhtmlFor="comment" value="Your message" />
               </div>
               <Textarea
                 {...register("description")}

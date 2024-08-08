@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Img } from "../../../components/common";
 import { toast } from "react-toastify";
-import { apiGetDetailUser, apiGetOrderByUserId } from "../../../apis/axios";
 import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux"
 import { formatDate, formatNumber } from "../../../utils/helper";
 import { Table } from "flowbite-react";
+import { getUserById } from "../../../apis/userApi";
+import { getOrderByUserId } from "../../../apis/orderApi";
 function DetailAccount() {
   const { t } = useTranslation("admin");
   const [orderData, setOrderData] = useState([]);
@@ -21,7 +22,7 @@ function DetailAccount() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetDetailUser(id || account?.id);
+        const res = await getUserById(id || account?.id);
         if (res) {
           console.log(res);
           setData(res.user);
@@ -35,7 +36,7 @@ function DetailAccount() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetOrderByUserId(account?.id);
+        const res = await getOrderByUserId(account?.id);
 
         if (res && res.status) {
           setOrderData(res.orders);
@@ -77,13 +78,13 @@ function DetailAccount() {
 
         <div className="flex-1 bg-[#fff] dark:bg-slate-800 dark:text-[#fff] rounded-md p-5">
           <div className="flex gap-5 p-5 bg-[#F6F7F9] dark:bg-[#0F172A] rounded-md">
-            <div class="relative flex-shrink-0">
+            <div className="relative flex-shrink-0">
               <Img
                 className="w-36 h-36 rounded-full object-cover ring-2 ring-gray-300 dark:ring-gray-500"
                 src={data?.avatar}
                 alt=""
               />
-              <span class="bottom-0 right-7 absolute  w-4 h-4 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+              <span className="bottom-0 right-7 absolute  w-4 h-4 bg-green-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
             </div>
 
             <div className="flex flex-col">
@@ -101,94 +102,94 @@ function DetailAccount() {
               {t("profile.personalInformation")}
             </h1>
 
-            <div class="relative overflow-x-auto sm:rounded-lg mt-3">
-              <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+            <div className="relative overflow-x-auto sm:rounded-lg mt-3">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
                   <tr className="border-b">
                     <th
                       scope="col"
-                      class="px-6 py-3 bg-gray-50 dark:bg-slate-800 w-32"
+                      className="px-6 py-3 bg-gray-50 dark:bg-slate-800 w-32"
                     >
                       {t("profile.properties")}
                     </th>
-                    <th scope="col" class="px-6 py-3">
+                    <th scope="col" className="px-6 py-3">
                       {t("profile.information")}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.userName")}
                     </th>
-                    <td class="px-6 py-4">{data?.userName}</td>
+                    <td className="px-6 py-4">{data?.userName}</td>
                   </tr>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.fullName")}
                     </th>
-                    <td class="px-6 py-4">{`${data?.lastName} ${data?.firstName}`}</td>
+                    <td className="px-6 py-4">{`${data?.lastName} ${data?.firstName}`}</td>
                   </tr>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.birthDay")}
                     </th>
-                    <td class="px-6 py-4">{formatDate(data?.birthDay || new Date())}</td>
+                    <td className="px-6 py-4">{formatDate(data?.birthDay || new Date())}</td>
                   </tr>
 
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.emailAddress")}
                     </th>
-                    <td class="px-6 py-4">{data?.email}</td>
+                    <td className="px-6 py-4">{data?.email}</td>
                   </tr>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.phoneNumber")}
                     </th>
-                    <td class="px-6 py-4">{data?.phone}</td>
+                    <td className="px-6 py-4">{data?.phone}</td>
                   </tr>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.sex")}
                     </th>
-                    <td class="px-6 py-4">{data?.sex}</td>
+                    <td className="px-6 py-4">{data?.sex}</td>
                   </tr>
-                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.activated")}
                     </th>
-                    <td class="px-6 py-4">{data?.status}</td>
+                    <td className="px-6 py-4">{data?.status}</td>
                   </tr>
                   <tr >
                     <th
                       scope="row"
-                      class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-slate-800"
                     >
                       {t("fields.role")}
                     </th>
-                    <td class="px-6 py-4">{data?.role?.name}</td>
+                    <td className="px-6 py-4">{data?.role?.name}</td>
                   </tr>
 
 
@@ -214,7 +215,7 @@ function DetailAccount() {
             </Table.Head>
             <Table.Body className="divide-y">
               {orderData.map((item, index) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                     {index + 1}
                   </Table.Cell>
@@ -222,7 +223,7 @@ function DetailAccount() {
                   <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
                   <Table.Cell>{formatNumber(item.total_payment)}đ</Table.Cell>
                   <Table.Cell>{item.status}</Table.Cell>
-                  <Table.Cell><Link to={`/admin/orders/detail/${item._id}`}><i class="fa-solid fa-angle-right hover:text-blue-500 hover:transform hover:scale-150"></i></Link></Table.Cell>
+                  <Table.Cell><Link to={`/admin/orders/detail/${item._id}`}><i className="fa-solid fa-angle-right hover:text-blue-500 hover:transform hover:scale-150"></i></Link></Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>

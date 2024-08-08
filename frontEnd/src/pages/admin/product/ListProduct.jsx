@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
-import {
-  apiGetAllProduct,
-  apiSoftDeleteProducts,
-} from "../../../apis/axios";
 import useDebounce from "../../../hooks/useDebounce";
-import { Filter, TableProduct } from "../../../components/adminComponent/product";
+import { Filter, TableProduct } from "../../../components/admin/product";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { getAllProducts, softDeleteProducts } from "../../../apis/productApi";
 
 const ListProduct = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +24,7 @@ const ListProduct = () => {
 
   const callApiGetAllProduct = async (currentPage, limit, newFilter) => {
     try {
-      const res = await apiGetAllProduct(
+      const res = await getAllProducts(
         `?name=${newFilter.keyword}&category=${newFilter.category}&brand=${newFilter.brand}&createdAt=${newFilter.createdAt}&status=${newFilter.status}&limit=${limit}&page=${currentPage}&sort=latest`);
 
       if (res && res.status) {
@@ -56,7 +53,7 @@ const ListProduct = () => {
             return;
           }
 
-          const res = await apiSoftDeleteProducts(dataCheck);
+          const res = await softDeleteProducts(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");

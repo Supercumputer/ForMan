@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { ProItem } from "../../components/clientComponent";
+import { useEffect, useState } from "react";
+import { ProItem } from "../../components/client";
 import { Spinner } from "flowbite-react";
-import { apiGetAllProductVariant } from "../../apis/axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ReactPaginate from "react-paginate";
+import { getAllProductVariants } from "../../apis/variantApi";
 
 function Search() {
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get("keyword");
-  
+
   const navigate = useNavigate();
   const page = searchParams.get("page") || 1;
 
@@ -26,7 +26,7 @@ function Search() {
     (async () => {
       try {
         setLoading(true);
-        const res = await apiGetAllProductVariant(
+        const res = await getAllProductVariants(
           `?search=${keyword}&limit=4&page=${page}`
         );
 
@@ -58,13 +58,13 @@ function Search() {
           <div className="mb-5">
             <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
               {result.map((item) => (
-                <ProItem item={item} />
+                <ProItem key={item._id} item={item} />
               ))}
             </div>
             <div className="flex justify-center my-10">
               <ReactPaginate
-                nextLabel={<i class="fa-solid fa-chevron-right"></i>}
-                previousLabel={<i class="fa-solid fa-chevron-left"></i>}
+                nextLabel={<i className="fa-solid fa-chevron-right"></i>}
+                previousLabel={<i className="fa-solid fa-chevron-left"></i>}
                 onPageChange={handlePageClick}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={2}
@@ -79,7 +79,7 @@ function Search() {
         </div>
       ) : (
         <div className="text-center h-[400px] flex items-center justify-center">
-          <Spinner aria-label="Center-aligned spinner example" color={"gray"}/>
+          <Spinner aria-label="Center-aligned spinner example" color={"gray"} />
         </div>
       )}
     </div>

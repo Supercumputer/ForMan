@@ -1,18 +1,15 @@
 import JoditEditor from "jodit-react";
 import { useEffect, useRef, useState } from "react";
-import { InputField, Img } from "../../../components/common";
+import { InputField } from "../../../components/common";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "flowbite-react";
-import {
-  apiGetAllBrand,
-  apiGetAllCategory,
-  apiGetProduct,
-  apiUpdateProduct,
-} from "../../../apis/axios";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
+import { getAllBrands } from "../../../apis/brandApi";
+import { getAllCategories } from "../../../apis/categoryApi";
+import { getProductById, updateProduct } from "../../../apis/productApi";
 
 const schema = z.object({
   code: z.string().min(1, { message: "Mã không hợp lệ." }), // Code là một chuỗi không rỗng
@@ -42,9 +39,9 @@ function EditProduct() {
   useEffect(() => {
     (async () => {
       await Promise.all([
-        apiGetAllBrand(),
-        apiGetAllCategory(),
-        apiGetProduct(id),
+        getAllBrands(),
+        getAllCategories(),
+        getProductById(id),
       ]).then(([brands, categorys, product]) => {
         setBrands(brands.brands);
         setCategories(categorys.categories);
@@ -81,7 +78,7 @@ function EditProduct() {
 
       formData.append("description", content);
 
-      const res = await apiUpdateProduct(formData, id);
+      const res = await updateProduct(formData, id);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -132,7 +129,7 @@ function EditProduct() {
             >
               <option value="">-- Brand --</option>
               {brands.map((brand) => (
-                <option value={brand._id}>{brand.brandName}</option>
+                <option key={brand._id} value={brand._id}>{brand.brandName}</option>
               ))}
             </select>
             {errors.brand && (
@@ -148,20 +145,20 @@ function EditProduct() {
               Category
             </label>
 
-            <ul class="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
+            <ul className="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
               {categories.map((category) => (
-                <li class="w-full">
-                  <div class="flex items-center ps-3">
+                <li key={category._id} className="w-full">
+                  <div className="flex items-center ps-3">
                     <input
                       id={category._id}
                       onClick={() => handlerCheckBox(category._id)}
                       type="checkbox"
                       checked={categoryId.includes(category._id)}
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                     />
                     <label
-                      for={category._id}
-                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      htmlFor={category._id}
+                      className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                     >
                       {category.categoryName}
                     </label>

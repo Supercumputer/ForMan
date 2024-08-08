@@ -1,27 +1,29 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { adminRouter } from "./routes";
-import { publicClientRouter, privateClientRouter } from "./routes/clientRouter";
+import adminRouter from "./routes/adminRoute";
+
+import { publicClientRouter, privateClientRouter } from "./routes/clientRoute";
 import { Fragment, useEffect } from "react";
-import { apiGetAccount } from "./apis/axios";
 import {
   PrivateRouterAdmin,
   PrivateRouterClient,
 } from "./components/privateRouterComponent";
+
 import { useDispatch } from "react-redux";
 import { login, setLoading } from "./redux/auth";
 import useSocket from "./hooks/useSocket";
+import { fetchAccountDetails } from "./apis/authApi";
 
 function App() {
   const dispatch = useDispatch();
-  
+
   useSocket();
-  
+
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetAccount();
+        const res = await fetchAccountDetails();
         if (res && res.status) {
           dispatch(login(res.resData));
         }
@@ -37,7 +39,7 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-        
+
           {/* path private admin */}
           <Route path="/admin" element={<PrivateRouterAdmin />}>
             {adminRouter.map((item, index) => {

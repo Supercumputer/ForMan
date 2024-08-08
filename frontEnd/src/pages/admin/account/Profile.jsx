@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Img } from "../../../components/common";
 import { toast } from "react-toastify";
-import { apiGetDetailUser, apiGetOrderByUserId, apiUpdateUser } from "../../../apis/axios";
 import { useSelector } from "react-redux";
 import { Button, Table } from "flowbite-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +9,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { formatDate, formatNumber } from "../../../utils/helper";
 import { Link } from "react-router-dom";
+import { getUserById, updateUser } from "../../../apis/userApi";
+import { getOrderByUserId } from "../../../apis/orderApi";
 
 const schema = z.object({
   userName: z.string().min(1, { message: "Username không hợp lệ." }),
@@ -43,7 +44,6 @@ function DetailAccountAdmin() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
   });
@@ -67,7 +67,7 @@ function DetailAccountAdmin() {
 
       formData.append("avatar", avatarPreview);
 
-      const res = await apiUpdateUser(formData, account?.id);
+      const res = await updateUser(account?.id, formData);
 
       if (res && !res.status) {
         toast.error(res.message);
@@ -86,7 +86,7 @@ function DetailAccountAdmin() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetDetailUser(account?.id);
+        const res = await getUserById(account?.id);
 
         if (res) {
           setUserData(res.user);
@@ -106,7 +106,7 @@ function DetailAccountAdmin() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetOrderByUserId(account?.id);
+        const res = await getOrderByUserId(account?.id);
 
         if (res && res.status) {
           setOrderData(res.orders);
@@ -165,7 +165,7 @@ function DetailAccountAdmin() {
                   {t("profile.personalInformation")}
                 </h3>
                 <Button size="sm" isProcessing={false} color="dark" onClick={() => setIsEdit(true)}>
-                  <div className="flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i></div>
+                  <div className="flex items-center gap-2"><i className="fa-solid fa-pen-to-square"></i></div>
                 </Button>
               </div>
               <div>
@@ -198,7 +198,7 @@ function DetailAccountAdmin() {
                         <div className="flex items-center lg:gap-4 gap-0 font-semibold">
                           <span className="min-w-[150px]">Giới tính: </span>
                           {
-                            isEdit ? <select id="underline_select" {...register('sex')} class="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
+                            isEdit ? <select id="underline_select" {...register('sex')} className="block py-2.5 px-0 w-full text-sm text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 appearance-none dark:text-gray-400 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
                               <option selected>Chọn giới tính</option>
                               <option value="Male">Male</option>
                               <option value="Female">Female</option>
@@ -212,7 +212,7 @@ function DetailAccountAdmin() {
                           <span className="min-w-[150px]">Ngày sinh: </span>
                           {
                             isEdit ?
-                              <input type="date" {...register('birthDay')} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-[#ccc] block w-full bg-transparent p-2.5" placeholder="Select date" />
+                              <input type="date" {...register('birthDay')} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-0 focus:border-[#ccc] block w-full bg-transparent p-2.5" placeholder="Select date" />
                               : <input type="text" {...register('birthDay')} className="outline-none border-b border-transparent border-b-[#ccc] focus:ring-0 px-0 text-[#333] focus:border-transparent focus:border-b-[#ccc] w-full" />
                           }
                         </div>
@@ -281,7 +281,7 @@ function DetailAccountAdmin() {
                   </Table.Head>
                   <Table.Body className="divide-y">
                     {orderData.map((item, index) => (
-                      <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                           {index + 1}
                         </Table.Cell>
@@ -289,7 +289,7 @@ function DetailAccountAdmin() {
                         <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
                         <Table.Cell>{formatNumber(item.total_payment)}đ</Table.Cell>
                         <Table.Cell>{item.status}</Table.Cell>
-                        <Table.Cell><Link to={`/admin/orders/detail/${item._id}`}><i class="fa-solid fa-angle-right hover:text-blue-500 hover:transform hover:scale-150"></i></Link></Table.Cell>
+                        <Table.Cell><Link to={`/admin/orders/detail/${item._id}`}><i className="fa-solid fa-angle-right hover:text-blue-500 hover:transform hover:scale-150"></i></Link></Table.Cell>
                       </Table.Row>
                     ))}
                   </Table.Body>

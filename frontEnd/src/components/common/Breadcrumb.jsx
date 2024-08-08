@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
-import { pathClient } from "../../utils/path";
+import pathClient from "../../utils/pathClient";
 
 const BreadcrumbComponent = ({ categoryName, productName }) => {
   const routes = [
-    { path: pathClient.product, breadcrumb: categoryName },
+    { path: pathClient.productCollection, breadcrumb: categoryName },
     { path: pathClient.productDetail, breadcrumb: productName },
     { path: "/", breadcrumb: "Home" },
   ];
@@ -16,7 +16,7 @@ const BreadcrumbComponent = ({ categoryName, productName }) => {
       {breadcrumbs.filter(el => !el.match.route === false).map(({ match, breadcrumb}, index, breadcrumbs) => (
         <Link className="flex gap-2 items-center hover:text-blue-500" key={match.pathname} to={match.pathname}>
           <span className="capitalize">{breadcrumb}</span>
-          {index !== breadcrumbs.length - 1 && <i class="fa-solid fa-chevron-right text-gray-700"></i>}
+          {index !== breadcrumbs.length - 1 && <i className="fa-solid fa-chevron-right text-gray-700"></i>}
         </Link>
       ))}
     </div>

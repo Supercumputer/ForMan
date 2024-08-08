@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { apiGetDetailUser, apiLogout } from "../../apis/axios";
-import { AddressDelivery, BtnOption, HistoryOrder, InforAccount, ResetPassword } from "../../components/clientComponent";
+import { AddressDelivery, BtnOption, HistoryOrder, InforAccount, ResetPassword } from "../../components/client";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/auth";
+import { logoutUser } from "../../apis/authApi";
+import { getUserById } from "../../apis/userApi";
 
 function Account() {
   const [active, setActive] = useState(1);
@@ -17,7 +18,7 @@ function Account() {
 
   const handlerLogout = async () => {
     try {
-      const res = await apiLogout();
+      const res = await logoutUser();
 
       if (res && res.status) {
         localStorage.removeItem("accessToken");
@@ -34,7 +35,7 @@ function Account() {
   useEffect(() => {
     async function callApiGetUserInfo() {
       try {
-        const res = await apiGetDetailUser(account?.id);
+        const res = await getUserById(account?.id);
         if (res && res.status) {
           setUser(res.user);
         }
@@ -53,31 +54,31 @@ function Account() {
           active={active === 1}
           name={"Thông tin cá nhân"}
           setActive={() => setActive(1)}
-          icon={<i class="fa-solid fa-user"></i>}
+          icon={<i className="fa-solid fa-user"></i>}
         />
         <BtnOption
           active={active === 2}
           name={"Lịch sử đơn hàng"}
           setActive={() => setActive(2)}
-          icon={<i class="fa-brands fa-jedi-order"></i>}
+          icon={<i className="fa-brands fa-jedi-order"></i>}
         />
         <BtnOption
           active={active === 3}
           name={"Đặt lại mật khẩu"}
           setActive={() => setActive(3)}
-          icon={<i class="fa-solid fa-user-pen"></i>}
+          icon={<i className="fa-solid fa-user-pen"></i>}
         />
         <BtnOption
           active={active === 4}
           name={"Địa chỉ giao hàng"}
           setActive={() => setActive(4)}
-          icon={<i class="fa-solid fa-location-dot"></i>}
+          icon={<i className="fa-solid fa-location-dot"></i>}
         />
         <BtnOption
           active={false}
           name={"Đăng xuất"}
           setActive={handlerLogout}
-          icon={<i class="fa-solid fa-right-from-bracket"></i>}
+          icon={<i className="fa-solid fa-right-from-bracket"></i>}
         />
       </div>
 

@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiDeleteAllCart, apiSendMailOrder, apiUpdateDiscountByCode, apiUpdateOrder, apiUpdateQuantityVariant } from '../../apis/axios';
 import { setCarts } from '../../redux/cart';
 import { Spinner } from 'flowbite-react';
-import { pathClient } from '../../utils/path';
+import pathClient from '../../utils/pathClient';
+import { deleteAllCartsByUserId } from '../../apis/cartApi';
+import { sendMailOrder, updateOrder } from '../../apis/orderApi';
+import { updateVariantQuantity } from '../../apis/variantApi';
+import { updateDiscountByCode } from '../../apis/discountApi';
 
 function Thanks() {
     const { carts } = useSelector((state) => state.cart);
@@ -25,20 +28,20 @@ function Thanks() {
         if (isSuccess) {
             (async () => {
                 if (account && account?.id) {
-                    await apiDeleteAllCart(account?.id);
-                    const res = await apiUpdateOrder(orderId, { status: "Confirmed", status_payment: type === 'COD' ? "Unpaid" : "Paid" });
+                    await deleteAllCartsByUserId(account?.id);
+                    const res = await updateOrder(orderId, { status: "Confirmed", status_payment: type === 'COD' ? "Unpaid" : "Paid" });
 
                     if (res && res.status) {
-                        await apiSendMailOrder(res.data)
+                        await sendMailOrder(res.data)
                     }
                 } else {
-                    await apiUpdateQuantityVariant(carts)
+                    await updateVariantQuantity(carts)
                     sessionStorage.removeItem('carts')
 
-                    const res = await apiUpdateOrder(orderId, { status_payment: type === 'COD' ? "Unpaid" : "Paid" });
+                    const res = await updateOrder(orderId, { status_payment: type === 'COD' ? "Unpaid" : "Paid" });
 
                     if (res && res.status) {
-                        await apiSendMailOrder(res.data)
+                        await sendMailOrder(res.data)
                     }
                 }
 
@@ -47,10 +50,10 @@ function Thanks() {
             })()
         } else {
             (async () => {
-                const res = await apiUpdateOrder(orderId, { status: "Failure" });
+                const res = await updateOrder(orderId, { status: "Failure" });
 
                 if (res && res.status) {
-                    await apiUpdateDiscountByCode({ user_id: res.data.user_id }, res.data.discount)
+                    await updateDiscountByCode({ user_id: res.data.user_id }, res.data.discount)
                 }
 
                 setLoading(false);

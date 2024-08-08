@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Img, InputField } from '../../../components/common';
-import { apiGetUserByEmail, apiSendFeedback } from '../../../apis/axios';
 import { toast } from 'react-toastify';
 import useDebounce from '../../../hooks/useDebounce';
 import { Button, Checkbox, Label, Textarea } from 'flowbite-react'
+import { getUserByEmail, sendUserFeedback } from '../../../apis/userApi';
 
 const FeedbackPage = () => {
   const [users, setUser] = useState([]);
@@ -34,7 +34,7 @@ const FeedbackPage = () => {
         emails: dataCheck.map((item) => item.email),
       }
 
-      let res = await apiSendFeedback(data);
+      let res = await sendUserFeedback(data);
       if (res && res.status) {
         toast.success(res.message);
       } else {
@@ -43,14 +43,14 @@ const FeedbackPage = () => {
 
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
 
   const callApiGetUserByEmail = async (email) => {
     try {
-      const res = await apiGetUserByEmail(`?email=${email}`);
+      const res = await getUserByEmail(`?email=${email}`);
       if (res && res.status) {
         setUser(res.users);
       } else {
@@ -82,15 +82,15 @@ const FeedbackPage = () => {
           />
           <div className={`absolute z-30 flex flex-col gap-3 right-0 top-20 left-0 bg-[#fff] dark:bg-slate-800 rounded-sm p-3 ${users.length === 0 ? 'hidden' : ''}`}>
             {users.map((user) => (
-              <div class="flex gap-2 items-center w-full hover:bg-[#F8FAFC] dark:hover:bg-[#2A303D] p-2 rounded-md">
-                <div class="flex-shrink-0">
-                  <Img class="w-10 h-10 rounded-full object-cover" src={user.avatar} alt="Neil image" />
+              <div key={user.id} className="flex gap-2 items-center w-full hover:bg-[#F8FAFC] dark:hover:bg-[#2A303D] p-2 rounded-md">
+                <div className="flex-shrink-0">
+                  <Img className="w-10 h-10 rounded-full object-cover" src={user.avatar} alt="Neil image" />
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-gray-900 truncate dark:text-white">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate dark:text-white">
                     {user.lastName} {user.firstName}
                   </p>
-                  <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                  <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                     {user.email}
                   </p>
                 </div>
@@ -136,19 +136,19 @@ const FeedbackPage = () => {
         <h2 className="text-xl font-bold mb-2">Danh Sách Phản Hồi</h2>
         <ul className="bg-[#fff] p-2 flex flex-col gap-2">
           {dataCheck.length > 0 ? dataCheck.map((user, index) => (
-            <div class="flex gap-2 items-center w-full hover:bg-[#F8FAFC] dark:hover:bg-[#2A303D] p-2 rounded-md">
-              <div class="flex-shrink-0">
-                <Img class="w-10 h-10 rounded-full object-cover" src={user.avatar} alt="Neil image" />
+            <div key={index} className="flex gap-2 items-center w-full hover:bg-[#F8FAFC] dark:hover:bg-[#2A303D] p-2 rounded-md">
+              <div className="flex-shrink-0">
+                <Img className="w-10 h-10 rounded-full object-cover" src={user.avatar} alt="Neil image" />
               </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-900 truncate dark:text-white">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate dark:text-white">
                   {user.lastName} {user.firstName}
                 </p>
-                <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                   {user.email}
                 </p>
               </div>
-              <div onClick={() => handleCheckbox(user)} className='text-blue-500 text-lg'><i class="fa-solid fa-rectangle-xmark"></i></div>
+              <div onClick={() => handleCheckbox(user)} className='text-blue-500 text-lg'><i className="fa-solid fa-rectangle-xmark"></i></div>
             </div>
           )) : <span className="text-center">Danh sách phản hồi trống.</span>}
         </ul>

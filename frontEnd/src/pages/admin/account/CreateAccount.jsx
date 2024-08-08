@@ -1,45 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { InputField } from "../../../components/common";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { apiCreateAccount, apiGetAllGroupRole } from "../../../apis/axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 import { Button } from "flowbite-react";
-
-const schema = z
-  .object({
-    firstName: z.string().min(1, { message: "First name không hợp lệ." }),
-    lastName: z.string().min(1, { message: "Last name không hợp lệ." }),
-    email: z.string().email({ message: "Email không hợp lệ." }),
-    phone: z.string().regex(/^0[0-9]{9}$/, {
-      message: "Phone không hợp lệ.",
-    }),
-    sex: z.enum(["Male", "Female", "Other"], { message: "Sex không hợp lệ." }),
-    role: z
-      .string()
-      .min(1, { message: "Vui lòng chọn quyền cho tài khoản này." }),
-    birthDay: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
-      message: "Birthday phải đúng định dạng YYYY-MM-DD.",
-    }),
-    avatar: z
-      .instanceof(FileList)
-      .refine((files) => files.length > 0, "Avatar không hợp lệ."),
-    password: z
-      .string()
-      .min(8, { message: "Password phải tối thiểu là 8 kí tự." }),
-    confirmPassword: z
-      .string()
-      .min(8, { message: "Confirm password phải tối thiểu là 8 kí tự." }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Mật khẩu không khớp.",
-    path: ["confirmPassword"],
-  });
-
+import userSchema from "../../../schema/userSchema";
+import { getAllGroupRoles } from "../../../apis/roleApi";
+import {createUser} from "../../../apis/userApi";
 function CreateAccount() {
   const [groupRole, setGroupRole] = useState([]);
   const navigate = useNavigate();
@@ -49,12 +19,12 @@ function CreateAccount() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(userSchema),
   });
 
   useEffect(() => {
     (async () => {
-      const res = await apiGetAllGroupRole("admin");
+      const res = await getAllGroupRoles("admin");
       if (res) {
         setGroupRole(res.groupRoles);
       }
@@ -74,7 +44,7 @@ function CreateAccount() {
         }
       }
 
-      const res = await apiCreateAccount(formData);
+      const res = await createUser(formData);
 
       if (res && !res.status) {
         toast.error(res.message);
@@ -83,7 +53,7 @@ function CreateAccount() {
 
       navigate(`${pathAdmin.managers}`);
       toast.success(res.message);
-      
+
     } catch (error) {
       console.log(error);
     } finally {
@@ -182,7 +152,7 @@ function CreateAccount() {
               >
                 <option value="">-- Role --</option>
                 {groupRole.map((group) => (
-                  <option value={group._id}>{group.name}</option>
+                  <option key={group._id} value={group._id}>{group.name}</option>
                 ))}
               </select>
               {errors.role && (

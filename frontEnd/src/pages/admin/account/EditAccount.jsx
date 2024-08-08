@@ -1,52 +1,19 @@
 import { useEffect, useState } from "react";
 import { Img, InputField } from "../../../components/common";
-import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "flowbite-react";
 import { toast } from "react-toastify";
 
-import * as z from "zod";
-import {
-  apiGetDetailUser,
-  apiGetAllGroupRole,
-  apiUpdateUser,
-} from "../../../apis/axios";
 import { useParams } from "react-router-dom";
 
-const schema = z.object({
-  userName: z.string().min(1, { message: "Username không hợp lệ." }),
-  firstName: z.string().min(1, { message: "First name không hợp lệ." }),
-  lastName: z.string().min(1, { message: "Last name không hợp lệ." }),
-  email: z.string().email({ message: "Email không hợp lệ." }),
-  phone: z.string().regex(/^0[0-9]{9}$/, {
-    message: "Phone không hợp lệ.",
-  }),
-  status: z.enum(["InActive", "Active", "Banned"], {
-    message: "Status không hợp lệ.",
-  }),
-  sex: z.enum(["Male", "Female", "Other"], { message: "Sex không hợp lệ." }),
-  role: z
-    .string()
-    .min(1, { message: "Vui lòng chọn quyền cho tài khoản này." }),
-  birthDay: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
-    message: "Birthday phải đúng định dạng YYYY-MM-DD.",
-  }),
-  avatar: z.custom((value) => {
-    if (value instanceof FileList) {
-      return value.length > 0;
-    }
-    return true;
-  }, "Avatar không hợp lệ."),
-  password: z.string().refine((val) => val === "" || val.length >= 8, {
-    message: "Password phải tối thiểu là 8 kí tự.",
-  }),
-});
+import userSchema from "../../../schema/userSchema";
+import { getAllGroupRoles } from "../../../apis/roleApi";
+import { getUserById, updateUser } from "../../../apis/userApi";
 
 function EditAccount() {
   const [avatar, setAvatar] = useState(null);
   const { id } = useParams();
-  const { t } = useTranslation("admin");
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [groupRole, setGroupRole] = useState([]);
@@ -57,12 +24,12 @@ function EditAccount() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(userSchema),
   });
 
   useEffect(() => {
     (async () => {
-      await Promise.all([apiGetAllGroupRole("admin"), apiGetDetailUser(id)])
+      await Promise.all([getAllGroupRoles("admin"), getUserById(id)])
         .then(([roles, user]) => {
           setGroupRole(roles.groupRoles);
           setAvatar(user.user.avatar);
@@ -90,7 +57,7 @@ function EditAccount() {
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-   
+
     file.preview = URL.createObjectURL(file);
 
     setAvatarPreview(file);
@@ -109,7 +76,7 @@ function EditAccount() {
         }
       }
 
-      const res = await apiUpdateUser(formData, id);
+      const res = await updateUser(formData, id);
 
       if (res && !res.status) {
         toast.error(res.message);
@@ -230,7 +197,7 @@ function EditAccount() {
                 {...register("role")}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                {groupRole.map((group, index) => (
+                {groupRole.map((group) => (
                   <option key={group._id} value={group._id}>
                     {group.name}
                   </option>

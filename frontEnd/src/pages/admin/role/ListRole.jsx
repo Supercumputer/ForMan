@@ -8,11 +8,11 @@ import {
 } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 import { ButtonPro, InputField } from "../../../components/common";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { apiCreateRole, apiGetAllRole, apiGetRole, apiUpdateRole } from "../../../apis/axios";
+import { createRole, getAllRoles, getRoleById, updateRole } from "../../../apis/roleApi";
 
 function ListRole() {
   const [data, setData] = useState([]);
@@ -24,7 +24,7 @@ function ListRole() {
 
   const callApiGetAllRole = async () => {
     try {
-      const res = await apiGetAllRole();
+      const res = await getAllRoles();
       if (res) {
         setData(res.roles);
         toast.success(res.message);
@@ -41,7 +41,7 @@ function ListRole() {
         return;
       }
 
-      const res = id ? await apiUpdateRole(id, value) : await apiCreateRole(value);
+      const res = id ? await updateRole(id, value) : await createRole(value);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -57,10 +57,10 @@ function ListRole() {
 
   const callApiGetRole = async (id) => {
     try {
-      const res = await apiGetRole(id);
+      const res = await getRoleById(id);
       if (res) {
         setId(id);
-        setValue({route: res.role.route, description: res.role.description});
+        setValue({ route: res.role.route, description: res.role.description });
         toast.success(res.message);
       }
     } catch (error) {
@@ -124,13 +124,13 @@ function ListRole() {
               <Dropdown.Item>Delete</Dropdown.Item>
               <Dropdown.Item>Activated</Dropdown.Item>
             </Dropdown>
-            <label for="table-search" class="sr-only">
+            <label htmlFor="table-search" className="sr-only">
               Search
             </label>
-            <div class="relative">
-              <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+            <div className="relative">
+              <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
                 <svg
-                  class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                  className="w-4 h-4 text-gray-500 dark:text-gray-400"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -138,9 +138,9 @@ function ListRole() {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                   />
                 </svg>
@@ -148,7 +148,7 @@ function ListRole() {
               <input
                 type="text"
                 id="table-search-users"
-                class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Search for users"
               />
             </div>
@@ -170,7 +170,7 @@ function ListRole() {
 
               <Table.Body className="divide-y">
                 {data?.map((item, index) => (
-                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell className="p-4">
                       <Checkbox />
                     </Table.Cell>
@@ -181,7 +181,7 @@ function ListRole() {
                       <div className="flex space-x-2">
                         {/* <ButtonPro
                           type="button"
-                          name={<i class="fa-solid fa-trash"></i>}
+                          name={<i className="fa-solid fa-trash"></i>}
                           onclick={""}
                           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         /> */}

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { InputOutlined, OrderDetail } from '../../components/clientComponent';
-import { apiGetOrderById } from '../../apis/axios';
+import { useState } from 'react';
+import { InputOutlined, OrderDetail } from '../../components/client';
 import { Button } from 'flowbite-react';
 import { toast } from 'react-toastify';
+import { getOrderById } from '../../apis/orderApi';
 
 const OrderLookup = () => {
 
@@ -20,7 +20,7 @@ const OrderLookup = () => {
             }
 
             setLoading(true);
-            const res = await apiGetOrderById(orderId);
+            const res = await getOrderById(orderId);
 
             if (res && res.status) {
                 setId(res.order._id);

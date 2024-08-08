@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -10,13 +10,13 @@ import {
 } from "flowbite-react";
 import { HiHome } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 import { ButtonPro } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
-import { apiDeleteSoftOrder, apiDeleteSoftsOrder, apiGetAllOrders, apiUpdateOrder } from "../../../apis/axios";
 import { formatDate, formatNumber } from "../../../utils/helper";
 import { toast } from "react-toastify";
+import { deleteSoftOrder, deleteSoftOrders, getAllOrders, updateOrder } from "../../../apis/orderApi";
 
 function ListOrder() {
 
@@ -73,7 +73,7 @@ function ListOrder() {
             return;
           }
 
-          const res = await apiDeleteSoftsOrder(dataCheck);
+          const res = await deleteSoftOrders(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -90,7 +90,7 @@ function ListOrder() {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteSoftOrder(id);
+      const res = await deleteSoftOrder(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -105,10 +105,10 @@ function ListOrder() {
 
   const handlerUpdateStatus = async (id, status) => {
     try {
-      const res = await apiUpdateOrder(id, { status: status })
+      const res = await updateOrder(id, { status: status })
 
       if (res && res.status) {
-        callApiGetAllOrders(currentPage, limit);
+        callApiGetAllOrders(currentPage, limit, keyword);
       } else {
         toast.error(res?.message);
       }
@@ -119,7 +119,7 @@ function ListOrder() {
 
   const callApiGetAllOrders = async (currentPage, limit, keyword) => {
     try {
-      const res = await apiGetAllOrders(`?limit=${limit}&page=${currentPage}&order_id=${keyword}`);
+      const res = await getAllOrders(`?limit=${limit}&page=${currentPage}&order_id=${keyword}`);
 
       if (res && res.status) {
         setData(res.orders);
@@ -164,13 +164,13 @@ function ListOrder() {
 
           </div>
 
-          <label for="table-search" class="sr-only">
+          <label htmlFor="table-search" className="sr-only">
             Search
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="relative">
+            <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
-                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -178,9 +178,9 @@ function ListOrder() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -190,7 +190,7 @@ function ListOrder() {
               onChange={(e) => setKeyword(e.target.value)}
               type="text"
               id="table-search-users"
-              class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Nhập vào order id"
             />
           </div>
@@ -225,7 +225,7 @@ function ListOrder() {
             </Table.Head>
             <Table.Body className="divide-y">
               {data?.map((item) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox checked={dataCheck.includes(item?._id)}
                       onChange={() => handleCheckbox(item?._id)} />
@@ -270,7 +270,7 @@ function ListOrder() {
                     <div className="flex gap-2">
                       <ButtonPro
                         type="button"
-                        name={<i class="fa-solid fa-trash"></i>}
+                        name={<i className="fa-solid fa-trash"></i>}
                         dataId={item?._id}
                         actionDelete={handlerDelete}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
@@ -278,7 +278,7 @@ function ListOrder() {
 
                       <ButtonPro
                         to={`${pathAdmin.orders}/detail/${item?._id}`}
-                        name={<i class="fa-solid fa-eye"></i>}
+                        name={<i className="fa-solid fa-eye"></i>}
                         className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                       />
                     </div>

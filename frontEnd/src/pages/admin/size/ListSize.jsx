@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -13,24 +13,12 @@ import { HiHome } from "react-icons/hi";
 import { ButtonPro, InputField } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import {
-  apiCreateSize,
-  apiDeleteSize,
-  apiDeletesSize,
-  apiGetAllSize,
-  apiGetSize,
-  apiUpdateSize,
-} from "../../../apis/axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import Swal from "sweetalert2";
 import { formatDate } from "../../../utils/helper";
-
-const schema = z.object({
-  sizeName: z.string().min(1, { message: "SizeName không hợp lệ." }),
-  description: z.string().min(1, { message: "Description không hợp lệ." }),
-});
+import sizeSchema from "../../../schema/sizeSchema";
+import { createSize, deleteSize, deleteSizes, getAllSizes, getSizeById, updateSize } from "../../../apis/sizeApi";
 
 function ListSize() {
   const {
@@ -39,7 +27,7 @@ function ListSize() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(sizeSchema),
   });
 
 
@@ -52,7 +40,7 @@ function ListSize() {
 
   const callApiGetAllSize = async () => {
     try {
-      const res = await apiGetAllSize();
+      const res = await getAllSizes();
 
       if (res) {
 
@@ -66,8 +54,8 @@ function ListSize() {
   const handlerSubmit = async (data) => {
     try {
       const res = id
-        ? await apiUpdateSize(data, id)
-        : await apiCreateSize(data);
+        ? await updateSize(data, id)
+        : await createSize(data);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -83,7 +71,7 @@ function ListSize() {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteSize(id);
+      const res = await deleteSize(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -98,12 +86,12 @@ function ListSize() {
 
   const callApiGetSize = async (id) => {
     try {
-      const res = await apiGetSize(id);
+      const res = await getSizeById(id);
 
       if (res && res.status) {
         setId(id);
         setOpenModal(true);
-        reset(res.Size);
+        reset(res.size);
       } else {
         toast.error(res.message);
       }
@@ -164,7 +152,7 @@ function ListSize() {
             return;
           }
 
-          const res = await apiDeletesSize(dataCheck);
+          const res = await deleteSizes(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -229,7 +217,7 @@ function ListSize() {
 
             <Table.Body className="divide-y">
               {data.map((item, index) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                <Table.Row key={index} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
                       checked={dataCheck.includes(item?._id)}
@@ -245,13 +233,13 @@ function ListSize() {
                         type={"button"}
                         dataId={item?._id}
                         actionDelete={handlerDelete}
-                        name={<i class="fa-solid fa-trash"></i>}
+                        name={<i className="fa-solid fa-trash"></i>}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                       />
 
                       <ButtonPro
                         onClick={() => callApiGetSize(item._id)}
-                        name={<i class="fa-solid fa-pen-to-square"></i>}
+                        name={<i className="fa-solid fa-pen-to-square"></i>}
                         className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                       />
                     </div>

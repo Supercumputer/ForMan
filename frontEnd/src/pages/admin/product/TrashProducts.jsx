@@ -10,16 +10,11 @@ import {
     Pagination,
     Select,
 } from "flowbite-react";
-import { ButtonPro, Img } from "../../../components/common";
-import {
-    apiRestoreProduct,
-    apiDestroyProduct,
-    apiDestroysProduct,
-    apiGetAllProductTrash,
-} from "../../../apis/axios";
+import { ButtonPro } from "../../../components/common";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { formatDate } from "../../../utils/helper";
+import { destroyProduct, destroyProducts, getAllProductsInTrash, restoreProduct } from "../../../apis/productApi";
 
 const ListProduct = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,7 +24,7 @@ const ListProduct = () => {
     const [data, setData] = useState([]);
     const [dataCheck, setDataCheck] = useState([]);
     const [checkAll, setCheckAll] = useState(false);
-    
+
     const onPageChange = (page) => setCurrentPage(page);
 
     const { t } = useTranslation("admin");
@@ -63,12 +58,12 @@ const ListProduct = () => {
     const callApiGetAllProduct = async (limit, currentPage, keyword) => {
         try {
             console.log(keyword);
-            
-            const res = await apiGetAllProductTrash(`?limit=${limit}&page=${currentPage}&name=${keyword}`);
+
+            const res = await getAllProductsInTrash(`?limit=${limit}&page=${currentPage}&name=${keyword}`);
 
             if (res && res.status) {
                 console.log(res);
-                
+
                 setTotalPages(res.totalPages);
                 setCurrentPage(res.currentPage)
                 setData(res.products);
@@ -80,7 +75,7 @@ const ListProduct = () => {
 
     const handlerDelete = async (id) => {
         try {
-            const res = await apiDestroyProduct(id);
+            const res = await destroyProduct(id);
 
             if (res && res.status) {
                 Swal.fire("Deleted!", res.message, "success");
@@ -110,7 +105,7 @@ const ListProduct = () => {
                         return;
                     }
 
-                    const res = await apiDestroysProduct(dataCheck);
+                    const res = await destroyProducts(dataCheck);
 
                     if (res && res.status) {
                         Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -131,7 +126,7 @@ const ListProduct = () => {
 
     const handlerRestore = async (id) => {
         try {
-            const res = await apiRestoreProduct(id);
+            const res = await restoreProduct(id);
             if (res && res.status) {
                 toast.success(res.message);
                 callApiGetAllProduct(limit, currentPage, keyword);
@@ -225,7 +220,7 @@ const ListProduct = () => {
                         </Table.Head>
                         <Table.Body className="divide-y">
                             {data?.map((item) => (
-                                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                                     <Table.Cell className="p-4">
                                         <Checkbox
                                             checked={dataCheck.includes(item?._id)}
@@ -250,7 +245,7 @@ const ListProduct = () => {
 
                                             <ButtonPro
                                                 onClick={() => handlerRestore(item._id)}
-                                                name={<i class="fa-solid fa-trash-can-arrow-up"></i>}
+                                                name={<i className="fa-solid fa-trash-can-arrow-up"></i>}
                                                 className="focus:outline-none text-white bg-green-400 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-green-900"
                                             />
 

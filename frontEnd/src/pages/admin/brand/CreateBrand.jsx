@@ -1,25 +1,14 @@
-import React, { useState } from "react";
-import { ButtonPro, Img, InputField } from "../../../components/common";
+import { useState } from "react";
+import { Img, InputField } from "../../../components/common";
 import { Button, Label, Textarea } from "flowbite-react";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { apiCreateBrand } from "../../../apis/axios";
+import { createBrand } from "../../../apis/brandApi"
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
-
-const schema = z.object({
-  brandName: z.string().min(1, { message: "Tên thương hiệu không hợp lệ." }),
-  description: z.string().min(1, { message: "Mô tả không hợp lệ." }),
-  country: z.string().min(1, { message: "Quốc gia không hợp lệ." }),
-  website: z.string().min(1, { message: "Website không hợp lệ." }),
-  contactEmail: z.string().min(1, { message: "Email không hợp lệ." }),
-  logo: z
-    .instanceof(FileList)
-    .refine((files) => files.length > 0, "Logo không hợp lệ."),
-});
+import  pathAdmin from "../../../utils/pathAdmin";
+import brandShema from "../../../schema/brandSchema";
 
 const CreateBrand = () => {
   const {
@@ -27,7 +16,7 @@ const CreateBrand = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(brandShema),
   });
 
   const navigate = useNavigate();
@@ -56,7 +45,7 @@ const CreateBrand = () => {
         }
       }
 
-      const res = await apiCreateBrand(formData);
+      const res = await createBrand(formData);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -101,7 +90,7 @@ const CreateBrand = () => {
           errors={errors?.contactEmail?.message}
           icon={
             <svg
-              class="w-4 h-4 text-gray-500 dark:text-gray-400"
+              className="w-4 h-4 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="currentColor"

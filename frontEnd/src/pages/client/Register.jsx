@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { apiRegister } from "../../apis/axios";
+import { registerUser } from "../../apis/authApi";
 
 const schema = z
   .object({
@@ -36,7 +36,7 @@ const Register = () => {
   const handlerSubmit = async (data) => {
 
     try {
-      const res = await apiRegister(data);
+      const res = await registerUser(data);
 
       if (res && res.status) {
         toast.success(res.message);

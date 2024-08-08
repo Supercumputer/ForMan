@@ -3,40 +3,17 @@ import { useEffect, useRef, useState } from "react";
 import { InputField, Img } from "../../../components/common";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "flowbite-react";
-import {
-  apiCreateProduct,
-  apiGetAllBrand,
-  apiGetAllCategory,
-  apiGetAllColor,
-  apiGetAllSize,
-} from "../../../apis/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
+import productSchema from "../../../schema/productSchema";
+import { getAllBrands } from "../../../apis/brandApi";
+import { getAllCategories } from "../../../apis/categoryApi";
+import { getAllColors } from "../../../apis/colorApi";
+import { getAllSizes } from "../../../apis/sizeApi";
+import { createProduct } from "../../../apis/productApi";
 
-const schema = z.object({
-  code: z.string().min(1, { message: "Mã không hợp lệ." }), // Code là một chuỗi không rỗng
-  name: z.string().min(1, { message: "Tên không hợp lệ." }), // Name là một chuỗi không rỗng
-  brand: z.string().min(1, { message: "Thương hiệu không hợp lệ." }), // Brand là một chuỗi không rỗng
-  color: z.string().min(1, { message: "Màu không hợp lệ." }), // Color là một chuỗi không rỗng
-  price: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseFloat(val);
-  }, z.number({ invalid_type_error: "Giá phải là một số." }).positive({ message: "Giá phải là một số dương." })), // Chuyển đổi giá trị thành số và kiểm tra giá trị dương
-  quantity: z.preprocess((val) => {
-    if (typeof val === "string") val = val.trim();
-    return val === "" ? NaN : parseInt(val, 10);
-  }, z.number({ invalid_type_error: "Số lượng phải là một số." }).int({ message: "Số lượng phải là số nguyên." }).positive({ message: "Số lượng phải là số nguyên dương." })),
-  size: z.string().min(1, { message: "Size không hợp lệ." }), // Size là một chuỗi không rỗng
-  images: z.custom((value) => {
-    if (value instanceof FileList) {
-      return value.length > 0;
-    }
-    return true;
-  }, "Ảnh không hợp lệ."),
-});
 
 function CreateProduct() {
   const {
@@ -44,7 +21,7 @@ function CreateProduct() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(productSchema),
   });
 
   const editor = useRef(null);
@@ -97,10 +74,10 @@ function CreateProduct() {
   useEffect(() => {
     (async () => {
       await Promise.all([
-        apiGetAllBrand(),
-        apiGetAllCategory(),
-        apiGetAllColor(),
-        apiGetAllSize(),
+        getAllBrands(),
+        getAllCategories(),
+        getAllColors(),
+        getAllSizes(),
       ]).then(([brands, categorys, colors, sizes]) => {
         setBrands(brands.brands);
         setCategories(categorys.categories);
@@ -135,7 +112,7 @@ function CreateProduct() {
 
       formData.append("description", content);
 
-      const res = await apiCreateProduct(formData);
+      const res = await createProduct(formData);
 
       if (res && res.status) {
         navigate(`${pathAdmin.products}`);
@@ -188,7 +165,7 @@ function CreateProduct() {
               >
                 <option value="">-- Color --</option>
                 {colors.map((color) => (
-                  <option value={color._id}>{color.colorName}</option>
+                  <option key={color._id} value={color._id}>{color.colorName}</option>
                 ))}
               </select>
               {errors.color && (
@@ -208,7 +185,7 @@ function CreateProduct() {
               >
                 <option value="">-- Size --</option>
                 {sizes.map((size) => (
-                  <option value={size._id}>{size.sizeName}</option>
+                  <option key={size._id} value={size._id}>{size.sizeName}</option>
                 ))}
               </select>
               {errors.size && (
@@ -259,7 +236,7 @@ function CreateProduct() {
               >
                 <option value="">-- Brand --</option>
                 {brands.map((brand) => (
-                  <option value={brand._id}>{brand.brandName}</option>
+                  <option key={brand._id} value={brand._id}>{brand.brandName}</option>
                 ))}
               </select>
               {errors.brand && (
@@ -282,20 +259,20 @@ function CreateProduct() {
             >
               Category
             </label>
-            <ul class="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
+            <ul className="grid grid-cols-4 gap-2 h-[100px] overflow-y-auto custom-scroll border rounded-md">
               {categories.map((category) => (
-                <li class="w-full">
-                  <div class="flex items-center ps-3">
+                <li key={category._id} className="w-full">
+                  <div className="flex items-center ps-3">
                     <input
                       id={category._id}
                       onClick={() => handlerCheckBox(category._id)}
                       type="checkbox"
                       checked={categoryId.includes(category._id)}
-                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
                     />
                     <label
-                      for={category._id}
-                      class="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                      htmlFor={category._id}
+                      className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                     >
                       {category.categoryName}
                     </label>

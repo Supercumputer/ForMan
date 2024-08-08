@@ -11,7 +11,7 @@ export const cartSlice = createSlice({
       state.carts = action.payload;
     },
 
-    setIsLoadCart: (state, action) => {
+    setIsLoadCart: (state) => {
       state.isLoadCart = !state.isLoadCart;
     },
   },

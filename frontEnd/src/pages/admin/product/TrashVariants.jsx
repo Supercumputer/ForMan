@@ -4,15 +4,10 @@ import { useTranslation } from "react-i18next";
 import { HiHome } from "react-icons/hi";
 import { Checkbox, Table, Button, Dropdown, Breadcrumb } from "flowbite-react";
 import { ButtonPro, Img } from "../../../components/common";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 import { toast } from "react-toastify";
-import {
-  apiRestoreVariant,
-  apiDestroyVariant,
-  apiDestroysVariant,
-  apiGetAllVariantByIdSoft,
-} from "../../../apis/axios";
 import Swal from "sweetalert2";
+import { destroyVariant, destroyVariants, getSoftDeletedVariantsByProductId, restoreVariant } from "../../../apis/variantApi";
 
 const TrashVariants = () => {
   const [data, setData] = useState([]);
@@ -50,12 +45,12 @@ const TrashVariants = () => {
 
   const callApiGetAllVariant = async () => {
     try {
-      const res = await apiGetAllVariantByIdSoft(id);
-      
+      const res = await getSoftDeletedVariantsByProductId(id);
+
       if (res && res.status) {
         setData(res.newVariants);
       }
-      
+
     } catch (error) {
       toast.error(error);
     }
@@ -63,7 +58,7 @@ const TrashVariants = () => {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDestroyVariant(id);
+      const res = await destroyVariant(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -93,7 +88,7 @@ const TrashVariants = () => {
             return;
           }
 
-          const res = await apiDestroysVariant(dataCheck);
+          const res = await destroyVariants(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -110,17 +105,17 @@ const TrashVariants = () => {
 
   const handlerRestore = async (id) => {
     try {
-        const res = await apiRestoreVariant(id);
-        if (res && res.status) {
-            toast.success(res.message);
-            callApiGetAllVariant();
-        } else {
-            toast.error(res?.message);
-        }
+      const res = await restoreVariant(id);
+      if (res && res.status) {
+        toast.success(res.message);
+        callApiGetAllVariant();
+      } else {
+        toast.error(res?.message);
+      }
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-}
+  }
 
   useEffect(() => {
     callApiGetAllVariant();
@@ -216,7 +211,7 @@ const TrashVariants = () => {
             <Table.Body className="divide-y">
               {data?.length > 0 ? (
                 data?.map((item) => (
-                  <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                  <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                     <Table.Cell className="p-4">
                       <Checkbox
                         checked={dataCheck.includes(item?._id)}
@@ -227,6 +222,7 @@ const TrashVariants = () => {
                     <Table.Cell className="flex flex-wrap gap-2 min-w-64">
                       {item.images.map((img) => (
                         <Img
+                          key={img}
                           src={img}
                           className="object-cover w-14 h-14 rounded-md border "
                         />
@@ -249,7 +245,7 @@ const TrashVariants = () => {
 
                         <ButtonPro
                           onClick={() => handlerRestore(item._id)}
-                          name={<i class="fa-solid fa-trash-can-arrow-up"></i>}
+                          name={<i className="fa-solid fa-trash-can-arrow-up"></i>}
                           className="focus:outline-none text-white bg-green-400 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-green-900"
                         />
                       </div>

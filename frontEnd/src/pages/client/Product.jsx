@@ -3,13 +3,13 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import { apiGetAllProductVariant } from "../../apis/axios";
-import { FilterSideBar, ProItem } from "../../components/clientComponent";
+import { FilterSideBar, ProItem } from "../../components/client";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { Select, Spinner } from "flowbite-react";
 import { useSelector } from "react-redux";
 import { Breadcrumb } from "../../components/common";
+import { getAllProductVariants } from "../../apis/variantApi";
 
 function Product() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,13 +35,12 @@ function Product() {
   };
 
   useEffect(() => {
-    
+
     (async () => {
       try {
         setLoading(true);
-        const res = await apiGetAllProductVariant(
-          `?category=${category}&limit=4&minPrice=${
-            data.price.minPrice
+        const res = await getAllProductVariants(
+          `?category=${category}&limit=4&minPrice=${data.price.minPrice
           }&maxPrice=${data.price.maxPrice}&size=${data.size.join(
             ","
           )}&color=${data.color.join(",")}&page=${page}&sort=${sort}`
@@ -63,7 +62,7 @@ function Product() {
 
   return (
     <>
-      <Breadcrumb categoryName={categoryName[0]?.categoryName}/>
+      <Breadcrumb categoryName={categoryName[0]?.categoryName} />
       <div className="font-roboto w-full h-full flex mt-5 mb-10 lg:px-[8%] px-2">
         <FilterSideBar isOpen={isOpen} setIsOpen={setIsOpen} />
 
@@ -72,7 +71,7 @@ function Product() {
             <div className="flex gap-2 items-center">
               <p className="text-[#333333] font-bold text-xl">{categoryName[0]?.categoryName}</p>
               <span>/</span>
-              <div class="text-[16px]">
+              <div className="text-[16px]">
                 <b>{totalRecords}</b> sản phẩm
               </div>
             </div>
@@ -82,7 +81,7 @@ function Product() {
                 onClick={() => setIsOpen(!isOpen)}
               >
                 <span className="pr-2 ">Bộ lọc</span>
-                <i class="fa-solid fa-filter"></i>
+                <i className="fa-solid fa-filter"></i>
               </div>
               <div className="flex gap-2 items-center">
                 <span className="text-nowrap font-normal text-[15px] text-[#333333]">
@@ -107,7 +106,7 @@ function Product() {
             result.length > 0 ? (
               <div className="grid xl:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4">
                 {result.map((item) => (
-                  <ProItem item={item} />
+                  <ProItem key={item._id} item={item} />
                 ))}
               </div>
             ) : (
@@ -127,8 +126,8 @@ function Product() {
 
           <div className="flex justify-center mt-5">
             <ReactPaginate
-              nextLabel={<i class="fa-solid fa-chevron-right"></i>}
-              previousLabel={<i class="fa-solid fa-chevron-left"></i>}
+              nextLabel={<i className="fa-solid fa-chevron-right"></i>}
+              previousLabel={<i className="fa-solid fa-chevron-left"></i>}
               onPageChange={handlePageClick}
               pageRangeDisplayed={3}
               marginPagesDisplayed={2}

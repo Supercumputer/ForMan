@@ -1,23 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { ButtonPro, Img, InputField } from "../../../components/common";
-import { Button, Label, Select, Textarea } from "flowbite-react";
+import { useEffect, useState } from "react";
+import { Img, InputField } from "../../../components/common";
+import { Button, Label, Textarea } from "flowbite-react";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { apiCreateCategory, apiGetAllCategory } from "../../../apis/axios";
+
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { pathAdmin } from "../../../utils/path";
-
-const schema = z.object({
-  categoryName: z.string().min(1, { message: "Tên danh mục không hợp lệ." }),
-  description: z.string().min(1, { message: "Mô tả không hợp lệ." }),
-  parentId: z.string().optional(),
-  image: z
-    .instanceof(FileList)
-    .refine((files) => files.length > 0, "Ảnh không hợp lệ."),
-});
+import pathAdmin from "../../../utils/pathAdmin";
+import categorySchema from "../../../schema/categorySchema";
+import { createCategory, getAllCategories } from "../../../apis/categoryApi";
 
 const CreateCategory = () => {
   const {
@@ -25,7 +17,7 @@ const CreateCategory = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(categorySchema),
   });
 
   const navigate = useNavigate();
@@ -55,7 +47,7 @@ const CreateCategory = () => {
         }
       }
 
-      const res = await apiCreateCategory(formData);
+      const res = await createCategory(formData);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -73,7 +65,7 @@ const CreateCategory = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetAllCategory();
+        const res = await getAllCategories();
         console.log(res);
         if (res && res.status) {
           setCategories(res.categories);
@@ -100,21 +92,21 @@ const CreateCategory = () => {
           errors={errors?.categoryName?.message}
         />
 
-        <div class="">
+        <div className="">
           <label
-            for="countries"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            htmlFor="countries"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
             Danh mục cha
           </label>
           <select
             id="countries"
             {...register("parentId")}
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           >
             <option value={""}>Chon danh mục cha</option>
             {categories.map((item) => (
-              <option value={item._id}>{item.categoryName}</option>
+              <option key={item._id} value={item._id}>{item.categoryName}</option>
             ))}
           </select>
           {errors?.parentId?.message && (
@@ -124,7 +116,7 @@ const CreateCategory = () => {
 
         <div className="">
           <div className="mb-2 block">
-            <Label htmlFor="description" value="Description" />
+            <Label htmlhtmlFor="description" value="Description" />
           </div>
           <Textarea
             id="description"

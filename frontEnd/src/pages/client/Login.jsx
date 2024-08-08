@@ -4,12 +4,12 @@ import { Link, Navigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { apiLogin } from "../../apis/axios";
 
 import { Spinner } from "flowbite-react";
+import { loginUser } from "../../apis/authApi";
 
 const schema = z.object({
-  
+
   email: z.string().email({ message: "Email không hợp lệ." }),
   password: z
     .string()
@@ -32,7 +32,7 @@ const Login = () => {
 
   const handlerSubmit = async (data) => {
     try {
-      const res = await apiLogin(data);
+      const res = await loginUser(data);
 
       if (res && res.status) {
         localStorage.setItem("accessToken", res.resData.accessToken);
@@ -89,7 +89,7 @@ const Login = () => {
               {errors?.email?.message && (
                 <p
                   id="standard_error_help"
-                  class="mt-2 text-xs font-medium text-red-600 "
+                  className="mt-2 text-xs font-medium text-red-600 "
                 >
                   {errors?.email?.message}
                 </p>
@@ -115,7 +115,7 @@ const Login = () => {
               {errors?.password?.message && (
                 <p
                   id="standard_error_help"
-                  class="mt-2 text-xs font-medium text-red-600 "
+                  className="mt-2 text-xs font-medium text-red-600 "
                 >
                   {errors?.password?.message}
                 </p>
@@ -127,7 +127,7 @@ const Login = () => {
                 href="http://localhost:3001/api/auth/google"
                 className="flex gap-2 items-center justify-center w-full py-2.5 px-4 mb-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
               >
-                <i class="fa-brands fa-google"></i>
+                <i className="fa-brands fa-google"></i>
                 <span>Login with Google</span>
               </a>
 
@@ -135,7 +135,7 @@ const Login = () => {
                 type="button"
                 className="flex gap-2 items-center justify-center w-full py-2.5 px-4 mb-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
               >
-                <i class="fa-brands fa-facebook"></i>
+                <i className="fa-brands fa-facebook"></i>
                 <span>Login with Facebook</span>
               </button>
             </div>

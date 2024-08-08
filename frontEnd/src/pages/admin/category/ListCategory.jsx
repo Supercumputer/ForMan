@@ -13,35 +13,16 @@ import {
   Label,
 } from "flowbite-react";
 import { ButtonPro, Img, InputField } from "../../../components/common";
-import { pathAdmin } from "../../../utils/path";
-import {
-  apiDeleteCategory,
-  apiDeleteCategorys,
-  apiGetAllCategory,
-  apiGetCategory,
-  apiUpdateCategory,
-} from "../../../apis/axios";
+import pathAdmin from "../../../utils/pathAdmin";
+
 import { toast } from "react-toastify";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Swal from "sweetalert2";
 import { formatDate } from "../../../utils/helper";
+import categorySchema from "../../../schema/categorySchema";
+import { deleteCategories, deleteCategory, getAllCategories, getCategoryById, updateCategory } from "../../../apis/categoryApi";
 
-const schema = z.object({
-  categoryName: z.string().min(1, { message: "Tên danh mục không hợp lệ." }),
-  description: z.string().min(1, { message: "Mô tả không hợp lệ." }),
-  parentId: z.string().optional(),
-  status: z.enum(["Hidden", "Presently"], {
-    message: "Trạng thái không hợp lệ.",
-  }),
-  image: z.custom((value) => {
-    if (value instanceof FileList) {
-      return value.length > 0;
-    }
-    return true;
-  }, "Ảnh không hợp lệ."),
-});
 function ListCategory() {
   const {
     register,
@@ -49,7 +30,7 @@ function ListCategory() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(categorySchema),
   });
 
   const { t } = useTranslation("admin");
@@ -71,7 +52,7 @@ function ListCategory() {
 
   const callApiGetAllCategory = async () => {
     try {
-      const res = await apiGetAllCategory();
+      const res = await getAllCategories();
       if (res && res.status) {
         setCategories(res.categories);
       }
@@ -82,7 +63,7 @@ function ListCategory() {
 
   const callApiGetCategory = async (id) => {
     try {
-      const res = await apiGetCategory(id);
+      const res = await getCategoryById(id);
 
       if (res && res.status) {
         setId(id);
@@ -112,7 +93,7 @@ function ListCategory() {
         }
       }
 
-      const res = await apiUpdateCategory(formData, id);
+      const res = await updateCategory(formData, id);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -130,7 +111,7 @@ function ListCategory() {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteCategory(id);
+      const res = await deleteCategory(id);
       if (res && res.status) {
         toast.success(res.message);
         callApiGetAllCategory();
@@ -185,7 +166,7 @@ function ListCategory() {
             return;
           }
 
-          const res = await apiDeleteCategorys(dataCheck);
+          const res = await deleteCategories(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -224,7 +205,7 @@ function ListCategory() {
       </Breadcrumb>
 
       <div className=" rounded-md p-2 bg-[#fff] dark:bg-slate-800">
-        <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
+        <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-2">
           <Dropdown
             label="Actions"
             dismissOnClick={false}
@@ -233,19 +214,19 @@ function ListCategory() {
             )}
           >
             <Dropdown.Item>
-              <Link to={`${pathAdmin.category}/create`}>Create</Link>
+              <Link to={`${pathAdmin.categoryCreate}`}>Create</Link>
             </Dropdown.Item>
 
             <Dropdown.Item onClick={handlerDeletes}>Delete</Dropdown.Item>
             <Dropdown.Item>Activated</Dropdown.Item>
           </Dropdown>
-          <label for="table-search" class="sr-only">
+          <label htmlFor="table-search" className="sr-only">
             Search
           </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+          <div className="relative">
+            <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
               <svg
-                class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                className="w-4 h-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -253,9 +234,9 @@ function ListCategory() {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -263,7 +244,7 @@ function ListCategory() {
             <input
               type="text"
               id="table-search-users"
-              class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search for users"
             />
           </div>
@@ -325,11 +306,10 @@ function ListCategory() {
                     <Table.Cell>{formatDate(item.createdAt)}</Table.Cell>
                     <Table.Cell>
                       <span
-                        className={`${
-                          item.status === "Presently"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        } font-semibold`}
+                        className={`${item.status === "Presently"
+                          ? "text-green-500"
+                          : "text-red-500"
+                          } font-semibold`}
                       >
                         {item.status}
                       </span>
@@ -340,13 +320,13 @@ function ListCategory() {
                           type="button"
                           dataId={item?._id}
                           actionDelete={handlerDelete}
-                          name={<i class="fa-solid fa-trash"></i>}
+                          name={<i className="fa-solid fa-trash"></i>}
                           className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         />
 
                         <ButtonPro
                           onClick={() => callApiGetCategory(item._id)}
-                          name={<i class="fa-solid fa-pen-to-square"></i>}
+                          name={<i className="fa-solid fa-pen-to-square"></i>}
                           className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                         />
                       </div>
@@ -382,21 +362,21 @@ function ListCategory() {
               register={register("categoryName")}
               errors={errors.categoryName?.message}
             />
-            <div class="">
+            <div className="">
               <label
-                for="countries"
-                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                htmlFor="countries"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Danh mục cha
               </label>
               <select
                 id="countries"
                 {...register("parentId")}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
                 <option value={""}>Chon danh mục cha</option>
                 {filterCategory(id).map((item) => (
-                  <option value={item._id}>{item.categoryName}</option>
+                  <option key={item._id} value={item._id}>{item.categoryName}</option>
                 ))}
               </select>
               {errors?.parentId?.message && (
@@ -420,7 +400,7 @@ function ListCategory() {
             </div>
             <div className="">
               <div className="mb-2 block">
-                <Label htmlFor="description" value="Description" />
+                <Label htmlhtmlFor="description" value="Description" />
               </div>
               <Textarea
                 id="description"

@@ -1,8 +1,7 @@
-import React from "react";
 import { HiHome } from "react-icons/hi";
 import { Breadcrumb } from "flowbite-react";
 import { ButtonPro } from "../../../components/common";
-import { pathAdmin } from "../../../utils/path";
+import pathAdmin from "../../../utils/pathAdmin";
 
 function InforAccount() {
   return (
@@ -97,12 +96,12 @@ function InforAccount() {
             <div className="flex gap-4">
               <ButtonPro
                 name="Group Roles"
-                to={`${pathAdmin.groupRoles}`}
+                to={`${pathAdmin.accountGroupRoles}`}
                 className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
               ></ButtonPro>
               <ButtonPro
                 name="Roles"
-                to={`${pathAdmin.roles}`}
+                to={`${pathAdmin.accountRoles}`}
                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
               ></ButtonPro>
             </div>

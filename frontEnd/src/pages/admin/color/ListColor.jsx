@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -13,24 +13,13 @@ import { HiHome } from "react-icons/hi";
 import { ButtonPro, InputField } from "../../../components/common";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import {
-  apiDeleteColor,
-  apiDeletesColor,
-  apiGetAllColor,
-  apiGetColor,
-  apiUpdateColor,
-  apiCreateColor,
-} from "../../../apis/axios";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import Swal from "sweetalert2";
 import { formatDate } from "../../../utils/helper";
-
-const schema = z.object({
-  colorName: z.string().min(1, { message: "ColorName không hợp lệ." }),
-  description: z.string().min(1, { message: "Description không hợp lệ." }),
-});
+import colorSchema from "../../../schema/colorSchema";
+import { createColor, deleteColor, deleteColors, getAllColors, getColorById, updateColor } from "../../../apis/colorApi";
 
 function ListColor() {
   const {
@@ -39,7 +28,7 @@ function ListColor() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(colorSchema),
   });
 
   const { t } = useTranslation("admin");
@@ -51,7 +40,7 @@ function ListColor() {
 
   const callApiGetAllColor = async () => {
     try {
-      const res = await apiGetAllColor();
+      const res = await getAllColors();
 
       if (res) {
         setData(res);
@@ -64,8 +53,8 @@ function ListColor() {
   const handlerSubmit = async (data) => {
     try {
       const res = id
-        ? await apiUpdateColor(data, id)
-        : await apiCreateColor(data);
+        ? await updateColor(id, data)
+        : await createColor(data);
 
       if (res && res.status) {
         toast.success(res.message);
@@ -81,7 +70,7 @@ function ListColor() {
 
   const handlerDelete = async (id) => {
     try {
-      const res = await apiDeleteColor(id);
+      const res = await deleteColor(id);
 
       if (res && res.status) {
         Swal.fire("Deleted!", res.message, "success");
@@ -96,7 +85,7 @@ function ListColor() {
 
   const callApiGetColor = async (id) => {
     try {
-      const res = await apiGetColor(id);
+      const res = await getColorById(id);
 
       if (res && res.status) {
         setId(id);
@@ -162,7 +151,7 @@ function ListColor() {
             return;
           }
 
-          const res = await apiDeletesColor(dataCheck);
+          const res = await deleteColors(dataCheck);
 
           if (res && res.status) {
             Swal.fire("Deleted!", "Your file has been deleted.", "success");
@@ -227,8 +216,8 @@ function ListColor() {
             </Table.Head>
 
             <Table.Body className="divide-y">
-              {data?.map((item, index) => (
-                <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+              {data?.map((item) => (
+                <Table.Row key={item?._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell className="p-4">
                     <Checkbox
                       checked={dataCheck.includes(item?._id)}
@@ -244,13 +233,13 @@ function ListColor() {
                         type={"button"}
                         dataId={item?._id}
                         actionDelete={handlerDelete}
-                        name={<i class="fa-solid fa-trash"></i>}
+                        name={<i className="fa-solid fa-trash"></i>}
                         className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                       />
 
                       <ButtonPro
                         onClick={() => callApiGetColor(item._id)}
-                        name={<i class="fa-solid fa-pen-to-square"></i>}
+                        name={<i className="fa-solid fa-pen-to-square"></i>}
                         className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2 dark:focus:ring-yellow-900"
                       />
                     </div>

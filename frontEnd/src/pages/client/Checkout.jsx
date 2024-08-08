@@ -3,10 +3,10 @@ import { useSelector } from "react-redux";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { CheckoutForm, CheckoutInfo } from "../../components/clientComponent";
+import { CheckoutForm, CheckoutInfo } from "../../components/client";
 import { useNavigate } from "react-router-dom";
-import { apiCreateOrder, apiCreatePaymentUrlVnpay } from "../../apis/axios";
 import { toast } from "react-toastify";
+import { createOrder, createPaymentUrlVnpay } from "../../apis/orderApi";
 
 
 const schema = z.object({
@@ -45,7 +45,7 @@ function Checkout() {
         try {
             const newData = { carts, user_id: account?.id, ...data };
 
-            const res = await apiCreateOrder(newData);
+            const res = await createOrder(newData);
 
             if (res && res.status) {
                 switch (data.delivery) {
@@ -54,24 +54,26 @@ function Checkout() {
                         break;
 
                     case "VNPAY":
-                        const resVnpay = await apiCreatePaymentUrlVnpay({ ...data, order_id: res.data._id });
+                        {
+                            const resVnpay = await createPaymentUrlVnpay({ ...data, order_id: res.data._id });
 
-                        const paymentUrl = resVnpay.paymentUrl;
-
-                        if (paymentUrl) {
-                            window.location.href = paymentUrl;
+                            const paymentUrl = resVnpay.paymentUrl;
+                           
+                            if (paymentUrl) {
+                                window.location.href = paymentUrl;
+                            }
+                            break;
                         }
 
-                        break;
                     case "MOMO":
-                        
+
                         break;
 
                     default:
                         break;
                 }
 
-            }else{
+            } else {
                 toast.error(res.message);
             }
 
