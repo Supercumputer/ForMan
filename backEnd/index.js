@@ -2,14 +2,14 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const passport = require("passport");
-const connectDb = require("./config/connectDb.js");
-const router = require("./routes/index.js");
-const configCors = require("./config/cors.js");
-const { app, io, server } = require("./config/socket.io.js");
+const connectDb = require("./src/config/connectDb.js");
+const router = require("./src/routes/index.js");
+const configCors = require("./src/config/cors.js");
+const { app, io, server } = require("./src/config/socket.io.js");
 require("dotenv").config();
 
-require("./config/passportLocal.js");
-require("./config/passportGoogle.js")
+require("./src/config/passportLocal.js");
+require("./src/config/passportGoogle.js")
 
 const port = process.env.PORT || 3002;
 
