@@ -124,7 +124,7 @@ const Login = () => {
 
             <div className="flex justify-center space-x-4">
               <a
-                href="http://localhost:3001/api/auth/google"
+                href={`${import.meta.env.VITE_APP_URLADMIN}/api/auth/google`}
                 className="flex gap-2 items-center justify-center w-full py-2.5 px-4 mb-2 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 focus:outline-none focus:bg-red-600"
               >
                 <i className="fa-brands fa-google"></i>
