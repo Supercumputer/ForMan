@@ -9,7 +9,7 @@ const useSocket = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const socket = io(import.meta.env.REACT_APP_URLADMIN, {
+        const socket = io(import.meta.env.VITE_APP_URLADMIN, {
             query: {
                 userId: account.id, // Gửi userId từ Redux store
             },
