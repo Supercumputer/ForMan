@@ -87,7 +87,7 @@ const googleLogin = (req, res) => {
       httpOnly: true,
     });
 
-    res.redirect(`http://localhost:3000/auth-success?accessToken=${req.user.accessToken}`);
+    res.redirect(`${process.env.URL_CLIENT}/auth-success?accessToken=${req.user.accessToken}`);
 
   } catch (error) {
     return res.status(500).json({ message: error.message });
